@@ -1,0 +1,69 @@
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+using namespace std;
+const int MAX = 55;
+
+int n, m, result=987987987;
+int arr[MAX][MAX], temp[15], dist[MAX*2];
+int ch_x[15], ch_y[15], h_x[MAX*2], h_y[MAX*2];
+int idx, h_idx;
+bool ck[15];
+
+int get_result(){
+  int res = 0;
+  memset(dist, 0, sizeof(dist));
+  for(int i=0;i<h_idx;i++){
+    for(int j=0;j<m;j++){
+      int d = abs(h_x[i]-ch_x[temp[j]])+abs(h_y[i]-ch_y[temp[j]]);
+      if(dist[i] == 0) dist[i] = d;
+      else if(dist[i] > d) dist[i] = d;
+    }
+  }
+  for(int i=0;i<h_idx;i++) res += dist[i];
+  return res;
+}
+
+void comb(int cnt, int max_store){
+  if(cnt >= max_store){
+    int val = get_result();
+    if(val < result) result = val;
+  } 
+  else{
+    for(int i=0;i<idx;i++){
+      temp[cnt] = i;
+      if(!ck[i]){
+        if(cnt == 0){
+          ck[i] = true;
+          comb(cnt+1, max_store);
+          ck[i] = false;
+        }
+        else if(cnt >= 1 && temp[cnt-1] < temp[cnt]){
+          ck[i] = true;
+          comb(cnt+1, max_store);
+          ck[i] = false;
+        }
+      }
+    }
+  }
+}
+int main(){
+  scanf("%d %d", &n, &m);
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      scanf("%d", &arr[i][j]);
+      if(arr[i][j] == 2){
+        ch_x[idx] = i;
+        ch_y[idx++] = j; 
+      }
+      else if(arr[i][j] == 1){
+        h_x[h_idx] = i;
+        h_y[h_idx++] = j;
+      }
+    }
+  }
+  
+  comb(0, m);
+  printf("%d\n", result);
+  return 0;
+}
