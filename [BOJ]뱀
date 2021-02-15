@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <queue>
+using namespace std;
+const int MAX = 105;
+
+int n, apple_cnt, move_cnt;
+int arr[MAX][MAX], sec[MAX];
+char dir[MAX];
+int head_x = 1, head_y = 1, tail_x = 1, tail_y = 1;
+int dx[] = {0, 1, 0, -1};
+int dy[] = {1, 0, -1, 0};
+bool snake[MAX][MAX];
+struct loc{
+  int x, y, idx;
+};
+queue <loc> rotate;
+
+int main(){
+  scanf("%d\n%d", &n, &apple_cnt);
+  for(int i=0;i<apple_cnt;i++) {
+    int sx, sy;
+    scanf("%d %d", &sx, &sy);
+    arr[sx][sy] = 1;
+  }
+  scanf("%d", &move_cnt);
+  for(int i=0;i<move_cnt;i++) scanf("%d %c", &sec[i], &dir[i]);
+   
+  int total_sec = 1;
+  int d = 0, move_idx=0, pre_d=0, pre_idx=0;
+  snake[head_x][head_y] = true;
+  
+  while(1){
+    head_x += dx[d];
+    head_y += dy[d];
+    if(head_x < 1 || head_x > n || head_y < 1 || head_y > n || snake[head_x][head_y]) break;
+    if(!snake[head_x][head_y]){
+      if(arr[head_x][head_y] == 1){
+        arr[head_x][head_y] = 0;
+        snake[head_x][head_y] = true;
+      } 
+      else{
+        if(!rotate.empty() && tail_x == rotate.front().x && tail_y == rotate.front().y) {
+          if(dir[rotate.front().idx] == 'L') pre_d = (pre_d+3)%4;
+          else pre_d = (pre_d+1)%4;
+          rotate.pop();
+        }
+        snake[head_x][head_y] = true;
+        snake[tail_x][tail_y] = false;
+        tail_x += dx[pre_d];
+        tail_y += dy[pre_d];
+      }
+    }
+    if(total_sec == sec[move_idx]){
+      rotate.push({head_x, head_y, pre_idx++});
+      if(dir[move_idx] == 'L') d = (d+3)%4;
+      else d = (d+1)%4;
+      move_idx++;
+    }
+    total_sec++;
+  }
+  printf("%d\n", total_sec);
+  return 0;
+}
