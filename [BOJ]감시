@@ -1,0 +1,125 @@
+#include <stdio.h>
+const int MAX = 15;
+
+int n, m, cctv, result=987987987;
+int arr[MAX][MAX], temp[MAX][MAX];
+int dir[MAX];
+int x[MAX], y[MAX], num[MAX];
+int dx[] = {0, 1, 0, -1};
+int dy[] = {1, 0, -1, 0};
+
+void fill_temp(){
+  for(int i=0;i<cctv;i++){
+    if(num[i] == 1){
+      int xx = x[i], yy = y[i];
+      while(1){
+        int nx = xx+dx[dir[i]], ny = yy+dy[dir[i]];
+        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
+        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
+        xx = nx, yy = ny;
+      }
+    }
+    else if(num[i] == 2){
+      int xx = x[i], yy = y[i];
+      while(1){
+        int nx = xx+dx[dir[i]], ny = yy+dy[dir[i]];
+        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
+        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
+        xx = nx, yy = ny;
+      }
+      xx = x[i], yy = y[i];
+      while(1){
+        int nx = xx+dx[(dir[i]+2)%4], ny = yy+dy[(dir[i]+2)%4];
+        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
+        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
+        xx = nx, yy = ny;
+      }
+    }
+    else if(num[i] == 3){
+      int xx = x[i], yy = y[i];
+      while(1){
+        int nx = xx+dx[dir[i]], ny = yy+dy[dir[i]];
+        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
+        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
+        xx = nx, yy = ny;
+      }
+      xx = x[i], yy = y[i];
+      while(1){
+        int nx = xx+dx[(dir[i]+3)%4], ny = yy+dy[(dir[i]+3)%4];
+        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
+        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
+        xx = nx, yy = ny;
+      }
+    }
+    else if(num[i] == 4){
+      for(int d=0;d<4;d++){
+        if(d == 1) continue;
+        int xx = x[i], yy = y[i];
+        while(1){
+          int nx = xx+dx[(dir[i]+d)%4], ny = yy+dy[(dir[i]+d)%4];
+          if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
+          if(temp[nx][ny] == 0) temp[nx][ny] = 7;
+          xx = nx, yy = ny;
+        }
+      }
+    }
+    else{
+      for(int d=0;d<4;d++){
+        int xx = x[i], yy = y[i];
+        while(1){
+          int nx = xx+dx[(dir[i]+d)%4], ny = yy+dy[(dir[i]+d)%4];
+          if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
+          if(temp[nx][ny] == 0) temp[nx][ny] = 7;
+          xx = nx, yy = ny;
+        }
+      }
+    }
+  }
+}
+int check(){
+  int count=0;
+  for(int i=0;i<n;i++){
+    for(int j=0;j<m;j++){
+      if(temp[i][j] == 0) count++;
+    }
+  }
+  return count;
+}
+void reset_temp(){
+  for(int i=0;i<n;i++){
+    for(int j=0;j<m;j++){
+      temp[i][j] = arr[i][j];
+    }
+  }
+}
+void comb(int cnt, int total){
+  if(cnt >= total){
+    fill_temp();
+    int res = check();
+    if(res < result) result = res;
+    reset_temp();
+  }
+  else {
+    for(int i=0;i<4;i++){
+      dir[cnt] = i;
+      comb(cnt+1, total);
+    }
+  }
+}
+int main(){
+  scanf("%d %d", &n, &m);
+  int idx=0;
+  for(int i=0;i<n;i++){
+    for(int j=0;j<m;j++){
+      scanf("%d", &arr[i][j]);
+      temp[i][j] = arr[i][j];
+      if(arr[i][j] >= 1 && arr[i][j] <= 5) {
+        cctv++;
+        x[idx] = i, y[idx] = j, num[idx++] = arr[i][j];
+      }
+    }
+  }
+  comb(0, cctv);
+  printf("%d\n", result);
+  return 0;
+}
