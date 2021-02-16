@@ -1,0 +1,64 @@
+#include <stdio.h>
+const int MAX = 25;
+
+int n, m, x, y, k;
+int arr[MAX][MAX];
+int move[1005];
+int dice[3][4];
+int dx[] = {0, 0, 0, -1, 1};
+int dy[] = {0, 1, -1, 0, 0};
+
+int main() {
+  scanf("%d %d %d %d %d", &n, &m, &x, &y, &k);
+  for(int i=0;i<n;i++){
+    for(int j=0;j<m;j++){
+      scanf("%d", &arr[i][j]);
+    }
+  }
+  for(int i=0;i<k;i++) scanf("%d", &move[i]);
+  
+  for(int i=0;i<k;i++){
+    int nx = x+dx[move[i]];
+    int ny = y+dy[move[i]];
+    if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+    if(move[i] == 1){
+      int temp = dice[1][2];
+      dice[1][2] = dice[1][1], dice[1][1] = dice[1][0], dice[1][0] = dice[3][1], dice[3][1] = temp;
+      if(arr[nx][ny] == 0) arr[nx][ny] = dice[3][1];
+      else {
+        dice[3][1] = arr[nx][ny];
+        arr[nx][ny] = 0;
+      }
+    }
+    else if(move[i] == 2){
+      int temp = dice[1][1];
+      dice[1][1] = dice[1][2], dice[1][2] = dice[3][1], dice[3][1] = dice[1][0], dice[1][0] = temp;
+      if(arr[nx][ny] == 0) arr[nx][ny] = dice[3][1];
+      else {
+        dice[3][1] = arr[nx][ny];
+        arr[nx][ny] = 0;
+      }
+    }
+    else if(move[i] == 3){
+      int temp = dice[0][1];
+      dice[0][1] = dice[3][1], dice[3][1] = dice[2][1], dice[2][1] = dice[1][1], dice[1][1] = temp;
+      if(arr[nx][ny] == 0) arr[nx][ny] = dice[3][1];
+      else {
+        dice[3][1] = arr[nx][ny];
+        arr[nx][ny] = 0;
+      }
+    }
+    else{
+      int temp = dice[3][1];
+      dice[3][1] = dice[0][1], dice[0][1] = dice[1][1], dice[1][1] = dice[2][1], dice[2][1] = temp;
+      if(arr[nx][ny] == 0) arr[nx][ny] = dice[3][1];
+      else {
+        dice[3][1] = arr[nx][ny];
+        arr[nx][ny] = 0;
+      }
+    }
+    x = nx, y = ny;
+    printf("%d\n", dice[1][1]);
+  }
+  return 0;
+}
