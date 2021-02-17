@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+
+int num[3], k, arr[3], cnt;
+bool ck[3];
+
+void comb(int idx){
+  if(idx >= 3){
+    cnt++;
+    if(cnt == k){
+      for(int i=0;i<3;i++) printf("%d ", arr[i]);
+      printf("\n");
+    }
+  }
+  else{
+    for(int i=0;i<3;i++){
+      arr[idx] = num[i];
+      if(!ck[i]){
+        ck[i] = true;
+        comb(idx+1);
+        ck[i] = false;
+      }
+    }
+  }
+}
+int main() {
+  for(int i=0;i<3;i++) scanf("%d", &num[i]);
+  scanf("%d", &k);
+  sort(num, num+3);
+  comb(0);
+  return 0;
+}
