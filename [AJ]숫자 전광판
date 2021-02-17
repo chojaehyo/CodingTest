@@ -1,0 +1,126 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAX = 105;
+
+int n, result[20][10010], space[10010];
+int cur_col, cur_row, max_row, max_col, col[MAX];
+char num[MAX][15], tmp[10];
+
+void fill_result(int len_col, int val){
+  int row = len_col*2-1;
+  if(val == '0'){
+    for(int i=cur_row;i<cur_row+row;i++){
+      result[i][cur_col] = 1;
+      result[i][cur_col+len_col-1] = 1;
+    }
+    for(int j=cur_col;j<cur_col+len_col;j++){
+      result[cur_row][j] = 1;
+      result[cur_row+row-1][j] = 1;
+    }
+  }
+  else if(val== '1'){
+    for(int i=cur_row;i<cur_row+row;i++) result[i][cur_col+len_col-1] = 1;
+  }
+  else if(val == '2'){
+    for(int i=cur_row;i<cur_row+row/2;i++) result[i][cur_col+len_col-1] = 1; 
+    for(int i=cur_row+row/2;i<cur_row+row;i++) result[i][cur_col] = 1;
+    for(int j=cur_col;j<cur_col+len_col;j++){
+      result[cur_row][j] = 1;
+      result[cur_row+row/2][j] = 1;
+      result[cur_row+row-1][j] = 1;
+    }
+  }
+  else if(val == '3'){
+    for(int i=cur_row;i<cur_row+row;i++) result[i][cur_col+len_col-1] = 1; 
+    for(int j=cur_col;j<cur_col+len_col;j++){
+      result[cur_row][j] = 1;
+      result[cur_row+row/2][j] = 1;
+      result[cur_row+row-1][j] = 1;
+    }
+  }
+  else if(val == '4'){
+    for(int i=cur_row;i<cur_row+row/2;i++) result[i][cur_col] = 1;
+    for(int i=cur_row;i<cur_row+row;i++) result[i][cur_col+len_col-1] = 1;
+    for(int j=cur_col;j<cur_col+len_col;j++) result[cur_row+row/2][j] = 1;
+  }
+  else if(val == '5'){
+    for(int i=cur_row;i<cur_row+row/2;i++) result[i][cur_col] = 1; 
+    for(int i=cur_row+row/2;i<cur_row+row;i++) result[i][cur_col+len_col-1] = 1;
+    for(int j=cur_col;j<cur_col+len_col;j++){
+      result[cur_row][j] = 1;
+      result[cur_row+row/2][j] = 1;
+      result[cur_row+row-1][j] = 1;
+    }
+  }
+  else if(val == '6'){
+    for(int i=cur_row;i<cur_row+row;i++) result[i][cur_col] = 1;
+    for(int i=cur_row+row/2;i<cur_row+row;i++) result[i][cur_col+len_col-1] = 1;
+    for(int j=cur_col;j<cur_col+len_col;j++){
+      result[cur_row+row/2][j] = 1;
+      result[cur_row+row-1][j] = 1;
+    }
+  }
+  else if(val == '7'){
+    for(int i=cur_row;i<cur_row+row;i++) result[i][cur_col+len_col-1] = 1;
+    for(int j=cur_col;j<cur_col+len_col;j++) result[cur_row][j] = 1;
+  }
+  else if(val == '8'){
+    for(int i=cur_row;i<cur_row+row;i++){
+      result[i][cur_col] = 1;
+      result[i][cur_col+len_col-1] = 1;
+    }
+    for(int j=cur_col;j<cur_col+len_col;j++){
+      result[cur_row][j] = 1;
+      result[cur_row+row/2][j] = 1;
+      result[cur_row+row-1][j] = 1;
+    }
+  }
+  else {
+    for(int i=cur_row;i<cur_row+row/2;i++) result[i][cur_col] = 1;
+    for(int i=cur_row;i<cur_row+row;i++) result[i][cur_col+len_col-1] = 1;
+    for(int j=cur_col;j<cur_col+len_col;j++) {
+      result[cur_row][j] = 1;
+      result[cur_row+row/2][j] = 1;
+    }
+  }
+}
+void fill_space(int loc){
+  for(int i=0;i<max_row;i++){
+    result[i][loc] = -1;
+  }
+}
+int main() {
+  int idx=0;
+  scanf("%d %s", &n, &tmp);
+  for(int i=0;i<n;i++){
+    scanf("%d %s", &col[i], &num[i]);
+    if(col[i] > max_col) max_col = col[i];
+  }
+  max_row = max_col*2-1;
+  for(int i=0;i<n;i++){
+    int len = strlen(num[i]);
+    for(int j=0;j<len;j++){
+      if(strcmp(tmp, "MIDDLE") == 0){
+        if(col[i] != max_col) cur_row = (max_row-(col[i]*2-1))/2;
+        else cur_row = 0;
+      }
+      else if(strcmp(tmp, "BOTTOM") == 0){
+        if(col[i] != max_col) cur_row = max_row-(col[i]*2-1);
+        else cur_row = 0;
+      }
+      fill_result(col[i], num[i][j]);
+      cur_col += col[i]+1;
+      space[idx++] = cur_col-1;
+    }
+  }
+  for(int i=0;i<idx;i++) fill_space(space[i]);
+  for(int i=0;i<max_row;i++){
+    for(int j=0;j<cur_col;j++){
+      if(result[i][j] == 0) printf(".");
+      else if(result[i][j] == 1) printf("#");
+      else printf(" ");
+    }printf("\n");
+  }
+  return 0;
+}
