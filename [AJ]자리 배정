@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <cstdlib>
+using namespace std;
+const int MAX = 20005;
+
+int n, result, result_seat;
+int seat[MAX], empty[MAX], nempty[MAX];
+int idx, nidx;
+
+int check_dist(int seat_num){
+  int val=987987987;
+  for(int i=0;i<nidx;i++){
+    if(val > abs(nempty[i]-seat_num)) val = abs(nempty[i]-seat_num);
+  }
+  return val;
+}
+int main() {
+  scanf("%d", &n);
+  for(int i=0;i<n;i++) {
+    scanf("%d", &seat[i]);
+    if(seat[i] == 0) empty[idx++] = i;
+    else nempty[nidx++] = i;
+  }
+  for(int i=0;i<idx;i++){
+    int val = check_dist(empty[i]);
+    if(val > result) result = val;
+  }
+  printf("%d\n", result);
+  return 0;
+}
