@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 100005;
+
+int n, ans[MAX];
+struct loc{
+  int s, e;
+};
+loc data[MAX];
+
+bool compare(const loc& a, const loc& b){
+  if(a.e < b.e) return true;
+  else if (a.e == b.e){
+    if(a.s < b.s) return true;
+    return false;
+  }
+  return false;
+}
+int main() {
+  scanf("%d", &n);
+  for(int i=0;i<n;i++){
+    int a, b;
+    scanf("%d %d", &a, &b);
+    data[i].s = a;
+    data[i].e = b;
+  }
+  sort(data, data+n, compare);
+  int result = 1;
+  ans[0] = data[0].e;
+  for(int i=1;i<n;i++){
+    if(ans[0] <= data[i].s) {
+      result++;
+      ans[0] = data[i].e;
+    }
+  }
+  printf("%d\n", result);
+  return 0;
+}
