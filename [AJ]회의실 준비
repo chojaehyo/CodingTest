@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 1005;
+
+int n, ans[MAX];
+struct Time{
+  int s, e;
+};
+Time data[MAX];
+
+bool compare(const Time& a, const Time& b){
+  if(a.s < b.s) return true;
+  else if(a.s == b.s){
+    if(a.e < b.e) return true;
+    return false;
+  }
+  return false;
+}
+int main() {
+  scanf("%d", &n);
+  for(int i=0;i<n;i++){
+    int a, b;
+    scanf("%d %d", &a, &b);
+    data[i].s = a;
+    data[i].e = b;
+  }
+  sort(data, data+n, compare);
+  
+  int idx=0;
+  ans[idx] = data[idx].e;
+  for(int i=1;i<n;i++){
+    if(idx >= 1){
+      int min_val=987987987, min_idx=0;
+      for(int j=0;j<idx;j++){
+        if(min_val > ans[j]) min_val = ans[j], min_idx = j;
+      }
+      if(ans[min_idx] <= data[i].s) ans[min_idx] = data[i].e;
+      else idx++, ans[idx] = data[i].e;
+    }
+    else{
+      if(ans[idx] <= data[i].s) ans[idx] = data[i].e;
+      else idx++, ans[idx] = data[i].e;
+    }
+  }
+  printf("%d", idx+1);
+  return 0;
+}
