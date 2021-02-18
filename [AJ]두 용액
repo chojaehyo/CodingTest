@@ -1,0 +1,38 @@
+#include <cstdio>
+#include <cstdlib>
+#include <algorithm>
+using namespace std;
+const int MAX = 100005;
+
+int n;
+int data[MAX];
+
+int get_result(int val, int start, int end){
+  int tmp = -val;
+  while(start+1 < end){
+    int mid = (start+end)/2;
+    if(data[mid] == tmp) return mid;
+    else if(data[mid] < tmp) start = mid;
+    else end = mid;
+  }
+  if(tmp - data[start] < data[end] - tmp) return start;
+  else return end;
+}
+int main() {
+  scanf("%d", &n);
+  for(int i=0;i<n;i++) scanf("%d", &data[i]);
+  sort(data, data+n);
+  int result = 987987987, idx=0, idx2=0;
+  for(int i=0;i<n-1;i++){
+    int index = get_result(data[i], i+1, n-1);
+    int value = data[index]+data[i];
+    if(value < 0) value = -value;
+    if(result > value){
+      result = value;
+      idx = i;
+      idx2 = index;
+    }
+  }
+  printf("%d %d\n", data[idx], data[idx2]);
+  return 0;
+}
