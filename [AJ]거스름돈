@@ -1,0 +1,15 @@
+#include <stdio.h>
+
+int main() {
+  int n, total=0;
+  scanf("%d", &n);
+  while(n > 0){
+    if(n/500 > 0) total += n/500, n %= 500;
+    else if(n/100 > 0) total += n/100, n %= 100;
+    else if(n/50 > 0) total += n/50, n %= 50;
+    else if(n/5 > 0) total += n/5, n %= 5;
+    else total += n, n=0;
+  }
+  printf("%d\n", total);
+  return 0;
+}
