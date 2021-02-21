@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 505;
+char arr[MAX];
+int dp[MAX][MAX];
+
+int main() {
+  scanf("%s", arr);
+  int len = strlen(arr);
+  
+  for(int i=1;i<len;i++){
+    for(int s=0;s+i<len;s++){
+      int e = s+i;
+      if((arr[s] == 'a' && arr[e] == 't') || (arr[s] == 'g' && arr[e] == 'c')){
+        dp[s][e] = dp[s+1][e-1]+2;
+      }
+      for(int m=s;m<e;m++){
+        dp[s][e] = max(dp[s][e], dp[s][m]+dp[m+1][e]);
+      }
+    }
+  }
+  printf("%d\n", dp[0][len-1]);
+  return 0;
+}
