@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <queue>
+using namespace std;
+const int MAX = 20;
+
+int n, result;
+int arr[MAX][MAX];
+struct info{
+  int sx, sy, ex, ey, dir;
+};
+
+int main(){
+  scanf("%d", &n);
+  for(int i=1;i<=n;i++){
+    for(int j=1;j<=n;j++){
+      scanf("%d", &arr[i][j]);
+    }
+  }
+  queue <info> q;
+  q.push({1, 1, 1, 2, 0});
+  
+  while(!q.empty()){
+    int sx = q.front().sx;
+    int sy = q.front().sy;
+    int ex = q.front().ex;
+    int ey = q.front().ey;
+    int dir = q.front().dir;
+    q.pop();
+    if(ex == n && ey == n) result++;
+    
+    if(dir == 0){
+      if(ey+1 <= n && arr[ex][ey+1] == 0) q.push({ex, ey, ex, ey+1, 0});
+      if(ex+1 <= n && ey+1 <= n && !arr[ex+1][ey+1] && !arr[ex][ey+1] && !arr[ex+1][ey]) q.push({ex, ey, ex+1, ey+1, 2});
+    }
+    else if(dir == 1){
+      if(ex+1 <= n && arr[ex+1][ey] == 0) q.push({ex, ey, ex+1, ey, 1});
+      if(ex+1 <= n && ey+1 <= n && !arr[ex+1][ey+1] && !arr[ex][ey+1] && !arr[ex+1][ey])q.push({ex, ey, ex+1, ey+1, 2});
+    }
+    else{
+      if(ey+1 <= n && arr[ex][ey+1] == 0) q.push({ex, ey, ex, ey+1, 0});
+      if(ex+1 <= n && arr[ex+1][ey] == 0) q.push({ex, ey, ex+1, ey, 1});
+      if(ex+1 <= n && ey+1 <= n && !arr[ex+1][ey+1] && !arr[ex][ey+1] && !arr[ex+1][ey]) q.push({ex, ey, ex+1, ey+1, 2});
+    }
+  } 
+  printf("%d\n", result);
+  return 0;
+}
