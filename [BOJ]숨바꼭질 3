@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <deque>
+using namespace std;
+const int MAX = 100005;
+
+int n, k;
+int visited[MAX];
+
+int main() {
+  scanf("%d %d", &n, &k);
+  deque <int> dq;
+  dq.push_back(n);
+  visited[n] = 1;
+  while(!dq.empty()){
+    int x = dq.front();
+    dq.pop_front();
+    
+    if(k == x) {
+      printf("%d\n", visited[k]-1);
+      break;
+    }
+    if(x*2 < MAX && !visited[x*2]){
+      dq.push_front(x*2);
+      visited[x*2] = visited[x];
+    }
+    if(x+1 < MAX && !visited[x+1]){
+      dq.push_back(x+1);
+      visited[x+1] = visited[x]+1;
+    }
+    if(x-1 >= 0 && !visited[x-1]){
+      dq.push_back(x-1);
+      visited[x-1] = visited[x]+1;
+    }
+  }
+  for(int i=1;i<=k;i++) printf("%d ", visited[i]);
+  return 0;
+}
