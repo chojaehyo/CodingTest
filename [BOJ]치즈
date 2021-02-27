@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 105;
+
+int n, m, total;
+int result, t;
+int arr[MAX][MAX];
+bool visited[MAX][MAX];
+int dx[] = {0, 1, 0, -1};
+int dy[] = {1, 0, -1, 0};
+struct loc{
+  int x, y;
+};
+
+void bfs(int a, int b){
+  visited[a][b] = true;
+  queue <loc> q;
+  q.push({a, b});
+  while(!q.empty()){
+    int x = q.front().x;
+    int y = q.front().y;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx >= 0 && nx < n && ny >= 0 && ny < m && !visited[nx][ny]){
+        if(arr[nx][ny] == 0){
+          visited[nx][ny] = true;
+          q.push({nx, ny});
+        }
+        else {
+          visited[nx][ny] = true;
+          arr[nx][ny] = 0;
+          total--;
+        }
+      } 
+    }
+  }
+}
+
+int main() {
+  scanf("%d %d", &n, &m);
+  for(int i=0;i<n;i++){
+    for(int j=0;j<m;j++){
+      scanf("%d", &arr[i][j]);
+      if(arr[i][j] == 1) total++;
+    }
+  }
+  while(total > 0){
+    memset(visited, 0, sizeof(visited));
+    if(total != 0){
+      result = total;
+    }
+    bfs(0, 0);
+    t++;
+  }
+  printf("%d\n", t);
+  printf("%d\n", result);
+  return 0;
+}
