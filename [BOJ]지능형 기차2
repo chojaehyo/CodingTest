@@ -1,0 +1,15 @@
+#include <stdio.h>
+
+int people, result;
+
+int main() {
+  for(int i=0;i<10;i++){
+    int in, out;
+    scanf("%d %d", &out, &in);
+    people -= out;
+    people += in;
+    if(result < people) result = people;
+  }
+  printf("%d\n", result);
+  return 0;
+}
