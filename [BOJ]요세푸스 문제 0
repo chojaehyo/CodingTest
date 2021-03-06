@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <queue>
+using namespace std;
+
+int main(){
+  int n, k;
+  scanf("%d %d", &n, &k);
+  queue <int> q;
+  for(int i=1;i<=n;i++) q.push(i);
+  printf("<");
+  while(q.size() > 1){
+    int val;
+    for(int i=0;i<k-1;i++) {
+      val = q.front();
+      q.pop();
+      q.push(val);
+    }
+    printf("%d, ", q.front());
+    val = q.front();
+    q.pop();
+  }
+  printf("%d>", q.front());
+  return 0;
+}
