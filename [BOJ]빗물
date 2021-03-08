@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+const int MAX = 505;
+
+int H, W, total;
+int height[MAX];
+
+int main(){
+  scanf("%d %d", &H, &W);
+  for(int i=1;i<=W;i++) scanf("%d", &height[i]);
+  for(int i=2;i<W;i++){
+    int left=0, right=0;
+    for(int j=1;j<i;j++){
+      left = max(left, height[j]);
+    }
+    for(int j=i+1;j<=W;j++){
+      right = max(right, height[j]);
+    }
+    total += max(0, min(left, right)-height[i]);
+  }
+  printf("%d\n", total);
+  return 0;
+}
