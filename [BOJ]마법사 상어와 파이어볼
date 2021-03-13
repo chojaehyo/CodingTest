@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <vector>
+using namespace std;
+const int MAX = 55;
+
+int N, M, K;
+struct info{
+  int x, y, m, s, d;
+};
+vector <info> fb;
+vector <info> arr[MAX][MAX];
+int dx[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+int dy[] = {0, 1, 1, 1, 0, -1, -1, -1}; 
+int true_d[] = {0, 2, 4, 6};
+int false_d[] = {1, 3, 5, 7};
+bool ck[2505];
+
+void move(){
+  for(int i=1;i<=N;i++){
+    for(int j=1;j<=N;j++){
+      arr[i][j].clear();
+    }
+  }
+  for(int i=0;i<fb.size();i++){
+    int x = fb[i].x;
+    int y = fb[i].y;
+    int m = fb[i].m;
+    int s = fb[i].s;
+    int d = fb[i].d;
+    
+    int ns = s % N;
+    int nx = x+dx[d] * ns;
+    int ny = y+dy[d] * ns;
+    if(nx < 1) nx += N;
+    if(ny < 1) ny += N;
+    if(nx > N) nx -= N;
+    if(ny > N) ny -= N;
+    
+    arr[nx][ny].push_back({nx, ny, m, s, d});
+    fb[i].x = nx;
+    fb[i].y = ny;
+  }
+}
+
+void sum_fb(){
+  vector <info> temp;
+  for(int i=1;i<=N;i++){
+    for(int j=1;j<=N;j++){
+      if(!arr[i][j].size()) continue;
+      else if(arr[i][j].size() == 1){
+        temp.push_back(arr[i][j][0]);
+      }
+      else{
+        int sum_m = 0, sum_s = 0, cnt = arr[i][j].size();
+        bool even = true, odd = true;
+        
+        for(int k=0;k<cnt;k++){
+          sum_m += arr[i][j][k].m;
+          sum_s += arr[i][j][k].s;
+          if(arr[i][j][k].d % 2) even = false;
+          else odd = false;
+        }
+        
+        int nm = sum_m / 5;
+        int ns = sum_s / cnt;
+        if(nm == 0) continue;
+        if(even || odd){
+          for(int k=0;k<4;k++) temp.push_back({i, j, nm, ns, true_d[k]});
+        }
+        else{
+          for(int k=0;k<4;k++) temp.push_back({i, j, nm, ns, false_d[k]});
+        }
+      }
+    }
+  }
+  fb = temp;
+}
+
+int main(){
+  scanf("%d %d %d", &N, &M, &K);
+  for(int i=0;i<M;i++){
+    int r, c, m, s, d;
+    scanf("%d %d %d %d %d", &r, &c, &m, &s, &d);
+    fb.push_back({r, c, m, s, d});
+    arr[r][c].push_back({r, c, m, s, d});
+  }
+  for(int i=0;i<K;i++){
+    move();
+    sum_fb();
+  }
+  
+  int result = 0;
+  for(int i=0;i<fb.size();i++) result += fb[i].m;
+  printf("%d\n", result);
+  return 0;
+}
