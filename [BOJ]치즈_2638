@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <cstring>
+#include <queue>
+using namespace std;
+const int MAX = 105;
+
+int N, M, total, Time;
+int arr[MAX][MAX], count[MAX][MAX];
+bool visited[MAX][MAX];
+struct loc{
+  int x, y;
+};
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+void bfs(int a, int b){
+  visited[a][b] = true;
+  queue <loc> q;
+  q.push({a, b});
+  
+  while(!q.empty()){
+    int x = q.front().x;
+    int y = q.front().y;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
+      if(!visited[nx][ny]){
+        if(arr[nx][ny] == 1){
+          count[nx][ny]++;
+        } 
+        else if(arr[nx][ny] == 0){
+          visited[nx][ny] = true;
+          q.push({nx, ny});
+        }
+      }
+    }
+  }
+}
+
+void melt(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      if(count[i][j] >= 2) {
+        arr[i][j] = 0;
+        total--;
+      }
+    }
+  }
+}
+int main() {
+  scanf("%d %d", &N, &M);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      scanf("%d", &arr[i][j]);
+      if(arr[i][j] == 1) total++;
+    }
+  }
+  while(total){
+    memset(visited, 0, sizeof(visited));
+    memset(count, 0, sizeof(count));
+    bfs(0, 0);
+    melt();
+    Time++;
+  }
+  printf("%d\n", Time);
+  return 0;
+}
