@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+
+int R, C, M, result;
+struct info{
+  int x, y, speed, dir, Size;
+};
+vector <int> arr[MAX][MAX];
+vector <info> shark;
+int dx[] = { 0, -1, 1, 0, 0 };
+int dy[] = { 0, 0, 0, 1, -1 };
+
+bool compare(int a, int b){
+  if(shark[a].Size > shark[b].Size) return true;
+  else return false;
+}
+
+void catch_shark(int col){
+  for(int i=1;i<=R;i++){
+    if(arr[i][col].size() > 0){
+      result += shark[arr[i][col][0]].Size;
+      shark[arr[i][col][0]].Size = 0;
+      arr[i][col].clear();
+      break;
+    }
+  }
+}
+
+void move_shark(){
+  for(int i=0;i<M;i++){
+    if(shark[i].Size > 0){
+      arr[shark[i].x][shark[i].y].clear();
+    }
+  }
+  
+  for(int i=0;i<M;i++){
+    if(shark[i].Size > 0){
+      int x = shark[i].x;
+      int y = shark[i].y;
+      int speed = shark[i].speed;
+      int dir = shark[i].dir;
+      int Size = shark[i].Size;
+      
+      if(dir == 1 || dir == 2) {
+        speed = speed % ((R-1) * 2);
+        for(int j=0;j<speed;j++){
+          int nx = x+dx[dir];
+          int ny = y+dy[dir];
+          if(nx < 1){
+            dir = 2;
+            nx += 2;
+          }
+          if(nx > R){
+            dir = 1;
+            nx -= 2;
+          }
+          x = nx, y = ny;
+        }
+      }
+      else {
+        speed = speed % ((C-1) * 2);
+        for(int j=0;j<speed;j++){
+          int nx = x + dx[dir];
+          int ny = y + dy[dir];
+          if(ny < 1){
+            dir = 3;
+            ny += 2;
+          }
+          if(ny > C){
+            dir = 4;
+            ny -= 2;
+          }
+          x = nx, y = ny;
+        }
+      }
+      shark[i].x = x;
+      shark[i].y = y;
+      shark[i].dir = dir;
+      arr[x][y].push_back(i);
+    }
+  }
+}
+
+void check_shark(){
+  for(int i=1;i<=R;i++){
+    for(int j=1;j<=C;j++){
+      if(arr[i][j].size() > 1){
+        sort(arr[i][j].begin(), arr[i][j].end(), compare);
+        
+        int big_shark = arr[i][j][0];
+        for(int k=1;k<arr[i][j].size();k++){
+          shark[arr[i][j][k]].Size = 0;
+        }
+        arr[i][j].clear();
+        arr[i][j].push_back(big_shark);
+      }
+    }
+  }
+}
+    
+int main(){
+  scanf("%d %d %d", &R, &C, &M);
+  for(int i=0;i<M;i++) {
+    int a, b, c, d, e;
+    scanf("%d %d %d %d %d", &a, &b, &c, &d, &e);
+    shark.push_back({a, b, c, d, e});
+    arr[a][b].push_back(i);
+  }
+  if(M == 0){
+    printf("0\n");
+    return 0;
+  }
+  for(int i=1;i<=C;i++){
+    catch_shark(i);
+    move_shark();
+    check_shark();
+  }
+  printf("%d\n", result);
+  return 0;
+}
