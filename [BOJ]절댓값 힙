@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <queue>   // pq 사용
+#include <cstdlib> // abs 사용
+using namespace std;
+
+int n;
+struct compare{
+  bool operator()(int a, int b){
+    if(abs(a) > abs(b)) return true;
+    else if(abs(a) == abs(b)){
+      if(a > b) return true;
+      else return false;
+    }
+    else return false;
+  }
+};
+priority_queue <int, vector<int>, compare> pq;
+int main(){
+  scanf("%d", &n);
+  int val;
+  for(int i=0;i<n;i++){
+    scanf("%d", &val);
+    if(val == 0){
+      if(pq.size() > 0){
+        printf("%d\n", pq.top());
+        pq.pop();
+      }
+      else printf("0\n");
+    }
+    else pq.push(val);
+  }
+  return 0;
+}
