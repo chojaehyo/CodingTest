@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <queue>
+using namespace std;
+
+int n;
+priority_queue <int> maxpq;
+priority_queue <int, vector<int>, greater<int>> minpq;
+int main(){
+  scanf("%d", &n);
+  int val;
+  for(int i=0;i<n;i++){
+    scanf("%d", &val);
+    if(maxpq.size() == 0) maxpq.push(val);
+    else{
+      if(maxpq.size() > minpq.size()) minpq.push(val);
+      else maxpq.push(val);
+
+      if(maxpq.top() > minpq.top()){
+        int maxtop = maxpq.top();
+        int mintop = minpq.top();
+        maxpq.pop();
+        minpq.pop();
+        maxpq.push(mintop);
+        minpq.push(maxtop);
+      }
+    }
+    printf("%d\n", maxpq.top());
+  }
+  return 0;
+}
