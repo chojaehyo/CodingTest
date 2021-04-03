@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <stdlib.h> //abs 사용
+
+int n, result;
+int board[20];
+
+bool check(int row){
+  for(int r=0;r<row;r++){
+    // 열이 같거나 대각선에 있는지 판별
+    if(board[row] == board[r] || row-r == abs(board[row]-board[r])){ 
+        return false;
+    }
+  }
+  return true;
+}
+
+void nqueen(int row){
+  if(row == n){
+    result++;
+    return;
+  }
+  for(int col=0;col<n;col++){
+    board[row] = col;
+    if(check(row)){
+      nqueen(row+1);
+    }
+  }
+}
+
+int main() {
+  scanf("%d", &n);
+  nqueen(0);
+  printf("%d", result);
+  return 0;
+}
