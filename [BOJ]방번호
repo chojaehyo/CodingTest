@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main(){
+  int num, number[10]={0};
+  scanf("%d", &num);
+  
+  while(num > 0){
+    int val = num % 10;
+    if(val == 9) val = 6;
+    number[val]++;
+    num /= 10;
+  }
+  int result=1;
+  number[6] = (number[6]+1)/2;
+  
+  for(int i=0;i<9;i++){
+    if(result < number[i]) result = number[i];
+  }
+  printf("%d\n", result);
+  return 0;
+}
