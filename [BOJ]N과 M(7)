@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+const int MAX = 10;
+
+int N, M, arr[MAX], ans[MAX];
+
+void comb(int idx){
+  if(idx >= M){
+    for(int i=0;i<idx;i++) printf("%d ", ans[i]);
+    printf("\n");
+  }
+  else{
+    for(int i=0;i<N;i++){
+      ans[idx] = arr[i];
+      comb(idx+1);
+    }
+  }
+}
+int main(){
+  scanf("%d %d", &N, &M);
+  for(int i=0;i<N;i++) scanf("%d", &arr[i]);
+  sort(arr, arr+N);
+  comb(0);
+  return 0;
+}
