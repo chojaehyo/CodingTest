@@ -1,0 +1,46 @@
+#include <stdio.h>
+const int MAX = 1005;
+
+int R, C, k, by, bx, sy, sx, dir[5];
+int dx[] = {0, 0, 0, -1, 1};
+int dy[] = {0, -1, 1, 0, 0};
+int arr[MAX][MAX];
+bool visited[MAX][MAX];
+
+void move(int idx){
+  while(1){
+    int nx = sx+dx[dir[idx]];
+    int ny = sy+dy[dir[idx]];
+    
+    if(nx < 0 || nx >= C || ny < 0 || ny >= R || arr[ny][nx] == 1 || visited[ny][nx]) break;
+    
+    visited[ny][nx] = true;
+    sx = nx;
+    sy = ny;
+  }
+}
+
+int main(){
+  scanf("%d %d", &R, &C);
+  scanf("%d", &k);
+  for(int i=0;i<k;i++) {
+    scanf("%d %d", &by, &bx);
+    arr[by][bx] = 1;
+  }
+  scanf("%d %d", &sy, &sx);
+  for(int i=0;i<4;i++) scanf("%d", &dir[i]);
+  visited[sy][sx] = true;
+  int tmp_x = sx, tmp_y = sy;
+  int d = 0, count=0;
+  while(count < 4){
+    move(d);
+    d = (d+1)%4;
+    if(tmp_x == sx && tmp_y == sy) count++;
+    else {
+      count = 0;
+      tmp_x = sx, tmp_y = sy;
+    }
+  }
+  printf("%d %d\n", sy, sx);
+  return 0;
+}
