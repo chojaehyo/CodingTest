@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <vector>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 55;
+
+int N, M, result = 987987987;
+int arr[MAX][MAX], com[15], count[MAX][MAX];
+vector <pair <int, int>> v;
+bool ck[15], visited[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+void spread(){
+  queue <pair <int, int>> q;
+  for(int i=0;i<M;i++) {
+    q.push({v[com[i]].first, v[com[i]].second});  
+    visited[v[com[i]].first][v[com[i]].second] = true;
+  }
+  while(!q.empty()){
+    int x = q.front().first;
+    int y = q.front().second;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 0 || nx >= N || ny < 0 || ny >= N || arr[nx][ny] == 1) continue;
+      if(!visited[nx][ny]){
+        visited[nx][ny] = true;
+        count[nx][ny] = count[x][y] + 1;
+        q.push({nx, ny});
+      }
+    }
+  }
+}
+
+bool check(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      if(arr[i][j] == 0 && count[i][j] == 0) return false;
+    }
+  }
+  return true;
+}
+
+int get_time(){
+  int ret = -1;
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      if(arr[i][j] == 0){
+        if(count[i][j] > ret) ret = count[i][j];
+      }
+    }
+  }
+  return ret;
+}
+void comb(int idx){
+  if(idx >= M){
+    memset(count, 0, sizeof(count));
+    memset(visited, 0 ,sizeof(visited));
+    spread();
+    
+    if(check()){
+      int val = get_time();
+      if(result > val) result = val;
+    }
+  } 
+  else{
+    for(int i=0;i<v.size();i++){
+      com[idx] = i;
+      if(!ck[i]){
+        ck[i] = true;
+        if(idx == 0) comb(idx+1);
+        if(idx >= 1 && com[idx-1] < com[idx]) comb(idx+1);
+        ck[i] = false;
+      }
+    }
+  }
+}
+
+int main(){
+  int isempty = 0;
+  scanf("%d %d", &N, &M);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      scanf("%d", &arr[i][j]);
+      if(arr[i][j] == 2) v.push_back({i, j});
+      else if(arr[i][j] == 0) isempty++;
+    }
+  }
+  if(isempty == 0) {
+    printf("0\n");
+    return 0;
+  }
+  comb(0);
+  if(result == 987987987) printf("-1\n");
+  else printf("%d\n", result);
+  return 0;
+}
