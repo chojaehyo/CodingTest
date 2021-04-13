@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <vector>
+#include <queue>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 55;
+
+int N, M, result = 987987987, isempty;
+int arr[MAX][MAX], com[15], cnt[MAX][MAX];
+vector <pair <int, int>> v;
+bool ck[15], visited[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+void spread(){
+  queue <pair <int, int>> q;
+  for(int i=0;i<M;i++) {
+    q.push({v[com[i]].first, v[com[i]].second});
+    visited[v[com[i]].first][v[com[i]].second] = true;
+  }
+  
+  int infect = 0, Time = 0;
+  while(!q.empty()){
+    int x = q.front().first;
+    int y = q.front().second;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 0 || nx >= N || ny < 0 || ny >= N || arr[nx][ny] == 1) continue;
+      if(!visited[nx][ny]){
+        visited[nx][ny] = true;
+        cnt[nx][ny] = cnt[x][y] + 1;
+        if(arr[nx][ny] == 0){
+          Time = cnt[nx][ny];
+          infect++;
+        }
+        q.push({nx, ny});
+      }
+    }
+  }
+  if(infect == isempty) result = min(result, Time);
+}
+
+void comb(int idx){
+  if(idx >= M){
+    memset(cnt, 0, sizeof(cnt));
+    memset(visited, 0 ,sizeof(visited));
+    spread();
+  } 
+  else{
+    for(int i=0;i<v.size();i++){
+      com[idx] = i;
+      if(!ck[i]){
+        ck[i] = true;
+        if(idx == 0) comb(idx+1);
+        if(idx >= 1 && com[idx-1] < com[idx]) comb(idx+1);
+        ck[i] = false;
+      }
+    }
+  }
+}
+
+int main(){
+  scanf("%d %d", &N, &M);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      scanf("%d", &arr[i][j]);
+      if(arr[i][j] == 2) v.push_back({i, j});
+      else if(arr[i][j] == 0) isempty++;
+    }
+  }
+  comb(0);
+  if(result == 987987987) printf("-1\n");
+  else printf("%d\n", result);
+  return 0;
+}
