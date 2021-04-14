@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <queue>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 25;
+
+int N, sx, sy, fish, Size=2, eat, result;
+int arr[MAX][MAX], cnt[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+bool visited[MAX][MAX];
+struct info{
+  int x, y, dist;
+};
+struct cmp{
+  bool operator()(info a, info b){
+    if(a.dist < b.dist) return false;
+    else if(a.dist == b.dist){
+      if(a.x < b.x) return false;
+      else if(a.x == b.x){
+        if(a.y < b.y) return false;
+        else return true;
+      }
+      else return true;
+    }
+    else return true;
+  }
+};
+
+bool find_fish(){
+  queue <pair<int,int>> q;
+  priority_queue <info, vector<info>, cmp> can_eat;
+  memset(visited, 0, sizeof(visited));
+  memset(cnt, 0, sizeof(cnt));
+  q.push({sx, sy});
+  visited[sx][sy] = true;
+  
+  while(!q.empty()){
+    int x = q.front().first;
+    int y = q.front().second;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 0 || nx >= N || ny < 0 || ny >= N || Size < arr[nx][ny]) continue;
+      if(!visited[nx][ny]){
+        cnt[nx][ny] = cnt[x][y]+1;
+        visited[nx][ny] = true;
+        if(arr[nx][ny] == 0) q.push({nx, ny});
+        else if(Size > arr[nx][ny] && arr[nx][ny] > 0){
+          can_eat.push({nx, ny, cnt[nx][ny]});
+          q.push({nx, ny});
+        }
+        else if(Size == arr[nx][ny]) q.push({nx, ny});
+      }
+    }
+  }
+  
+  if(!can_eat.empty()){
+    result += can_eat.top().dist;
+    eat++;
+    if(eat == Size) Size++, eat = 0;
+    sx = can_eat.top().x;
+    sy = can_eat.top().y;
+    fish--;
+    arr[sx][sy] = 0;
+    return true;
+  }
+  else return false;
+}
+
+int main(){
+  scanf("%d", &N);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      scanf("%d", &arr[i][j]);
+      if(arr[i][j] == 9) {
+        sx = i, sy = j;
+        arr[i][j] = 0;
+      }
+      else if(arr[i][j] >= 1 && arr[i][j] <= 6) fish++;
+    }
+  }
+  
+  if(fish == 0) printf("0\n");
+  else{
+    while(1){
+      if(!find_fish()) break;
+    }
+    printf("%d\n", result);
+  }
+  return 0;
+}
