@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <cstring>
+using namespace std;
+const int MAX = 55;
+
+int N, M, T;
+int arr[MAX][MAX];
+bool ck[MAX][MAX];
+
+void rotate(int x, int d, int k){
+  int val = 1;
+  int nk = k % M;
+  while(val*x <= N){
+    int row = val*x;
+    
+    for(int kk=0;kk<nk;kk++){
+      if(d == 0){ // -->
+        int tmp = arr[row][M];
+        for(int i=M-1;i>=1;i--) arr[row][i+1] = arr[row][i];
+        arr[row][1] = tmp;
+        
+      }
+      else{       // <--
+        int tmp = arr[row][1];
+        for(int i=2;i<=M;i++) arr[row][i-1] = arr[row][i];
+        arr[row][M] = tmp;
+      }
+    }
+    val++;
+  }
+}
+
+void delete_val(){
+  memset(ck, 0, sizeof(ck));
+  bool flag = false;
+
+  for(int i=1;i<=N;i++){
+    for(int j=1;j<=M;j++){
+      if(arr[i][j] != 0){
+        if(j == M){
+          if(arr[i][M] == arr[i][1]){
+            flag = true;
+            ck[i][M] = true;
+            ck[i][1] = true;
+          }
+        }
+        else{
+          if(arr[i][j] == arr[i][j+1]){
+            flag = true;
+            ck[i][j] = true;
+            ck[i][j+1] = true;
+          }
+        }
+      }
+    }
+  }
+  
+  for(int i=1;i<N;i++){
+    for(int j=1;j<=M;j++){
+      if(arr[i][j] > 0){
+        if(arr[i][j] == arr[i+1][j]){
+          flag = true;
+          ck[i][j] = true;
+          ck[i+1][j] = true;
+        }
+      }
+    }
+  }
+
+  if(flag){
+    for(int i=1;i<=N;i++){
+      for(int j=1;j<=M;j++){
+        if(ck[i][j]) arr[i][j] = 0;
+      }
+    }
+  }
+  else {
+    float sum_val = 0;
+    int cnt = 0;
+    for(int i=1;i<=N;i++){
+      for(int j=1;j<=M;j++){
+        if(arr[i][j] > 0){
+          sum_val += arr[i][j];
+          cnt++;
+        }
+      }
+    }
+    float avg = sum_val / cnt;
+    for(int i=1;i<=N;i++){
+      for(int j=1;j<=M;j++){
+        if(arr[i][j] > 0){
+          if(arr[i][j] < avg) arr[i][j]++;
+          else if(arr[i][j] > avg) arr[i][j]--;
+        }
+      }
+    }
+  }
+}
+
+int main(){
+  scanf("%d %d %d", &N, &M, &T);
+  for(int i=1;i<=N;i++){
+    for(int j=1;j<=M;j++){
+      scanf("%d", &arr[i][j]);
+    }
+  }
+  for(int i=1;i<=T;i++){
+    int x, d, k;
+    scanf("%d %d %d", &x, &d, &k);
+    rotate(x, d, k);
+    delete_val();
+  }
+  int result = 0;
+  for(int i=1;i<=N;i++){
+    for(int j=1;j<=M;j++){
+      result += arr[i][j];
+    }
+  }
+  printf("%d\n", result);
+  return 0;
+}
