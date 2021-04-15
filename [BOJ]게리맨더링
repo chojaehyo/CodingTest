@@ -1,0 +1,144 @@
+#include <stdio.h>
+#include <vector>
+#include <queue>
+#include <cstring>
+#include <cstdlib>
+using namespace std;
+const int MAX = 15;
+
+int N, answer = 987987987;
+int people[MAX], com[MAX], area[MAX];
+vector <int> A, B;
+vector <int> v[MAX];
+bool ck[MAX];
+
+void make_vector(int k){
+  bool check[MAX] = {0};
+  A.clear();
+  B.clear();
+  memset(area, 0, sizeof(area));
+  
+  for(int i=0;i<k;i++) check[com[i]] = true;
+  
+  for(int i=1;i<=N;i++){
+    if(check[i]) {
+      A.push_back(i);
+      area[i] = 1;
+    }
+    else {
+      B.push_back(i);
+      area[i] = 2;
+    }
+  }
+}
+
+bool check_connect(){
+  bool visit_A[MAX] = {0};
+  bool visit_B[MAX] = {0};
+  
+  bool flag_A = true, flag_B = true;
+  
+  if(A.size() == 1) flag_A = true;
+  else{
+    queue <int> q;
+    q.push({A[0]});
+    visit_A[A[0]] = true;
+    
+    while(!q.empty()){
+      int cur = q.front();
+      q.pop();
+      
+      for(int i=0;i<v[cur].size();i++){
+        int next = v[cur][i];
+        
+        if(!visit_A[next] && area[next] == 1){
+            visit_A[next] = true;
+            q.push({next});
+        }
+      }
+    }
+    for(int i=0;i<A.size();i++){
+      if(!visit_A[A[i]]) flag_A = false;
+    }
+  }
+  
+  if(B.size() == 1) flag_B = true;
+  else{
+    queue <int> q;
+    q.push({B[0]});
+    visit_B[B[0]] = true;
+    
+    while(!q.empty()){
+      int cur = q.front();
+      q.pop();
+      
+      for(int i=0;i<v[cur].size();i++){
+        int next = v[cur][i];
+        
+        if(!visit_B[next] && area[next] == 2){
+            visit_B[next] = true;
+            q.push({next});
+        }
+      }
+    }
+    for(int i=0;i<B.size();i++){
+      if(!visit_B[B[i]]) flag_B = false;
+    }
+  }
+  
+  if(flag_A && flag_B) return true;
+  return false;
+}
+
+int get_diff(){
+  int A_people = 0, B_people = 0;
+  
+  for(int i=0;i<A.size();i++) A_people += people[A[i]];
+  
+  for(int i=0;i<B.size();i++) B_people += people[B[i]];
+  
+  return abs(A_people - B_people);
+}
+
+void comb(int idx, int total){
+  if(idx >= total){
+    make_vector(idx);
+    if(check_connect()){
+      int diff = get_diff();
+      if(answer > diff) answer = diff;
+    }
+    return;
+  }
+  for(int i=1;i<=N;i++){
+    com[idx] = i;
+    if(!ck[i]){
+      ck[i] = true;
+      if(idx == 0) comb(idx+1, total);
+      else if(idx >= 1 && com[idx-1] < com[idx]) comb(idx+1, total);
+      ck[i] = false;
+    }
+  }
+}
+
+int main(){
+  scanf("%d", &N);
+  for(int i=1;i<=N;i++) scanf("%d", &people[i]);
+  
+  for(int i=1;i<=N;i++){
+    int cnt;
+    scanf("%d", &cnt);
+    for(int j=0;j<cnt;j++){
+      int a;
+      scanf("%d", &a);
+      v[i].push_back(a);
+    }
+  }
+  
+  for(int i=1;i<=N/2;i++){
+    comb(0, i);
+  }
+  
+  if(answer == 987987987) printf("-1\n");
+  else printf("%d\n", answer);
+  return 0;
+}
