@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+
+int dice[15], horse[5], com[15], answer;
+int board[100];
+bool loc[100], finish[5];
+
+int check(){
+  int score = 0;
+  for(int i=0;i<10;i++){
+    if(finish[com[i]]) continue;
+    int cur = horse[com[i]];
+    int next = cur + dice[i];
+    if(next == 5) next = 26;
+    else if(next == 10) next = 40;
+    else if(next == 15) next = 55;
+    else if(next >= 43 && next <= 51) next -= 13;
+    else if(next >= 59 && next <= 67) next -= 29;
+    
+    if(next == 33) next = 20;
+    else if((next >= 21 && next <= 25) || (next >=34 && next <= 38)) finish[com[i]] = true;
+    
+    if(loc[next]) return -1;
+    else{
+      loc[cur] = false;
+      horse[com[i]] = next;
+      score += board[next];
+      if(!finish[com[i]]) loc[next] = true;
+    }
+  }
+  
+  return score;
+}
+
+void comb(int idx, int total){
+  if(idx >= total){
+    memset(finish, 0, sizeof(finish));
+    memset(horse, 0, sizeof(horse));
+    memset(loc, 0, sizeof(loc));
+    
+    int res = check();
+    if(res != -1){
+      if(answer < res) answer = res;
+    } 
+    return;
+  }
+  for(int i=1;i<=4;i++){
+    com[idx] = i;
+    comb(idx+1, total);
+  }
+}
+
+void fill_board(){
+  for(int i=1;i<=20;i++) board[i] = 2*i;
+  int val = 0;
+  for(int i=26;i<=29;i++) board[i] = 10+(val++)*3;
+  val = 5;
+  for(int i=30;i<=33;i++) board[i] = 5*val++;
+  board[40] = 20, board[41] = 22, board[42] = 24;
+  val = 5;
+  for(int i=43;i<=46;i++) board[i] = 5*val++;
+  board[55] = 30, board[56] = 28, board[57] = 27, board[58] = 26;
+  val = 5;
+  for(int i=59;i<=62;i++) board[i] = 5*val++;
+}
+
+int main(){
+  for(int i=0;i<10;i++) scanf("%d", &dice[i]);
+  
+  fill_board();
+  
+  comb(0, 10);
+  printf("%d\n", answer);
+  return 0;
+}
