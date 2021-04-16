@@ -1,0 +1,157 @@
+#include <stdio.h>
+const int MAX = 25;
+
+int N, M, K;
+int alive_shark;
+int MAP[MAX][MAX], priority[405][5][5];
+
+struct s_info{
+  int num, k;
+};
+s_info smell[MAX][MAX];
+
+struct info{
+  int x, y, d;
+  bool alive = true;
+};
+
+info shark[405];
+int dx[] = {-1, 1, 0, 0};
+int dy[] = {0, 0, -1, 1};
+
+bool check_range(int x, int y){
+  if(x < 0 || x >= N || y < 0 || y >= N) return false;
+  return true;
+}
+void Input(){
+  scanf("%d %d %d", &N, &M, &K);
+  alive_shark = M;
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      int val;
+      scanf("%d", &MAP[i][j]);
+      if(MAP[i][j] > 0) {
+        smell[i][j].num = MAP[i][j];
+        smell[i][j].k = K;
+        shark[MAP[i][j]].x = i;
+        shark[MAP[i][j]].y = j;
+        shark[MAP[i][j]].alive = true;
+      }
+    }
+  }
+  for(int i=1;i<=M;i++) {
+    int val;
+    scanf("%d", &val);
+    shark[i].d = val-1;
+  }
+  for(int i=1;i<=M;i++){
+    for(int a=0;a<4;a++){
+      for(int b=0;b<4;b++){
+        int val;
+        scanf("%d", &val);
+        priority[i][a][b] = val-1;
+      }
+    }
+  }
+}
+
+void move_shark(){
+  for(int i=1;i<=M;i++){
+    int x = shark[i].x;
+    int y = shark[i].y;
+    int d = shark[i].d;
+    
+    bool flag = false;
+    if(shark[i].alive) {
+      for(int j=0;j<4;j++){
+        int dir = priority[i][d][j];
+        int nx = x+dx[dir];
+        int ny = y+dy[dir];
+        
+        if(check_range(nx, ny) && smell[nx][ny].k == 0){
+          if(MAP[nx][ny] == 0){
+            MAP[x][y] = 0;
+            MAP[nx][ny] = i;
+            shark[i].x = nx;
+            shark[i].y = ny;
+            shark[i].d = dir;
+            flag = true;
+            break;
+          }
+          else{
+            if(MAP[nx][ny] < i){
+              MAP[x][y] = 0;
+              shark[i].alive = false;
+              alive_shark--;
+              flag = true;
+              break;
+            }
+            else if(MAP[nx][ny] > i){
+              MAP[x][y] = 0;
+              MAP[nx][ny] = i;
+              shark[i].x = nx;
+              shark[i].y = ny;
+              shark[i].d = dir;
+              shark[MAP[nx][ny]].alive = false;
+              alive_shark--;
+              flag = true;
+              break;
+            }
+          }
+        }
+      }
+      if(!flag){
+        for(int j=0;j<4;j++){
+          int dir = priority[i][d][j];
+          int nx = x+dx[dir];
+          int ny = y+dy[dir];
+          
+          if(check_range(nx, ny) && smell[nx][ny].num == i){
+            MAP[x][y] = 0;
+            MAP[nx][ny] = i;
+            shark[i].x = nx;
+            shark[i].y = ny;
+            shark[i].d = dir;
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  for(int i=1;i<=M;i++){
+    if(shark[i].alive){
+      int x = shark[i].x;
+      int y = shark[i].y;
+      smell[x][y].num = i;
+      smell[x][y].k = K;
+    }
+  }    
+}
+
+void remove_smell(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      if(MAP[i][j] == 0 && smell[i][j].k > 0) {
+        smell[i][j].k--;
+        if(smell[i][j].k == 0) smell[i][j].num = 0;
+      }
+    }
+  }
+}
+
+int main(){
+  Input();
+  int Time=0;
+  while(Time <= 1000){
+    if(alive_shark == 1){
+      printf("%d\n", Time);
+      return 0;
+    }
+    move_shark();
+    remove_smell();
+    Time++;
+  }
+  printf("-1\n");
+  return 0;
+}
