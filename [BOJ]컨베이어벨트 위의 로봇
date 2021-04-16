@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <deque>
+using namespace std;
+const int MAX = 205;
+
+int N, K, r_idx;
+
+struct info{
+  int dur, r;
+};
+deque <info> dq; 
+
+int check_zero(){
+  int cnt=0;
+  for(int i=0;i<dq.size();i++){
+    if(dq[i].dur == 0) cnt++; 
+  }
+  return cnt;
+}
+
+void move(){
+  int dur = dq.back().dur;
+  int r = dq.back().r;
+  dq.pop_back();
+  dq.push_front({dur, r});
+  
+  if(dq[N-1].r == 1) dq[N-1].r = 0;
+
+  for(int i=N-2;i>=0;i--){
+    if(dq[i].r == 1){
+      if(dq[i+1].dur >= 1 && dq[i+1].r == 0){
+        dq[i].r = 0;
+        dq[i+1].r = 1;
+        dq[i+1].dur--;
+      }
+    }
+  }
+    
+  if(dq[N-1].r == 1) dq[N-1].r = 0;
+  
+  if(dq[0].dur >= 1 && dq[0].r == 0) {
+    dq[0].dur--;
+    dq[0].r = 1;
+  }
+}
+
+int main(){
+  scanf("%d %d", &N, &K);
+  for(int i=0;i<2*N;i++){
+    int val;
+    scanf("%d", &val);
+    dq.push_back({val, 0});
+  }
+  int Time = 0;
+
+  while(1){
+    int res = check_zero();
+    if(res >= K) break;
+    move();
+    Time++;
+  }
+  printf("%d\n", Time);
+  return 0;
+}
