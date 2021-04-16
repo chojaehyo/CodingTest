@@ -3,94 +3,105 @@
 using namespace std;
 const int MAX = 55;
 
-int N, M, K;
+int N, M, K, answer, Size;
 struct info{
   int x, y, m, s, d;
+  bool alive;
 };
-vector <info> fb;
-vector <info> arr[MAX][MAX];
-int dx[] = {-1, -1, 0, 1, 1, 1, 0, -1};
-int dy[] = {0, 1, 1, 1, 0, -1, -1, -1}; 
-int true_d[] = {0, 2, 4, 6};
-int false_d[] = {1, 3, 5, 7};
-bool ck[2505];
+vector <info> fireball;
+vector <int> board[MAX][MAX];
 
-void move(){
+int dx[] = {-1, -1, 0, 1, 1, 1, 0, -1}; 
+int dy[] = {0, 1, 1, 1, 0, -1, -1, -1};
+
+void move_fireball(){
   for(int i=1;i<=N;i++){
     for(int j=1;j<=N;j++){
-      arr[i][j].clear();
+      board[i][j].clear();
     }
   }
-  for(int i=0;i<fb.size();i++){
-    int x = fb[i].x;
-    int y = fb[i].y;
-    int m = fb[i].m;
-    int s = fb[i].s;
-    int d = fb[i].d;
-    
-    int ns = s % N;
-    int nx = x+dx[d] * ns;
-    int ny = y+dy[d] * ns;
-    if(nx < 1) nx += N;
-    if(ny < 1) ny += N;
-    if(nx > N) nx -= N;
-    if(ny > N) ny -= N;
-    
-    arr[nx][ny].push_back({nx, ny, m, s, d});
-    fb[i].x = nx;
-    fb[i].y = ny;
+  for(int i=0;i<fireball.size();i++){
+    if(fireball[i].alive){
+      int x = fireball[i].x;
+      int y = fireball[i].y;
+      int m = fireball[i].m;
+      int s = fireball[i].s;
+      int d = fireball[i].d;
+      if(m == 0) {
+        fireball[i].alive = false;
+        continue;
+      }
+      
+      int ns = s % N;
+      int nx = x+dx[d]*ns;
+      int ny = y+dy[d]*ns;
+        
+      if(nx < 1) nx += N;
+      if(nx > N) nx -= N;
+      if(ny < 1) ny += N;
+      if(ny > N) ny -= N;
+      
+      board[nx][ny].push_back(i);
+      fireball[i].x = nx;
+      fireball[i].y = ny;
+    }
   }
-}
-
-void sum_fb(){
-  vector <info> temp;
+  
   for(int i=1;i<=N;i++){
     for(int j=1;j<=N;j++){
-      if(!arr[i][j].size()) continue;
-      else if(arr[i][j].size() == 1){
-        temp.push_back(arr[i][j][0]);
-      }
-      else{
-        int sum_m = 0, sum_s = 0, cnt = arr[i][j].size();
-        bool even = true, odd = true;
-        
-        for(int k=0;k<cnt;k++){
-          sum_m += arr[i][j][k].m;
-          sum_s += arr[i][j][k].s;
-          if(arr[i][j][k].d % 2) even = false;
-          else odd = false;
+      int cnt=0, tm=0, ts=0, td=0;
+      bool odd=false, even=false;
+      
+      if(board[i][j].size() > 1){
+        for(int k=0;k<board[i][j].size();k++){
+          fireball[board[i][j][k]].alive = false;
+          cnt++;
+          tm += fireball[board[i][j][k]].m;
+          ts += fireball[board[i][j][k]].s;
+          if(fireball[board[i][j][k]].d % 2 == 0) even = true;
+          else odd = true;
         }
         
-        int nm = sum_m / 5;
-        int ns = sum_s / cnt;
+        int nm = tm / 5;
+        int ns = ts / cnt;
+        
+        if((even && !odd) || (!even && odd)) td = 1;
+        else td = 2;
+        
         if(nm == 0) continue;
-        if(even || odd){
-          for(int k=0;k<4;k++) temp.push_back({i, j, nm, ns, true_d[k]});
-        }
         else{
-          for(int k=0;k<4;k++) temp.push_back({i, j, nm, ns, false_d[k]});
+          if(td == 1){
+            fireball.push_back({i, j, nm, ns, 0, true});
+            fireball.push_back({i, j, nm, ns, 2, true});
+            fireball.push_back({i, j, nm, ns, 4, true});
+            fireball.push_back({i, j, nm, ns, 6, true});
+          }
+          else{
+            fireball.push_back({i, j, nm, ns, 1, true});
+            fireball.push_back({i, j, nm, ns, 3, true});
+            fireball.push_back({i, j, nm, ns, 5, true});
+            fireball.push_back({i, j, nm, ns, 7, true});
+          }
         }
       }
     }
   }
-  fb = temp;
 }
 
 int main(){
   scanf("%d %d %d", &N, &M, &K);
   for(int i=0;i<M;i++){
-    int r, c, m, s, d;
-    scanf("%d %d %d %d %d", &r, &c, &m, &s, &d);
-    fb.push_back({r, c, m, s, d});
-    arr[r][c].push_back({r, c, m, s, d});
-  }
-  for(int i=0;i<K;i++){
-    move();
-    sum_fb();
+    int a, b, c, d, e;
+    scanf("%d %d %d %d %d", &a, &b, &c, &d, &e);
+    fireball.push_back({a, b, c, d, e, true});
+    board[a][b].push_back(i);
   }
   
-  int result = 0;
-  for(int i=0;i<fb.size();i++) result += fb[i].m;
-  printf("%d\n", result);
+  for(int i=0;i<K;i++) move_fireball();
+  
+  for(int i=0;i<fireball.size();i++){
+    if(fireball[i].alive) answer += fireball[i].m;
+  }
+  printf("%d\n", answer);
   return 0;
 }
