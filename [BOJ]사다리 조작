@@ -1,0 +1,51 @@
+#include <stdio.h>
+const int MAX = 30;
+
+int N, M, H, result=987987987;
+bool arr[MAX][MAX];
+
+bool check(){
+  for(int i=1;i<=N;i++){
+    int cur = i;
+    for(int j=1;j<=H;j++){
+      if(arr[cur][j]) cur++;
+      else if(arr[cur-1][j]) cur--;
+    }
+    if(cur != i) return false;
+  }
+  return true;
+}
+
+void comb(int idx, int cnt){
+  if(cnt >= 4) return;
+  
+  if(check()){
+    if(result > cnt) result = cnt;
+    return;
+  }
+  
+  for(int i=idx;i<=H;i++){
+    for(int j=1;j<N;j++){
+      if(arr[j-1][i]) continue;
+      if(arr[j][i]) continue;
+      if(arr[j+1][i]) continue;
+      
+      arr[j][i] = true;
+      comb(i, cnt+1);
+      arr[j][i] = false;
+    }
+  }
+}
+int main(){
+  scanf("%d %d %d", &N, &M, &H);
+  for(int i=0;i<M;i++) {
+    int a, b;
+    scanf("%d %d", &a, &b);
+    arr[b][a] = true;
+  }
+
+  comb(1, 0);
+  if(result == 987987987) printf("-1\n");
+  else printf("%d\n", result);
+  return 0;
+}
