@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 15;
+
+int N, M, K, total_tree;
+int arr[MAX][MAX], add[MAX][MAX];
+vector <int> tree[MAX][MAX];
+
+int dx[] = {-1, -1, -1, 0, 1, 1, 1, 0};
+int dy[] = {-1, 0, 1, 1, 1, 0, -1, -1};
+
+void SpringSummer(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      if(tree[i][j].size() > 0){
+        sort(tree[i][j].begin(), tree[i][j].end());
+        
+        int dead = 0;
+        vector <int> tmp;
+        
+        for(int k=0;k<tree[i][j].size();k++){
+          int age = tree[i][j][k];
+          
+          if(arr[i][j] >= age){
+            arr[i][j] -= age;
+            tmp.push_back(age+1);
+          }
+          else {
+            dead += age / 2;
+            total_tree--;
+          }
+        }
+        tree[i][j].clear();
+        for(int k=0;k<tmp.size();k++){
+          tree[i][j].push_back(tmp[k]);
+        }
+        arr[i][j] += dead;
+      }
+    }
+  }
+}
+
+void Fall(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      for(int k=0;k<tree[i][j].size();k++){
+        int age = tree[i][j][k];
+        
+        if(age % 5 == 0){
+          for(int d=0;d<8;d++){
+            int nx = i+dx[d];
+            int ny = j+dy[d];
+            
+            if(nx >= 0 && nx < N && ny >= 0 && ny < N){
+              total_tree++;
+              tree[nx][ny].push_back(1);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void Winter(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      arr[i][j] += add[i][j];
+    }
+  }
+}
+
+int main(){
+  scanf("%d %d %d", &N, &M, &K);
+  total_tree = M;
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      scanf("%d", &add[i][j]);
+      arr[i][j] = 5;
+    }
+  }
+  for(int i=0;i<M;i++){
+    int x, y, age;
+    scanf("%d %d %d", &x, &y, &age);
+    tree[x-1][y-1].push_back(age);
+  }
+  
+  for(int i=0;i<K;i++){
+    SpringSummer();
+    Fall();
+    Winter();
+  }
+  printf("%d\n", total_tree);
+  return 0;
+}
