@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+const int MAX = 105;
+
+int N, L, way;
+int array[MAX][MAX], array2[MAX][MAX];
+
+// bool check(int arr[][MAX], int x, int y){
+//   int tmp = arr[x][y+1];
+//   for(int j=y+1;j<=y+L;j++){
+//     if(arr[x][j] != tmp) return false;
+//   }
+//   return true;
+// }
+void check_line(int arr[][MAX], int idx){
+  int cnt=1;
+  bool flag = true;
+  
+  for(int i=0;i<N-1;i++){
+    if(arr[idx][i] == arr[idx][i+1]) cnt++;
+    
+    else if(arr[idx][i]-arr[idx][i+1] == -1){
+      if(cnt >= L) cnt = 1;
+      else {
+        flag = false;
+        break;
+      }
+    }
+    
+    else if(arr[idx][i]-arr[idx][i+1] == 1){
+      int tmp = arr[idx][i+1];
+      for(int j=i+1;j<=i+L;j++){
+        if(arr[idx][j] != tmp){
+          flag = false;
+          break;
+        }
+      }
+      i = i+L-1;
+      cnt = 0;
+    }
+    else if(abs(arr[idx][i]-arr[idx][i+1]) >= 2){
+      flag = false;
+      break;
+    }
+  }
+  if(flag) way++;
+}
+int main(){
+  scanf("%d %d", &N, &L);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      scanf("%d", &array[i][j]);
+      array2[j][i] = array[i][j];
+    }
+  }
+  
+  for(int i=0;i<N;i++) check_line(array, i);
+  for(int i=0;i<N;i++) check_line(array2, i);
+  
+  printf("%d\n", way);
+  return 0;
+}
