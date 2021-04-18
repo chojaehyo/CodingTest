@@ -1,125 +1,98 @@
 #include <stdio.h>
+#include <vector>
+using namespace std;
 const int MAX = 15;
 
-int n, m, cctv, result=987987987;
-int arr[MAX][MAX], temp[MAX][MAX];
-int dir[MAX];
-int x[MAX], y[MAX], num[MAX];
-int dx[] = {0, 1, 0, -1};
-int dy[] = {1, 0, -1, 0};
+int N, M, result=987987987;
+int arr[MAX][MAX], tmp[MAX][MAX], ans[10];
+struct info{
+  int x, y, num;
+};
+vector <info> cctv;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
 
-void fill_temp(){
-  for(int i=0;i<cctv;i++){
-    if(num[i] == 1){
-      int xx = x[i], yy = y[i];
-      while(1){
-        int nx = xx+dx[dir[i]], ny = yy+dy[dir[i]];
-        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
-        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
-        xx = nx, yy = ny;
-      }
+void fill_space(int x, int y, int d){
+  while(1){
+    int nx = x+dx[d];
+    int ny = y+dy[d];
+    if(tmp[nx][ny] == 6) break;
+    if(nx < 0 || nx >= N || ny < 0 || ny >= M) break;
+    tmp[nx][ny] = 1;
+    x = nx;
+    y = ny;
+  }
+}
+void fill_tmp(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      tmp[i][j] = arr[i][j];
     }
-    else if(num[i] == 2){
-      int xx = x[i], yy = y[i];
-      while(1){
-        int nx = xx+dx[dir[i]], ny = yy+dy[dir[i]];
-        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
-        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
-        xx = nx, yy = ny;
-      }
-      xx = x[i], yy = y[i];
-      while(1){
-        int nx = xx+dx[(dir[i]+2)%4], ny = yy+dy[(dir[i]+2)%4];
-        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
-        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
-        xx = nx, yy = ny;
-      }
+  }
+  
+  for(int c=0;c<cctv.size();c++){
+    int d = ans[c];
+    int x = cctv[c].x;
+    int y = cctv[c].y;
+    int type = cctv[c].num;
+    
+    if(type == 1) fill_space(x, y, d);
+    else if(type == 2){
+      fill_space(x, y, d);
+      fill_space(x, y, (d+2)%4);
     }
-    else if(num[i] == 3){
-      int xx = x[i], yy = y[i];
-      while(1){
-        int nx = xx+dx[dir[i]], ny = yy+dy[dir[i]];
-        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
-        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
-        xx = nx, yy = ny;
-      }
-      xx = x[i], yy = y[i];
-      while(1){
-        int nx = xx+dx[(dir[i]+3)%4], ny = yy+dy[(dir[i]+3)%4];
-        if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
-        if(temp[nx][ny] == 0) temp[nx][ny] = 7;
-        xx = nx, yy = ny;
-      }
+    else if(type == 3){
+      fill_space(x, y, d);
+      fill_space(x, y, (d+1)%4);
     }
-    else if(num[i] == 4){
-      for(int d=0;d<4;d++){
-        if(d == 1) continue;
-        int xx = x[i], yy = y[i];
-        while(1){
-          int nx = xx+dx[(dir[i]+d)%4], ny = yy+dy[(dir[i]+d)%4];
-          if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
-          if(temp[nx][ny] == 0) temp[nx][ny] = 7;
-          xx = nx, yy = ny;
-        }
-      }
+    else if(type == 4){
+      fill_space(x, y, d);
+      fill_space(x, y, (d+1)%4);
+      fill_space(x, y, (d+3)%4);
     }
     else{
-      for(int d=0;d<4;d++){
-        int xx = x[i], yy = y[i];
-        while(1){
-          int nx = xx+dx[(dir[i]+d)%4], ny = yy+dy[(dir[i]+d)%4];
-          if(nx < 0 || nx >= n || ny < 0 || ny >= m || temp[nx][ny] == 6) break;
-          if(temp[nx][ny] == 0) temp[nx][ny] = 7;
-          xx = nx, yy = ny;
-        }
-      }
+      fill_space(x, y, d);
+      fill_space(x, y, (d+1)%4);
+      fill_space(x, y, (d+2)%4);
+      fill_space(x, y, (d+3)%4);
     }
   }
 }
-int check(){
-  int count=0;
-  for(int i=0;i<n;i++){
-    for(int j=0;j<m;j++){
-      if(temp[i][j] == 0) count++;
+
+int count_space(){
+  int cnt = 0;
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      if(tmp[i][j] == 0) cnt++;
     }
   }
-  return count;
+  return cnt;
 }
-void reset_temp(){
-  for(int i=0;i<n;i++){
-    for(int j=0;j<m;j++){
-      temp[i][j] = arr[i][j];
-    }
-  }
-}
-void comb(int cnt, int total){
-  if(cnt >= total){
-    fill_temp();
-    int res = check();
+void comb(int idx){
+  if(idx >= cctv.size()){
+    fill_tmp();
+    int res = count_space();
     if(res < result) result = res;
-    reset_temp();
+    return;
   }
-  else {
-    for(int i=0;i<4;i++){
-      dir[cnt] = i;
-      comb(cnt+1, total);
-    }
+  for(int i=0;i<4;i++){
+    ans[idx] = i;
+    comb(idx+1);
   }
 }
+
 int main(){
-  scanf("%d %d", &n, &m);
-  int idx=0;
-  for(int i=0;i<n;i++){
-    for(int j=0;j<m;j++){
+  scanf("%d %d", &N, &M);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
       scanf("%d", &arr[i][j]);
-      temp[i][j] = arr[i][j];
-      if(arr[i][j] >= 1 && arr[i][j] <= 5) {
-        cctv++;
-        x[idx] = i, y[idx] = j, num[idx++] = arr[i][j];
+      if(arr[i][j] >= 1 && arr[i][j] <= 5){
+        cctv.push_back({i, j, arr[i][j]});
       }
     }
   }
-  comb(0, cctv);
+  
+  comb(0);
   printf("%d\n", result);
   return 0;
 }
