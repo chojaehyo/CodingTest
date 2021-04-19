@@ -1,0 +1,35 @@
+#include <stdio.h>
+const int MAX = 25;
+
+int R, C, result;
+int alphabet[30];
+char arr[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+
+void dfs(int x, int y, int cnt){
+  for(int i=0;i<4;i++){
+    int nx = x+dx[i];
+    int ny = y+dy[i];
+    
+    if(nx < 0 || nx >= R || ny < 0 || ny >= C || alphabet[arr[nx][ny]-'A'] == 1) continue;
+  
+    if(alphabet[arr[nx][ny]-'A'] == 0){
+      alphabet[arr[nx][ny]-'A'] = 1;
+      dfs(nx, ny, cnt+1);
+      alphabet[arr[nx][ny]-'A'] = 0;
+    }
+  }
+  if(result < cnt) result = cnt;
+  
+}
+int main(){
+  scanf("%d %d", &R, &C);
+  for(int i=0;i<R;i++) scanf("%s", arr[i]);
+  
+  alphabet[arr[0][0]-'A'] = 1;
+  dfs(0, 0, 1);
+  printf("%d\n", result);
+  return 0;
+}
