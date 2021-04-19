@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <cstring>
+#include <vector>
+using namespace std;
+const int MAX = 55;
+
+int N, K, result;
+bool ck[30];
+vector <int> arr[MAX];
+
+void comb(int val, int idx){
+  if(idx >= K){
+    int cnt = 0;
+    for(int i=0;i<N;i++){
+      bool flag = true;
+      for(int j=0;j<arr[i].size();j++){
+        if(!ck[arr[i][j]]) {
+          flag = false;
+          break;
+        }
+      }
+      if(flag) cnt++;
+    }
+    if(result < cnt) result = cnt;
+    return;
+  }
+  for(int i=val;i<26;i++){
+    if(!ck[i]){
+      ck[i] = true;
+      comb(i, idx+1);
+      ck[i] = false;
+    }
+  }
+}
+int main(){
+  scanf("%d %d", &N, &K);
+  for(int i=0;i<N;i++){
+    char word[20];
+    scanf("%s", &word);
+    int len = strlen(word);
+    for(int j=0;j<len;j++){
+      arr[i].push_back(word[j]-'a');
+    }
+  }
+  if(K < 5) {
+    printf("0\n");
+    return 0;
+  }
+  else if(K == 26){
+    printf("%d\n", N);
+    return 0;
+  }
+  ck['a'-'a'] = true;
+  ck['n'-'a'] = true;
+  ck['t'-'a'] = true;
+  ck['i'-'a'] = true;
+  ck['c'-'a'] = true;
+  K-= 5;
+  comb(0, 0);
+  
+  printf("%d\n", result);
+  return 0;
+}
