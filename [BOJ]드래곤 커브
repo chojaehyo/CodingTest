@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <vector>
+using namespace std;
+const int MAX = 105;
+
+int N, x, y, d, g;
+int arr[MAX][MAX];
+int dx[] = {0, -1, 0, 1};
+int dy[] = {1, 0, -1, 0};
+vector <int> v;
+
+void make_generation(){
+  int Size = v.size();
+  for(int i=Size-1;i>=0;i--){
+    
+    int nd = (v[i]+1)%4;
+    x += dx[nd];
+    y += dy[nd];
+    arr[x][y] = 1;
+    v.push_back(nd);
+  }
+}
+
+int check_square(){
+  int cnt = 0;
+  for(int i=0;i<100;i++){
+    for(int j=0;j<100;j++){
+      if(arr[i][j] == 1 && arr[i+1][j] == 1 
+      && arr[i][j+1] == 1 && arr[i+1][j+1] == 1){
+        cnt++;
+      }
+    }
+  }
+  return cnt;
+}
+int main(){
+  scanf("%d", &N);
+  for(int i=0;i<N;i++){
+    scanf("%d %d %d %d", &y, &x, &d, &g);
+    v.clear();
+    arr[x][y] = 1;
+    x += dx[d];
+    y += dy[d];
+    arr[x][y] = 1;
+    
+    v.push_back(d);
+    for(int i=0;i<g;i++){
+      make_generation();
+    }
+  }
+  int res = check_square();
+  printf("%d\n", res);
+  return 0;
+}
