@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+const int MAX = 20;
+
+int L, C, arr[MAX], ans[MAX];
+bool alpha[30];
+
+bool check_pw(){
+  int v_cnt = 0, c_cnt = 0;
+  for(int i=0;i<L;i++){
+    if(ans[i] == 'a'-'a' || ans[i] == 'e'-'a' || ans[i] == 'i'-'a'
+    || ans[i] == 'o'-'a' || ans[i] == 'u'-'a') v_cnt++;
+    else c_cnt++;
+  }
+  if(v_cnt >= 1 && c_cnt >= 2) return true;
+  return false;
+}
+void comb(int idx){
+  if(idx >= L){
+    if(check_pw()){
+      for(int i=0;i<L;i++) printf("%c", ans[i]+'a');
+      printf("\n");
+    }
+  }
+  else{
+    for(int i=0;i<C;i++){
+      ans[idx] = arr[i];
+      if(!alpha[i]){
+        alpha[i] = true;
+        if(idx == 0) comb(idx+1);
+        else if(idx >= 1 && ans[idx-1] < ans[idx]) comb(idx+1);
+        alpha[i] = false;
+      }
+    }
+  }
+}
+int main(){
+  scanf("%d %d", &L, &C);
+  for(int i=0;i<C;i++){
+    char input;
+    scanf(" %c", &input);
+    arr[i] = input-'a';
+  }
+  sort(arr, arr+C);
+  comb(0);
+  return 0;
+}
