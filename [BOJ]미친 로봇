@@ -1,0 +1,37 @@
+#include <stdio.h>
+const int MAX = 30;
+
+int N;
+double result, percent[5];
+bool visited[MAX][MAX];
+int dx[] = {0, 0, 1, -1};
+int dy[] = {1, -1, 0, 0};
+
+void DFS(int x, int y, int cnt, double change){
+  if(N == cnt){
+    result += change;
+    return;
+  }
+  
+  visited[x][y] = true;
+  for(int i=0;i<4;i++){
+    int nx = x+dx[i];
+    int ny = y+dy[i];
+    
+    if(!visited[nx][ny]){
+      DFS(nx, ny, cnt+1, percent[i]*change);
+    }
+  }
+  visited[x][y] = false;
+  
+}
+int main(){
+  scanf("%d", &N);
+  for(int i=0;i<4;i++) {
+    scanf("%lf", &percent[i]);
+    percent[i] *= 0.01;
+  }
+  DFS(15, 15, 0, 1.0);
+  printf("%.10lf", result);
+  return 0;
+}
