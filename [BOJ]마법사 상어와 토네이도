@@ -75,8 +75,6 @@ int main(){
       idx++;
     }
   }
-  
-  for(int i=N;i>=1;i--) move_sand(x, y, d);
   printf("%d\n", sand);
   return 0;
 }
