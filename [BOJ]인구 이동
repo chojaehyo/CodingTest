@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <cstring>
+#include <queue>
+#include <vector>
+using namespace std;
+const int MAX = 55;
+
+int N, L, R;
+int arr[MAX][MAX];
+bool visited[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+bool isRange(int x, int y){
+  if(x < 0 || x >= N || y < 0 || y >= N) return false;
+  return true;
+}
+bool bfs(int a, int b){
+  queue <pair<int, int>> q;
+  vector <pair<int, int>> uni;
+  q.push({a, b});
+  uni.push_back({a, b});
+  visited[a][b] = true;
+  
+  while(!q.empty()){
+    int x = q.front().first;
+    int y = q.front().second;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(!isRange(nx, ny)) continue;
+      if(!visited[nx][ny]){
+        int diff = abs(arr[nx][ny]-arr[x][y]);
+        if(L <= diff && diff <= R){
+          q.push({nx, ny});
+          uni.push_back({nx, ny});
+          visited[nx][ny] = true;
+        }
+      }
+    }
+  }
+  if(uni.size() == 1) return false;
+  else if(uni.size() > 1) {
+    int total_ppl = 0, cnt = uni.size();
+    for(int i=0;i<uni.size();i++){
+      total_ppl += arr[uni[i].first][uni[i].second];
+    }
+    for(int i=0;i<uni.size();i++){
+      arr[uni[i].first][uni[i].second] = total_ppl/cnt;
+    }
+    return true;
+  }
+}
+
+int main(){
+  scanf("%d %d %d", &N, &L, &R);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      scanf("%d", &arr[i][j]);
+    }
+  }
+  int Time = 0;
+  while(1){
+    bool flag = false;
+    memset(visited, 0, sizeof(visited));
+    for(int i=0;i<N;i++){
+      for(int j=0;j<N;j++){
+        if(!visited[i][j]){
+          bool move = bfs(i, j);
+          if(move) flag = true;
+        }
+      }
+    }
+    if(!flag) break;
+    else Time++;
+  }
+  printf("%d\n", Time);
+  return 0;
+}
