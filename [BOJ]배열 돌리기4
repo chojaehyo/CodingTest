@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 55;
+
+int N, M, K, result = 987987987;
+int arr[MAX][MAX], tmp_arr[MAX][MAX], ans[10];
+struct INFO{
+  int x, y, s;
+};
+bool ck[MAX];
+INFO r_ope[10];
+
+void rotate(int idx){
+  int x = r_ope[idx].x, y = r_ope[idx].y, s = r_ope[idx].s;
+  
+  int sx = x-s, sy = y-s;
+  int ex = x+s, ey = y+s;
+  
+  int cnt = (ex-sx) / 2;
+  for(int c=0;c<cnt;c++){
+    int nsx = sx+c, nsy = sy+c;
+    int nex = ex-c, ney = ey-c;
+    
+    int tmp = arr[nsx][nsy];
+    for(int i=nsx+1;i<=nex;i++) arr[i-1][nsy] = arr[i][nsy];
+    for(int j=nsy+1;j<=ney;j++) arr[nex][j-1] = arr[nex][j];
+    for(int i=nex-1;i>=nsx;i--) arr[i+1][ney] = arr[i][ney];
+    for(int j=ney-1;j>=nsy+1;j--) arr[nsx][j+1] = arr[nsx][j];
+    arr[nsx][nsy+1] = tmp;
+  }
+}
+
+int get_min(){
+  int ret = 987987987;
+  for(int i=1;i<=N;i++){
+    int total = 0;
+    for(int j=1;j<=M;j++){
+      total += arr[i][j];
+    }
+    ret = min(ret, total);
+  }
+  return ret;
+}
+
+void reset_arr(){
+  for(int i=1;i<=N;i++){
+    for(int j=1;j<=M;j++){
+      arr[i][j] = tmp_arr[i][j];
+    }
+  }
+}
+
+void comb(int idx){
+  if(idx >= K){
+    for(int i=0;i<idx;i++){
+      rotate(ans[i]);
+    }
+    int res = get_min();
+    result = min(res, result);
+    reset_arr();
+  }
+  else{
+    for(int i=0;i<K;i++){
+      ans[idx] = i;
+      if(!ck[i]){
+        ck[i] = true;
+        comb(idx+1);
+        ck[i] = false;
+      }
+    }
+  }
+}
+
+int main() {
+  scanf("%d %d %d", &N, &M, &K);
+  for(int i=1;i<=N;i++){
+    for(int j=1;j<=M;j++){
+      scanf("%d", &arr[i][j]);
+      tmp_arr[i][j] = arr[i][j];
+    }
+  }
+  for(int i=0;i<K;i++){
+    int a, b, c;
+    scanf("%d %d %d", &a, &b, &c);
+    r_ope[i] = {a, b, c};
+  }
+  comb(0);
+  printf("%d\n", result);
+  return 0;
+}
