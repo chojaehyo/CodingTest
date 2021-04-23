@@ -5,9 +5,14 @@ using namespace std;
 const int MAX = 25;
 
 int N, result;
-int arr[MAX][MAX], tmp[MAX][MAX];
-int dx[] = { -1, 0, 1, 0 };
-int dy[] = { 0, 1, 0, -1 };
+int arr[MAX][MAX];
+void find_max() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (arr[i][j] > 0) result = max(result, arr[i][j]);
+		}
+	}
+}
 
 void move(int dir) {
 	queue <int> q;
@@ -43,7 +48,7 @@ void move(int dir) {
 					arr[i][j] = 0;
 				}
 			}
-			int idx = N - 1;
+			int idx = N-1;
 			while (!q.empty()) {
 				int val = q.front();
 				q.pop();
@@ -116,25 +121,23 @@ void move(int dir) {
 void copy_arr(int A[][MAX], int B[][MAX]) {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			A[i][j] = B[i][j];
+			B[i][j] = A[i][j];
 		}
 	}
 }
 void comb(int cnt) {
 	if (cnt == 5) {
-		for (int i = 0; i < N; i++) {
-		    for (int j = 0; j < N; j++) {
-			    result = max(result, arr[i][j]);
-		    }
-	    }
-        return;
+		find_max();
 	}
-    copy_arr(tmp, arr);
-    for (int i = 0; i < 4; i++) {
-        move(i);
-        comb(cnt + 1);
-        copy_arr(arr, tmp);
-    }
+	else {
+	  int temp[MAX][MAX];
+		copy_arr(arr, temp);
+		for (int i = 0; i < 4; i++) {
+			move(i);
+			comb(cnt + 1);
+			copy_arr(temp, arr);
+		}
+	}
 }
 int main() {
 	scanf("%d", &N);
