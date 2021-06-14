@@ -1,0 +1,72 @@
+#include <cstdio>
+
+int main(){
+    int T;
+    scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+      int arr[10][10] = {0};
+        
+     	for(int i=0;i<9;i++){
+         	for(int j=0;j<9;j++){
+             	scanf("%d", &arr[i][j]);
+            }
+        }
+        bool flag = false;
+        
+        for(int i=0;i<9;i++){
+            int number[10] = {0};
+         	for(int j=0;j<9;j++){
+                if(number[arr[i][j]] == 0) number[arr[i][j]] = 1;
+                else {
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag) {
+                printf("#%d 0\n", t);
+                break;
+            }
+        }
+        if(flag) continue;
+        
+        for(int i=0;i<9;i++){
+            int number2[10] = {0};
+         	for(int j=0;j<9;j++){
+                if(number2[arr[j][i]] == 0) number2[arr[j][i]] = 1;
+                else {
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag) {
+                printf("#%d 0\n", t);
+                break;
+            }
+        }
+        if(flag) continue;
+        
+        int row[] = {0, 0, 0, 3, 3, 3, 6, 6, 6};
+        int col[] = {0, 3, 6, 0, 3, 6, 0, 3, 6};
+        int cnt = 0;
+        while(cnt < 9){
+            int number3[10] = {0};
+            for(int i=row[cnt];i<row[cnt]+3;i++){
+                for(int j=col[cnt];j<col[cnt]+3;j++){
+					if(number3[arr[i][j]] == 0) number3[arr[i][j]] = 1;
+                    else {
+                     	flag = true;
+                        break;
+                    }
+                }
+                if(flag) break;
+            }
+            if(flag) break;
+            cnt++;
+        }
+        if(flag) printf("#%d 0\n", t);
+        else printf("#%d 1\n", t);
+    }
+    
+	return 0;    
+}
