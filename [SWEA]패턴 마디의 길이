@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+
+int main(){
+    int T;
+    scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+        char arr[35] = {0};
+     	scanf("%s", arr);   
+        
+       	int idx = 0;
+        int result = 1, same = 1;
+        
+        for(int i=1;i<strlen(arr);i++){
+            if(arr[idx] != arr[i]){
+                same = 1;
+                result++;
+            }
+            else{
+                if(i > 2 && same == 1) idx++;
+                else{
+                    same++;
+                    result++;
+                }
+            }
+        }
+        if(same == result) printf("#%d 1\n", t);
+        else printf("#%d %d\n", t, result);
+    }
+ 	return 0;   
+}
