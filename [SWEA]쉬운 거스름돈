@@ -1,0 +1,22 @@
+#include <cstdio>
+
+int arr[] = {50000, 10000, 5000, 1000, 500, 100, 50, 10};
+
+int main(){
+    int T;
+    scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+        int money;
+     	scanf("%d", &money);  
+        
+        printf("#%d\n", t);
+        for(int i=0;i<8;i++){
+            int cnt = money / arr[i];
+            printf("%d ", cnt);
+            money %= arr[i];
+        }
+        printf("\n");
+    }
+ 	return 0;   
+}
