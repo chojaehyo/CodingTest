@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+
+char grades[10][3] = {"A+", "A0", "A-", "B+", "B0", "B-", "C+", "C0", "C-", "D0"};
+int main(){
+    int T;
+    scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+        int N, K;
+        scanf("%d %d", &N, &K);
+        
+        double students[100] = {0};
+        for(int i=0;i<N;i++){
+         	int mid, fin, ass;
+            scanf("%d %d %d", &mid, &fin, &ass);
+            
+            students[i] = mid*0.35 + fin*0.45 + ass*0.2;
+        }
+       
+		double target_score = students[K-1];
+        
+        sort(students, students+N, greater<double>());
+        
+        int idx = 0;
+        for(int i=0;i<N;i++) {
+            if(target_score == students[i]) idx = i;
+        }
+        printf("#%d %s\n", t, grades[idx*10/N]);
+    }	
+ 	return 0;   
+}
