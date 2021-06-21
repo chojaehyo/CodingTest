@@ -1,0 +1,25 @@
+#include <cstdio>
+
+int main(){
+  int T;
+  scanf("%d", &T);
+  
+  for(int t=1;t<=T;t++){
+    int n;
+    scanf("%d", &n);
+    
+    int cost, max_cost = -1, max_idx = -1;
+    char name[100][21] = {0};
+      
+    for(int i=0;i<n;i++){
+      scanf("%d %s", &cost, name[i]);
+      
+      if(cost > max_cost){
+        max_cost = cost;
+        max_idx = i;
+      }
+    }
+    printf("%s\n", name[max_idx]);
+  }
+  return 0;
+}
