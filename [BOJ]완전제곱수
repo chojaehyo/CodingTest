@@ -1,0 +1,22 @@
+#include <cstdio>
+#include <cmath>
+
+int main(){
+  int M, N;
+  scanf("%d\n%d", &M, &N);
+  
+  int num1 = sqrt(M);
+  int num2 = sqrt(N);
+  
+  if(pow(num1, 2) < M) num1++;
+  
+  int total = 0;
+  
+  for(int i=num1;i<=num2;i++) total += pow(i, 2);
+  
+  int ans = pow(num1, 2);
+  
+  if(total == 0) printf("-1\n");
+  else printf("%d\n%d\n", total, ans);
+  return 0;
+}
