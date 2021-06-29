@@ -19,10 +19,10 @@ int main(){
     
     alpha[input[0]-'a'] = 1;
     
-    for(int i=0;i<len-1;i++){
-      if(input[i] == input[i+1]) continue;
+    for(int i=1;i<len;i++){
+      if(input[i-1] == input[i]) continue;
       else{
-        if(!alpha[input[i+1]-'a']) alpha[input[i+1]-'a'] = 1;
+        if(!alpha[input[i]-'a']) alpha[input[i]-'a'] = 1;
         else{
           flag = true;
           break;
