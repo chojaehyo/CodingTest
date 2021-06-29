@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+
+int main(){
+  int a, b;
+  scanf("%d %d", &a, &b);
+  
+  int val1 = 1, val2 = 1;
+  
+  int num = 2;
+  
+  while(num <= max(a, b)){
+    if(a % num == 0 && b % num == 0){
+      a /= num;
+      b /= num;
+      val1 *= num;
+    }
+    else num++;
+  }
+  
+  val2 = val1 * a * b;
+  
+  printf("%d\n%d\n", val1, val2);
+  return 0;
+}
