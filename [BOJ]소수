@@ -1,0 +1,30 @@
+#include <cstdio>
+
+bool check(int val){
+  for(int i=2;i<val;i++){
+    if(val % i == 0) return false;
+  }
+  return true;
+}
+
+int main() {
+  int m, n;
+  scanf("%d\n%d", &m, &n);
+  
+  int total = 0, min_val = 0;
+  bool find = false;
+  
+  for(int i=m;i<=n;i++){
+    if(i == 1) continue;
+    if(check(i)) {
+      total += i;
+      if (!find){
+        find = true;
+        min_val = i;
+      }
+    }
+  }
+  if(total == 0) printf("-1\n");
+  else printf("%d\n%d", total, min_val);
+  return 0;
+}
