@@ -48,11 +48,9 @@ int main(){
   
   vector <int> house;
   
-  int group = 0;
   for(int i=0;i<N;i++){
     for(int j=0;j<N;j++){
       if(!visited[i][j] && arr[i][j] == 1){
-        group++;
         int cnt = get_house_cnt(i, j);
         house.push_back(cnt);
       }
@@ -60,7 +58,7 @@ int main(){
   }
   
   sort(house.begin(), house.end());
-  printf("%d\n", group);
+  printf("%d\n", house.size());
   for(int i=0;i<house.size();i++) printf("%d\n", house[i]);
   return 0;
 }
