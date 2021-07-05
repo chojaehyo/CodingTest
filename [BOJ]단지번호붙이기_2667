@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <queue>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 30;
+
+int N;
+int arr[MAX][MAX];
+bool visited[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+int get_house_cnt(int a, int b){
+  int h_cnt = 1;
+  visited[a][b] = true;
+  queue <pair<int, int>> q;
+  q.push(make_pair(a, b));
+  
+  while(!q.empty()){
+    int x = q.front().first;
+    int y = q.front().second;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x + dx[i];
+      int ny = y + dy[i];
+      
+      if(nx >= 0 && nx < N && ny >= 0 && ny < N){
+        if(!visited[nx][ny] && arr[nx][ny] == 1){
+          visited[nx][ny] = true;
+          q.push(make_pair(nx, ny));
+          h_cnt++;
+        }
+      }
+    }
+  }
+  return h_cnt;
+}
+
+int main(){
+  scanf("%d", &N);
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      scanf("%1d", &arr[i][j]);
+    }
+  }
+  
+  vector <int> house;
+  
+  int group = 0;
+  for(int i=0;i<N;i++){
+    for(int j=0;j<N;j++){
+      if(!visited[i][j] && arr[i][j] == 1){
+        group++;
+        int cnt = get_house_cnt(i, j);
+        house.push_back(cnt);
+      }
+    }
+  }
+  
+  sort(house.begin(), house.end());
+  printf("%d\n", group);
+  for(int i=0;i<house.size();i++) printf("%d\n", house[i]);
+  return 0;
+}
