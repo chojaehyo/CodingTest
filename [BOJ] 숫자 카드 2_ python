@@ -1,0 +1,31 @@
+def find(target, start, end):
+    while start <= end:
+        mid = (start+end)//2
+        if arr1[mid] == target:
+            return 1
+        elif arr1[mid] < target:
+            start = mid+1
+        elif arr1[mid] > target:
+            end = mid-1
+    return -1
+
+n = int(input())
+arr1 = list(map(int, input().split()))
+m = int(input())
+arr2 = list(map(int, input().split()))
+
+arr1.sort()
+dict1 = {}
+
+for i in arr1:
+    if i not in dict1:
+        dict1[i] = 1
+    else:
+        dict1[i] += 1
+
+for i in arr2:
+    res = find(i, 0, len(arr1)-1)
+    if res == 1:
+        print(dict1[i], end=' ')
+    else:
+        print(0, end=' ')
