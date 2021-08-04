@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <deque>
+#include <algorithm>
+using namespace std;
+
+int main(){
+  int T;
+  scanf("%d", &T);
+  
+  for(int t=1;t<=T;t++){
+    int n, m;
+    scanf("%d %d", &n, &m);
+    
+    deque <pair<int, int>> printer;
+    deque <int> tmp;
+    for(int i=0;i<n;i++){
+      int val;
+      scanf("%d", &val);
+      tmp.push_back(val);
+      if (i == m) printer.push_back(make_pair(val, 1));
+      else printer.push_back(make_pair(val, 0));
+    }
+    sort(tmp.begin(), tmp.end(), greater<int>());
+    
+    bool flag = false;
+    int cnt = 0;
+    
+    while(!flag){
+      
+      int max_val = tmp.front();
+      tmp.pop_front();
+      
+      for(int i=0;i<printer.size();i++){
+        int cur_val = printer.front().first;
+        int cur_check = printer.front().second;
+        printer.pop_front();
+        
+        if(max_val == cur_val){
+          if(cur_check == 1) flag = true;
+          break;
+        }
+        else printer.push_back(make_pair(cur_val, cur_check));
+      }
+      cnt++;
+    }
+    printf("%d\n", cnt);
+  }
+  return 0;
+}
