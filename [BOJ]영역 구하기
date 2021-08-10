@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+
+int n, m, k, arr[MAX][MAX];
+bool visited[MAX][MAX];
+int dx[] = { 0, 1, 0, -1 };
+int dy[] = { -1, 0, 1, 0 };
+
+int bfs(int a, int b) {
+	int total = 1;
+	visited[a][b] = true;
+	queue <pair<int, int>> q;
+	q.push(make_pair(a, b));
+
+	while (!q.empty()) {
+		int x = q.front().first;
+		int y = q.front().second;
+		q.pop();
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+
+			if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+			if (!visited[nx][ny] && arr[nx][ny] == 0) {
+				visited[nx][ny] = true;
+				total++;
+				q.push(make_pair(nx, ny));
+			}
+		}
+
+	}
+	return total;
+}
+int main() {
+	scanf("%d %d %d", &n, &m, &k);
+
+	for (int i = 0; i < k; i++) {
+		int a, b, c, d;
+		scanf("%d %d %d %d", &a, &b, &c, &d);
+
+		for (int row = min(n - b, n - d); row < max(n - b, n - d); row++) {
+			for (int col = min(a, c); col < max(a, c); col++){
+				arr[row][col] = 1;
+			}
+		}
+	}
+
+	vector <int> area;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (!visited[i][j] && arr[i][j] == 0) {
+				int cnt = bfs(i, j);
+				area.push_back(cnt);
+			}
+		}
+	}
+	printf("%d\n", area.size());
+	sort(area.begin(), area.end());
+	for (int i = 0; i < area.size(); i++) printf("%d ", area[i]);
+
+	return 0;
+}
