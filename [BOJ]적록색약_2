@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 105;
+
+int n;
+char arr[MAX][MAX];
+bool visited[MAX][MAX];
+int dx[] = { 0, 1, 0, -1 };
+int dy[] = { -1, 0, 1, 0 };
+
+void bfs(int a, int b, char val, int flag) {
+	visited[a][b] = true;
+	queue <pair<int, int>> q;
+	q.push(make_pair(a, b));
+
+	while (!q.empty()) {
+		int x = q.front().first;
+		int y = q.front().second;
+		q.pop();
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+
+			if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+			
+			if (flag == 1) {
+				if (!visited[nx][ny] && arr[nx][ny] == val) {
+					visited[nx][ny] = true;
+					q.push(make_pair(nx, ny));
+				}
+			}
+			else {
+				if (!visited[nx][ny]) {
+					if (val == 'R' || val == 'G') {
+						if (arr[nx][ny] == 'R' || arr[nx][ny] == 'G') {
+							visited[nx][ny] = true;
+							q.push(make_pair(nx, ny));
+						}
+					}
+					else {
+						if (arr[nx][ny] == val) {
+							visited[nx][ny] = true;
+							q.push(make_pair(nx, ny));
+						}
+					}
+				}
+			}
+		}
+	}
+
+}
+int main() {
+	scanf("%d", &n);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			scanf(" %1c", &arr[i][j]);
+		}
+	}
+
+	int area = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (!visited[i][j]) {
+				area++;
+				bfs(i, j, arr[i][j], 1);
+			}
+		}
+	}
+
+	printf("%d\n", area);
+	area = 0;
+	memset(visited, 0, sizeof(visited));
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (!visited[i][j]) {
+				area++;
+				bfs(i, j, arr[i][j], 2);
+			}
+		}
+	}
+	printf("%d\n", area);
+	return 0;
+}
