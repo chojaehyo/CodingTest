@@ -23,22 +23,12 @@ int main() {
 		int ny = y + dy[dir];
 		
 		if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-		if (dir == 1) {
-			int tmp = dice[1][1];
-			dice[1][1] = dice[1][0], dice[1][0] = dice[3][1], dice[3][1] = dice[1][2], dice[1][2] = tmp;
-		}
-		else if (dir == 2) {
-			int tmp = dice[1][1];
-			dice[1][1] = dice[1][2], dice[1][2] = dice[3][1], dice[3][1] = dice[1][0], dice[1][0] = tmp;
-		}
-		else if (dir == 3) {
-			int tmp = dice[0][1];
-			dice[0][1] = dice[1][1], dice[1][1] = dice[2][1], dice[2][1] = dice[3][1], dice[3][1] = tmp;
-		}
-		else {
-			int tmp = dice[0][1];
-			dice[0][1] = dice[3][1], dice[3][1] = dice[2][1], dice[2][1] = dice[1][1], dice[1][1] = tmp;
-		}
+		
+		int tmp = dice[1][1];
+		if (dir == 1) dice[1][1] = dice[1][0], dice[1][0] = dice[3][1], dice[3][1] = dice[1][2], dice[1][2] = tmp;
+		else if (dir == 2) dice[1][1] = dice[1][2], dice[1][2] = dice[3][1], dice[3][1] = dice[1][0], dice[1][0] = tmp;
+		else if (dir == 3) dice[1][1] = dice[2][1], dice[2][1] = dice[3][1], dice[3][1] = dice[0][1], dice[0][1] = tmp;
+		else dice[1][1] = dice[0][1], dice[0][1] = dice[3][1], dice[3][1] = dice[2][1], dice[2][1] = tmp;
 
 		if (arr[nx][ny] == 0) arr[nx][ny] = dice[3][1];
 		else {
