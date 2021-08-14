@@ -43,7 +43,10 @@ int main() {
 		int nx = x + dx[d];
 		int ny = y + dy[d];
 
-		if (nx < 1 || nx > n || ny < 1 || ny > n || arr[nx][ny] == 2) break;
+		if (nx < 1 || nx > n || ny < 1 || ny > n || arr[nx][ny] == 2) {
+            time++;
+            break;
+        }
 			
 		if (arr[nx][ny] == 1) {
 			snake.push(make_pair(nx, ny));
@@ -60,6 +63,6 @@ int main() {
 		x = nx, y = ny;
 		time++;
 	}
-	printf("%d\n", time+1);
+	printf("%d\n", time);
 	return 0;
 }
