@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <deque>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 25;
+
+int n, shark_x, shark_y, shark_size = 2, eat_cnt, result;
+int arr[MAX][MAX], dist[MAX][MAX];
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+bool visited[MAX][MAX];
+
+struct info {
+	int x, y, dist;
+};
+
+bool comp(info a, info b) {
+	if (a.dist < b.dist) return true;
+	else if (a.dist == b.dist) {
+		if (a.x < b.x) return true;
+		else if (a.x == b.x) {
+			if (a.y < b.y) return true;
+			return false;
+		}
+	}
+	return false;
+}
+
+bool find_fish() {
+	memset(visited, 0, sizeof(visited));
+	memset(dist, 0, sizeof(dist));
+
+	deque <pair<int, int>> q;
+	deque <info> can_eat;
+	q.push_back(make_pair(shark_x, shark_y));
+	visited[shark_x][shark_y] = true;
+
+	while (!q.empty()) {
+		int x = q.front().first;
+		int y = q.front().second;
+		q.pop_front();
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+
+			if (nx < 0 || nx >= n || ny < 0 || ny >= n || shark_size < arr[nx][ny]) continue;
+
+			if (!visited[nx][ny]) {
+				dist[nx][ny] = dist[x][y] + 1;
+				visited[nx][ny] = true;
+				if (arr[nx][ny] > 0 && arr[nx][ny] < shark_size) {
+					can_eat.push_back({nx, ny, dist[nx][ny]});
+					q.push_back(make_pair(nx, ny));
+				}
+				else if (arr[nx][ny] == 0 || arr[nx][ny] == shark_size) q.push_back(make_pair(nx, ny));
+			}
+		}
+	}
+
+	if (!can_eat.empty()) {
+		sort(can_eat.begin(), can_eat.end(), comp);
+
+		int fish_x = can_eat.front().x;
+		int fish_y = can_eat.front().y;
+		int fish_dist = can_eat.front().dist;
+		
+		arr[fish_x][fish_y] = 0;
+		shark_x = fish_x, shark_y = fish_y;
+		result += fish_dist;
+		
+		eat_cnt++;
+		if (eat_cnt == shark_size) {
+			shark_size++;
+			eat_cnt = 0;
+		}
+		return true;
+	}
+	else return false;
+}
+
+int main() {
+	scanf("%d", &n);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			scanf("%d", &arr[i][j]);
+			if (arr[i][j] == 9) {
+				shark_x = i, shark_y = j;
+				arr[i][j] = 0;
+			}
+		}
+	}
+	while (1) {
+		if (!find_fish()) break;
+	}
+	printf("%d\n", result);
+
+	return 0;
+}
