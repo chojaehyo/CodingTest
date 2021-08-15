@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <vector>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 20005;
+
+int T, n, m, num, group[MAX];
+vector <int> graph[MAX];
+bool visited[MAX], flag;
+
+void check_group(int node) {
+	group[node] = 1;
+	visited[node] = true;
+	queue <int> q;
+	q.push(node);
+
+	while (!q.empty()) {
+		int cur = q.front();
+		q.pop();
+
+		for (int i = 0; i < graph[cur].size(); i++) {
+			int next = graph[cur][i];
+
+			if (group[next] > 0 && group[next] == group[cur]) {
+				flag = true;
+				return;
+			}
+
+			if (group[cur] == 1) num = 2;
+			else num = 1;
+
+			if (!visited[next] && group[next] == 0) {
+				visited[next] = true;
+				group[next] = num;
+				q.push(next);
+			}
+		}
+	}
+}
+int main() {
+	scanf("%d", &T);
+
+	for (int t = 1; t <= T; t++) {
+		scanf("%d %d", &n, &m);
+
+		memset(graph, 0, sizeof(graph));
+		memset(visited, 0, sizeof(visited));
+		memset(group, 0, sizeof(group));
+		flag = false;
+
+		for (int i = 0; i < m; i++) {
+			int a, b;
+			scanf("%d %d", &a, &b);
+			graph[a].push_back(b);
+			graph[b].push_back(a);
+		}
+		
+		
+		for (int i = 1; i <= n; i++) {
+			if (!visited[i]) check_group(i);
+		}
+
+		if (flag) printf("NO\n");
+		else printf("YES\n");
+	}
+	return 0;
+}
