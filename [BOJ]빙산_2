@@ -1,0 +1,114 @@
+#include <cstdio>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 305;
+
+int n, m, arr[MAX][MAX], arr2[MAX][MAX];
+bool visited[MAX][MAX];
+int dx[] = { 0, -1, 0, 1 };
+int dy[] = { -1, 0, 1, 0 };
+
+int get_zero_count(int x, int y) {
+	int cnt = 0;
+	for (int i = 0; i < 4; i++) {
+		int nx = x + dx[i];
+		int ny = y + dy[i];
+
+		if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+		if (arr[nx][ny] == 0) cnt++;
+	}
+	return cnt;
+}
+
+void melt_ice() {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (arr[i][j] > 0) {
+				int zero = get_zero_count(i, j);
+
+				arr2[i][j] -= zero;
+				if (arr2[i][j] < 0) arr2[i][j] = 0;
+			}
+		}
+	}
+}
+
+void update_arr() {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) arr[i][j] = arr2[i][j];
+	}
+}
+
+int check_ice_cnt() {
+	int ice = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (arr[i][j] > 0) ice++;
+		}
+	}
+	return ice;
+}
+
+void bfs(int a, int b) {
+	visited[a][b] = true;
+	queue <pair<int, int>> q;
+	q.push(make_pair(a, b));
+
+	while (!q.empty()) {
+		int x = q.front().first;
+		int y = q.front().second;
+		q.pop();
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+
+			if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+			if (!visited[nx][ny] && arr[nx][ny] > 0) {
+				visited[nx][ny] = true;
+				q.push(make_pair(nx, ny));
+			}
+		}
+	}
+}
+
+bool check_area() {
+	int cnt = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (!visited[i][j] && arr[i][j] > 0) {
+				bfs(i, j);
+				cnt++;
+			}
+		}
+	}
+	if (cnt > 1) return true;
+	else return false;
+}
+
+int main() {
+	scanf("%d %d", &n, &m);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			scanf("%d", &arr[i][j]);
+			arr2[i][j] = arr[i][j];
+		}
+	}
+
+	int time = 1;
+	while (1) {
+		melt_ice();
+		update_arr();
+		memset(visited, 0, sizeof(visited));
+		if (check_ice_cnt() == 0) {
+			time = 0;
+			break;
+		}
+		if (check_area()) break;
+		time++;
+	}
+	printf("%d\n", time);
+	return 0;
+}
