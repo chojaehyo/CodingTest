@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 10005;
+
+int n, total, result;
+vector <pair<int, int>> graph[MAX];
+bool visited[MAX];
+
+void dfs(int cur) {
+	for (int i = 0; i < graph[cur].size(); i++) {
+		int next = graph[cur][i].first;
+		int weight = graph[cur][i].second;
+		if (!visited[next]) {
+			visited[next] = true;
+			total += weight;
+			dfs(next);
+			total -= weight;
+			visited[next] = false;
+		}
+	}
+	result = max(result, total);
+}
+
+int main() {
+	scanf("%d", &n);
+
+	for (int i = 0; i < n - 1; i++) {
+		int a, b, w;
+		scanf("%d %d %d", &a, &b, &w);
+		graph[a].push_back(make_pair(b, w));
+		graph[b].push_back(make_pair(a, w));
+	}
+
+	for (int i = 1; i <= n; i++) {
+		total = 0;
+		visited[i] = true;
+		dfs(i);
+		visited[i] = false;
+	}
+	printf("%d\n", result);
+	return 0;
+}
