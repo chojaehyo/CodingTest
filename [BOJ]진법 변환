@@ -1,0 +1,19 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int n;
+
+int main(){
+  string s;
+  cin >> s >> n;
+  
+  int total = 0, val = 1;
+  for(int i=s.size()-1;i>=0;i--){
+    if(s[i] >= 'A') total += val * (s[i]-'A'+10);
+    else total += val * (s[i]-'0');
+    val *= n;
+  }
+  cout << total << "\n";
+  return 0;
+}
