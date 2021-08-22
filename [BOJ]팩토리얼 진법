@@ -1,0 +1,16 @@
+import sys
+
+def factorial(x):
+  if x == 1: return 1
+  return x * factorial(x-1)
+
+while True:
+  n = sys.stdin.readline().strip()
+  if int(n) == 0: break
+  
+  len_n = len(n)
+  total = 0
+  
+  for i in range(len(n)):
+    total += int(n[i]) * factorial(len_n-i)
+  print(total)
