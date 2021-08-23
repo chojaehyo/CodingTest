@@ -1,0 +1,14 @@
+def solution(record):
+    arr = dict()
+    
+    for r in record:
+        if r[0] == "E" or r[0] == "C":
+            com, uid, name = r.split(" ")
+            arr[uid] = name
+    
+    answer = []
+    for r in record:
+        if r[0] == "E": answer.append("{}님이 들어왔습니다.".format(arr[r.split(" ")[1]]))
+        elif r[0] == "L": answer.append("{}님이 나갔습니다.".format(arr[r.split(" ")[1]]))
+            
+    return answer
