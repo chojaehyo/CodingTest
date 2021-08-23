@@ -1,0 +1,57 @@
+#include <vector>
+#include <cstring>
+#include <queue>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+int dx[] = {0, 1, 0, -1};
+int dy[] = {-1, 0, 1, 0};
+int N, M;
+bool visited[MAX][MAX];
+
+int bfs(int a, int b, vector<vector<int>> picture){
+    int cnt = 1;
+    visited[a][b] = true;
+    queue<pair<int, int>> q;
+    q.push(make_pair(a, b));
+    
+    while(!q.empty()){
+        int x = q.front().first;
+        int y = q.front().second;
+        q.pop();
+        
+        for(int i=0;i<4;i++){
+            int nx = x+dx[i];
+            int ny = y+dy[i];
+            
+            if(nx < 0 || nx >= M || ny < 0 || ny >= N) continue;
+            if(!visited[nx][ny] && picture[nx][ny] == picture[x][y]){
+                visited[nx][ny] = true;
+                cnt++;
+                q.push(make_pair(nx, ny));
+            }
+        }
+    }
+    return cnt;
+}
+
+vector<int> solution(int m, int n, vector<vector<int>> picture) {
+    int number_of_area = 0;
+    int max_size_of_one_area = 0;
+    memset(visited, 0, sizeof(visited));
+    N = n, M = m;
+    
+    for(int i=0;i<m;i++){
+        for(int j=0;j<n;j++){
+            if(!visited[i][j] && picture[i][j] > 0){
+                int val = bfs(i, j, picture);
+                max_size_of_one_area = max(val, max_size_of_one_area);
+                number_of_area++;
+            }
+        }
+    }
+    vector<int> answer(2);
+    answer[0] = number_of_area;
+    answer[1] = max_size_of_one_area;
+    return answer;
+}
