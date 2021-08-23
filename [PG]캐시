@@ -1,0 +1,24 @@
+def solution(cacheSize, cities):
+    answer = 0
+    arr = []
+    
+    for city in cities:
+        city = city.lower()
+        if len(arr) == cacheSize:
+            if city.lower() not in arr:
+                arr.append(city)
+                arr.pop(0)
+                answer += 5
+            else:
+                arr.remove(city)
+                arr.append(city)
+                answer += 1
+        else :
+            if city not in arr:
+                arr.append(city)
+                answer += 5
+            else:
+                arr.remove(city)
+                arr.append(city)
+                answer += 1
+    return answer
