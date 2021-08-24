@@ -1,0 +1,10 @@
+def solution(s):
+    answer = []
+    s = s[2:-2].split("},{")
+    s = sorted(s, key=len)
+    
+    arr = [list(map(int, x.split(','))) for x in s]
+    for x in arr:
+        val = set(x).difference(set(answer)) # val = set(x)-set(answer)
+        answer.append(list(val)[0])
+    return answer
