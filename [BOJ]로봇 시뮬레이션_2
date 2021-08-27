@@ -45,6 +45,7 @@ bool move(int num, char com, int rep) {
 	}
 
 	robots[num].x = x, robots[num].y = y, robots[num].d = d;
+	arr[x][y] = num;
 	return true;
 }
 
