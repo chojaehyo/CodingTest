@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAX = 105;
+
+int n, r, c, k, arr[MAX][MAX], arr2[MAX][MAX];
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+
+void battle() {
+	for (int x = 0; x < r; x++) {
+		for (int y = 0; y < c; y++) {
+			for (int d = 0; d < 4; d++) {
+				int nx = x + dx[d];
+				int ny = y + dy[d];
+
+				if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+				if (arr[x][y] == n - 1) {
+					if (arr[x][y] - arr[nx][ny] == n - 1) arr2[nx][ny] = arr[x][y];
+				}
+				else {
+					if (arr[x][y] - arr[nx][ny] == -1) arr2[nx][ny] = arr[x][y];
+				}	
+			}
+		}
+	}
+
+	for (int i = 0; i < r; i++) {
+		for (int j = 0; j < c; j++) {
+			if (arr2[i][j] != -1) arr[i][j] = arr2[i][j];
+		}
+	}
+}
+
+int main() {
+	while (1) {
+		memset(arr, 0, sizeof(arr));
+		scanf("%d %d %d %d", &n, &r, &c, &k);
+
+		if (n == 0 && r == 0 && c == 0 && k == 0) break;
+
+		for (int i = 0; i < r; i++) {
+			for (int j = 0; j < c; j++) scanf("%d", &arr[i][j]);
+		}
+
+		for (int i = 0; i < k; i++) {
+			memset(arr2, -1, sizeof(arr2));
+			battle();
+		}
+
+		for (int i = 0; i < r; i++) {
+			for (int j = 0; j < c; j++) {
+				printf("%d ", arr[i][j]);
+			}
+			printf("\n");
+		}
+	}
+	return 0;
+}
