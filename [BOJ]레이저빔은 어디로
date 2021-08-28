@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+using namespace std;
+const int MAX = 55;
+
+int n, r, T, arr[MAX][MAX], final_x, final_y;
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+struct info {
+	int x, y, d;
+};
+bool visited[MAX][MAX];
+
+bool move(int a, int b, int dir) {
+	queue <info> q;
+	q.push({ a, b, dir });
+
+	while (!q.empty()) {
+		int x = q.front().x;
+		int y = q.front().y;
+		int d = q.front().d;
+		q.pop();
+
+
+		int nx = x + dx[d];
+		int ny = y + dy[d];
+
+		if (nx < 1 || nx > n || ny < 1 || ny > n) {
+			final_x = nx;
+			final_y = ny;
+			return true;
+		}
+
+		if (!visited[nx][ny] && arr[nx][ny] == 1) {
+			d = (d + 1) % 4;
+			q.push({ nx, ny, d });
+		}
+		else if (visited[nx][ny] && arr[nx][ny] == 1) return false;
+
+		else if (arr[nx][ny] == 0) q.push({ nx, ny, d });
+	}
+}
+
+int main() {
+	scanf("%d", &T);
+
+	for (int t = 0; t < T; t++) {
+		scanf("%d %d", &n, &r);
+
+		memset(visited, 0, sizeof(visited));
+		memset(arr, 0, sizeof(arr));
+		for (int i = 0; i < r; i++) {
+			int mx, my;
+			scanf("%d %d", &mx, &my);
+
+			arr[mx][my] = 1;
+		}
+
+		int rx, ry, rd;
+		scanf("%d %d", &rx, &ry);
+
+		if (rx == 0) rd = 2;
+		else if (rx == n + 1) rd = 0;
+		else if (ry == 0) rd = 1;
+		else rd = 3;
+
+		if (move(rx, ry, rd)) printf("%d %d\n", final_x, final_y);
+		else printf("0 0\n");
+	}
+	return 0;
+}
