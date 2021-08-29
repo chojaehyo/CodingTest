@@ -12,7 +12,7 @@ int dx[] = { 1, 0, -1, 0 };
 int dy[] = { 0, 1, 0, -1 };
 vector <info> workers;
 
-void find_gift(int x, int y) {
+void find_worker(int x, int y) {
 	for (int d = 0; d < 4; d++) {
 		int nx = x + dx[d];
 		int ny = y + dy[d];
@@ -63,15 +63,15 @@ int main() {
 		else arr[0][0] = 0;
 
 		for (int j = 0; j < B; j++) {
-			if (arr[B - 1][j] == 1) find_gift(B - 1, j);
+			if (arr[B - 1][j] == 1) find_worker(B - 1, j);
 		}
 
 		for (int i = B - 2; i >= 0; i--) {
-			if (arr[i][B - 1] == 1) find_gift(i, B - 1);
+			if (arr[i][B - 1] == 1) find_worker(i, B - 1);
 		}
 
 		for (int j = B - 2; j >= 0; j--) {
-			if (arr[0][j] == 1) find_gift(0, j);
+			if (arr[0][j] == 1) find_worker(0, j);
 		}
 
 		for (int i = 0; i < N; i++) {
