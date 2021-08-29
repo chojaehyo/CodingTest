@@ -1,0 +1,90 @@
+#include <cstdio>
+#include <vector>
+using namespace std;
+const int MAX = 105;
+
+struct info {
+	int x, y, t, packing;
+	bool can_work;
+};
+int B, N, M, arr[MAX][MAX], gift;
+int dx[] = { 1, 0, -1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+vector <info> workers;
+
+void find_gift(int x, int y) {
+	for (int d = 0; d < 4; d++) {
+		int nx = x + dx[d];
+		int ny = y + dy[d];
+
+		if (nx < 0 || nx >= B || ny < 0 || ny >= B) continue;
+
+		if (arr[nx][ny] >= 2 && workers[arr[nx][ny]-2].can_work) {
+			arr[x][y] = 0;
+			M--;
+			gift++;
+			workers[arr[nx][ny]-2].can_work = false;
+			break;
+		}
+	}
+}
+
+void rotation() {
+	if (arr[B - 1][0] == 1) {
+		arr[B - 1][0] = 0;
+		M--;
+	}
+
+	for (int j = 1; j < B; j++) arr[B - 1][j - 1] = arr[B - 1][j];
+
+	for (int i = B - 2; i >= 0; i--) arr[i + 1][B - 1] = arr[i][B - 1];
+	
+	for (int j = B - 2; j >= 0; j--) arr[0][j + 1] = arr[0][j];
+}
+
+int main() {
+	scanf("%d %d %d", &B, &N, &M);
+
+	for (int i = 0; i < N; i++) {
+		int x, y, t;
+		scanf("%d %d %d", &x, &y, &t);
+
+		workers.push_back({ x, y, t, t, true});
+		arr[x][y] = i + 2;
+	}
+
+	int cnt = M;
+	while (M) {
+		rotation();
+		if (cnt > 0) {
+			arr[0][0] = 1;
+			cnt--;
+		}
+		else arr[0][0] = 0;
+
+		for (int j = 0; j < B; j++) {
+			if (arr[B - 1][j] == 1) find_gift(B - 1, j);
+		}
+
+		for (int i = B - 2; i >= 0; i--) {
+			if (arr[i][B - 1] == 1) find_gift(i, B - 1);
+		}
+
+		for (int j = B - 2; j >= 0; j--) {
+			if (arr[0][j] == 1) find_gift(0, j);
+		}
+
+		for (int i = 0; i < N; i++) {
+			if (!workers[i].can_work) {
+				workers[i].packing--;
+				if (workers[i].packing == 0) {
+					workers[i].can_work = true;
+					workers[i].packing = workers[i].t;
+				}
+			}
+		}
+	}
+
+	printf("%d\n", gift);
+	return 0;
+}
