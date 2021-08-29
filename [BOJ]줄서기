@@ -1,0 +1,71 @@
+#include <iostream>
+#include <string>
+#include <deque>
+#include <algorithm>
+using namespace std;
+
+deque<string> arr;
+deque<string> sorted_arr;
+int n;
+
+bool compare(string a, string b) {
+	if (a[0] < b[0]) return true;
+	else if (a[0] == b[0]) {
+		if (a.size() < b.size()) return true;
+		else if (a.size() == b.size()){
+			for (int i = 2; i < a.size(); i++) {
+				if (a[i] < b[i]) return true;
+				else if(a[i] > b[i]) return false;
+			}
+		}
+	}
+	return false;
+}
+
+int main() {
+	cin >> n;
+
+	for (int i = 0; i < n*5; i++) {
+			string s;
+			cin >> s;
+			arr.push_back(s);
+			sorted_arr.push_back(s);
+	}
+
+	sort(sorted_arr.begin(), sorted_arr.end(), compare);
+	
+	deque <string> wait_arr;
+	while(!arr.empty()){
+		if (sorted_arr.front() == arr.front()) {
+			sorted_arr.pop_front();
+			arr.pop_front();
+		}
+		else {
+			if (wait_arr.size() == 0) {
+				wait_arr.push_back(arr.front());
+				arr.pop_front();
+			}
+			else {
+				if (wait_arr.back() == sorted_arr.front()) {
+					sorted_arr.pop_front();
+					wait_arr.pop_back();
+				}
+				else {
+					wait_arr.push_back(arr.front());
+					arr.pop_front();
+				}
+			}
+		}
+	}
+	while (!sorted_arr.empty()) {
+		if (wait_arr.back() == sorted_arr.front()) {
+			sorted_arr.pop_front();
+			wait_arr.pop_back();
+		}
+		else break;
+	}
+
+	if (wait_arr.empty()) cout << "GOOD\n";
+	else cout << "BAD\n";
+	return 0;
+}
