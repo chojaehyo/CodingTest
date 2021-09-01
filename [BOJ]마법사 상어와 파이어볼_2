@@ -28,10 +28,6 @@ void fb_move() {
 			int m = fb[i].m;
 			int d = fb[i].d;
 
-			if (m == 0) {
-				fb[i].dead = true;
-				continue;
-			}
 			int nx = x + dx[d] * s;
 			int ny = y + dy[d] * s;
 
