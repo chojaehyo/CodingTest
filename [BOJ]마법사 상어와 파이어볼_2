@@ -1,0 +1,113 @@
+#include <cstdio>
+#include <deque>
+using namespace std;
+const int MAX = 55;
+
+int N, M, K;
+struct info {
+	int r, c, m, s, d;
+	bool dead = false;
+};
+deque <int> arr[MAX][MAX];
+deque <info> fb;
+int dx[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+int dy[] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+
+void fb_move() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			arr[i][j].clear();
+		}
+	}
+
+	for (int i = 0; i < fb.size(); i++) {
+		if (!fb[i].dead) {
+			int x = fb[i].r;
+			int y = fb[i].c;
+			int s = fb[i].s % N;
+			int m = fb[i].m;
+			int d = fb[i].d;
+
+			if (m == 0) {
+				fb[i].dead = true;
+				continue;
+			}
+			int nx = x + dx[d] * s;
+			int ny = y + dy[d] * s;
+
+			if (nx < 0) nx += N;
+			if (nx >= N) nx -= N;
+			if (ny < 0) ny += N;
+			if (ny >= N) ny -= N;
+
+			arr[nx][ny].push_back(i);
+			fb[i].r = nx, fb[i].c = ny;
+		}
+	}
+}
+
+void make_fb(int x, int y) {
+	int total_m = 0, total_s = 0, fb_cnt = arr[x][y].size();
+	int odd_d = 0, even_d = 0;
+
+	for (int i = 0; i < arr[x][y].size(); i++) {
+		int num = arr[x][y][i];
+		total_m += fb[num].m;
+		total_s += fb[num].s;
+		if (fb[num].d % 2 == 0) even_d++;
+		else odd_d++;
+		fb[num].dead = true;
+	}
+	int new_m = total_m / 5;
+	int new_s = total_s / fb_cnt;
+
+	if (new_m != 0) {
+		if (odd_d == 0 || even_d == 0) {
+			fb.push_back({ x, y, new_m, new_s, 0 , false });
+			fb.push_back({ x, y, new_m, new_s, 2 , false });
+			fb.push_back({ x, y, new_m, new_s, 4 , false });
+			fb.push_back({ x, y, new_m, new_s, 6 , false });
+		}
+		else {
+			fb.push_back({ x, y, new_m, new_s, 1 , false });
+			fb.push_back({ x, y, new_m, new_s, 3 , false });
+			fb.push_back({ x, y, new_m, new_s, 5 , false });
+			fb.push_back({ x, y, new_m, new_s, 7 , false });
+		}
+	}
+	
+}
+
+void check_arr() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (arr[i][j].size() > 1) {
+				make_fb(i, j);
+			}
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d %d", &N, &M, &K);
+
+	for (int i = 0; i < M; i++) {
+		int r, c, m, s, d;
+		scanf("%d %d %d %d %d", &r, &c, &m, &s, &d);
+
+		fb.push_back({ r-1, c-1, m, s, d, false});
+		
+		arr[r-1][c-1].push_back(i);
+	}
+	for (int i = 0; i < K; i++) {
+		fb_move();
+		check_arr();
+	}
+
+	int result = 0;
+	for (int i = 0; i < fb.size(); i++) {
+		if (!fb[i].dead) result += fb[i].m;
+	}
+	printf("%d\n", result);
+	return 0;
+}
