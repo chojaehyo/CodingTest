@@ -1,0 +1,25 @@
+def solution(numbers, hand):
+    answer = ''
+    left, right = [1, 4, 7], [3, 6, 9]
+    position = {1: (0, 0), 2:(0, 1), 3:(0, 2), 4:(1, 0), 
+    			5:(1, 1), 6:(1, 2), 7:(2, 0), 8:(2, 1), 
+                9:(2, 2), 0:(3, 1),'*': (3, 0), '#':(3, 2)}
+    cur_left, cur_right = position['*'], position['#']
+    
+    for num in numbers:
+        if num in left: 
+            answer += 'L'
+            cur_left = position[num]
+        elif num in right: 
+            answer += 'R'
+            cur_right = position[num]
+        else:
+            left_dist = abs(cur_left[0]-position[num][0]) + abs(cur_left[1]-position[num][1])
+            right_dist = abs(cur_right[0]-position[num][0]) + abs(cur_right[1]-position[num][1])
+            if left_dist < right_dist or (left_dist == right_dist and hand == 'left'):
+                answer += 'L'
+                cur_left = position[num]
+            elif left_dist > right_dist or (left_dist == right_dist and hand == 'right'):
+                answer += 'R'
+                cur_right = position[num]
+    return answer
