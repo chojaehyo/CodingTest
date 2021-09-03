@@ -1,5 +1,3 @@
-from itertools import accumulate
-
 def solution(N, stages):
     answer = []
     fail = {}
