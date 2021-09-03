@@ -1,0 +1,15 @@
+from itertools import accumulate
+
+def solution(N, stages):
+    answer = []
+    fail = {}
+    total = len(stages)
+    
+    for i in range(1, N+1):
+        if(total != 0):
+            fail[i] = stages.count(i) / total
+            total -= stages.count(i)
+        else: fail[i] = 0
+            
+    answer = sorted(fail, key=lambda x:fail[x], reverse=True)    
+    return answer
