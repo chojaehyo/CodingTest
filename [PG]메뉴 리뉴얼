@@ -1,0 +1,25 @@
+from itertools import combinations
+
+def solution(orders, course):
+    answer = []
+    for c in course:
+        comb = {}
+        for order in orders:
+            order = sorted(order)
+            tmp = ["".join(i) for i in list(combinations(order, c))]
+            
+            for i in tmp:
+                if i not in comb: comb[i] = 1
+                else: comb[i] += 1
+        sc = sorted(comb, key=lambda x:comb[x], reverse=True)
+        
+        res = []
+        if len(sc) >= 1 and comb[sc[0]] >= 2: res.append(sc[0])
+            
+        for i in range(1, len(sc)):
+            if len(res) >= 1 and comb[res[-1]] == comb[sc[i]]: res.append(sc[i])
+            else: break
+        
+        answer.extend(res)
+        answer.sort()
+    return answer
