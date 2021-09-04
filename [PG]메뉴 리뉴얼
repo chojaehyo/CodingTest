@@ -5,8 +5,7 @@ def solution(orders, course):
     for c in course:
         comb = {}
         for order in orders:
-            order = sorted(order)
-            tmp = ["".join(i) for i in list(combinations(order, c))]
+            tmp = ["".join(i) for i in combinations(sorted(order), c)]
             
             for i in tmp:
                 if i not in comb: comb[i] = 1
