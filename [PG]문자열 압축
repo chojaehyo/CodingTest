@@ -1,8 +1,7 @@
 def solution(s):
-    answer = 987987987
-    
     if len(s) == 1: answer = 1
     else:
+        res = []
         for i in range(1, len(s)//2+1):
             arr, count, total = '', [], 0
             for j in range(0, len(s), i):
@@ -23,6 +22,7 @@ def solution(s):
                 if c == 1: continue
                 else: total += len(str(c))
 
-            answer = min(answer, total)
+            res.append(total)
+        answer = min(res)
                 
     return answer
