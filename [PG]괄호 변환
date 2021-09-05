@@ -1,0 +1,36 @@
+def check(s):
+    stack = []
+    for x in s:
+        if x == "(": stack.append(x)
+        else:
+            if len(stack) >= 1 and stack[-1] == "(": stack.pop(-1)
+            else: stack.append(x)
+                
+    if len(stack) == 0: return True
+    else : return False
+    
+def solve(s):
+    if len(s) == 0: return s
+    
+    cnt1, cnt2 = 0, 0
+    for i in range(len(s)):
+        if s[i] == "(": cnt1 += 1
+        else: cnt2 += 1
+        
+        if cnt1 == cnt2: 
+            u = s[:i+1]
+            v = solve(s[i+1:])
+            
+            if(check(u)): return u+v
+            else:
+                new_u = ''
+                for j in u[1:-1]:
+                    if j == "(" : new_u += ")"
+                    else: new_u += "("
+                
+                return "(" + v + ")" + new_u
+            
+def solution(p):
+    if check(p): answer = p
+    else: answer = solve(p)
+    return answer
