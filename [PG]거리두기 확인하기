@@ -1,0 +1,37 @@
+from itertools import product
+
+def bfs(p, X, Y, D):
+    visited = [[0]*5 for _ in range(5)] 
+    dx = [-1, 0, 1, 0]
+    dy = [0, 1, 0, -1]
+    q = [[X, Y, D]]
+    visited[X][Y] = 1
+    
+    while q:
+        x, y, d = q.pop(0)
+        
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            nd = d + 1
+
+            if 0 <= nx < 5 and 0 <= ny < 5 and visited[nx][ny] == 0:
+                visited[nx][ny] = 1
+                if p[nx][ny] == 'P' and nd <= 2: return False
+                elif p[nx][ny] == 'O' and nd == 1: q.append([nx, ny, nd])
+
+    return True
+                    
+def solution(places):
+    answer = []
+    
+    for place in places:
+        flag = 1
+        
+        for i, j in product(range(5), repeat=2):
+            if place[i][j] == 'P':
+                result = bfs(place, i, j, 0)
+                if not result: flag = 0
+        answer.append(flag)
+        
+    return answer
