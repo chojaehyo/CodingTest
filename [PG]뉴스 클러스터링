@@ -1,0 +1,48 @@
+# <code1>
+from collections import Counter
+
+def solution(str1, str2):
+    answer = 0
+    arr1 = [str1[i:i+2].lower() for i in range(len(str1)-1) if str1[i:i+2].isalpha()]
+    arr2 = [str2[i:i+2].lower() for i in range(len(str2)-1) if str2[i:i+2].isalpha()]
+    
+    dict1 = dict(Counter(arr1))
+    dict2 = dict(Counter(arr2))
+    
+    keys = set()
+    for key in dict1.keys(): keys.add(key)
+    for key in dict2.keys(): keys.add(key)
+        
+    cnt1, cnt2 = 0, 0
+    for key in keys:
+        if key in dict1.keys() and key in dict2.keys():
+            cnt1 += min(dict1[key], dict2[key])
+        
+    for key in keys:
+        if key in dict1.keys() and key in dict2.keys():
+            cnt2 += max(dict1[key], dict2[key])
+        elif key not in dict1.keys():
+            cnt2 += dict2[key]
+        elif key not in dict2.keys():
+            cnt2 += dict1[key]
+    
+    if cnt2 == 0: answer = 65536
+    else: answer = int((cnt1/cnt2)*65536)
+    return answer
+    
+    ##############################################################################################
+    
+    #<code2>
+    
+    def solution(str1, str2):
+    arr1 = [str1[i:i+2].lower() for i in range(len(str1)-1) if str1[i:i+2].isalpha()]
+    arr2 = [str2[i:i+2].lower() for i in range(len(str2)-1) if str2[i:i+2].isalpha()]
+    
+    i_arr = set(arr1) & set(arr2)
+    u_arr = set(arr1) | set(arr2)
+    
+    if len(u_arr) == 0: return 65536
+    
+    i_cnt = sum([min(arr1.count(i), arr2.count(i)) for i in i_arr])
+    u_cnt = sum([max(arr1.count(u), arr2.count(u)) for u in u_arr])
+    return int((i_cnt/u_cnt)*65536)
