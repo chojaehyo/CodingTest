@@ -1,0 +1,34 @@
+from itertools import permutations
+
+def calc(a, ope, b):
+    if ope == "*": return str(int(a)*int(b))
+    elif ope == "+": return str(int(a)+int(b))
+    else: return str(int(a)-int(b))
+    
+def solve(ope, exp):
+    arr = []
+    tmp = ''
+    for i in exp:
+        if i.isdigit() == True: tmp += i
+        else:
+            arr.append(tmp)
+            arr.append(i)
+            tmp = ''
+    arr.append(tmp)
+    
+    for x in ope:
+        stack = []
+        while len(arr) != 0:
+            tmp = arr.pop(0)
+            if tmp != x: stack.append(tmp)
+            else: stack.append(calc(stack.pop(), x, arr.pop(0))) 
+        arr = stack
+    return abs(int(arr[0]))
+
+def solution(expression):
+    result = []
+    comb = list(permutations(['*', '-', '+'], 3))
+    
+    for c in comb:
+        result.append(solve(c, expression))
+    return max(result)
