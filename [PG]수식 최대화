@@ -6,16 +6,7 @@ def calc(a, ope, b):
     else: return str(int(a)-int(b))
     
 def solve(ope, exp):
-    arr = []
-    tmp = ''
-    for i in exp:
-        if i.isdigit() == True: tmp += i
-        else:
-            arr.append(tmp)
-            arr.append(i)
-            tmp = ''
-    arr.append(tmp)
-    
+    arr = exp[:]
     for x in ope:
         stack = []
         while len(arr) != 0:
@@ -26,9 +17,16 @@ def solve(ope, exp):
     return abs(int(arr[0]))
 
 def solution(expression):
-    result = []
+    result, arr, tmp = [], [], ''
+    for i in expression:
+        if i.isdigit() == True: tmp += i
+        else:
+            arr.append(tmp)
+            arr.append(i)
+            tmp = ''
+    arr.append(tmp)
     comb = list(permutations(['*', '-', '+'], 3))
     
     for c in comb:
-        result.append(solve(c, expression))
+        result.append(solve(c, arr))
     return max(result)
