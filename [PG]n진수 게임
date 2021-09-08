@@ -1,0 +1,19 @@
+def change(n, q):
+    tmp = ''
+    num = '0123456789ABCDEF'
+    if n == 0: return "0"
+    while n > 0:
+        n, mod = divmod(n, q)
+        tmp += str(num[mod])
+    return tmp[::-1]
+
+def solution(n, t, m, p):
+    answer = ''
+    num = ''
+    for i in range(t*m): num += change(i, n)
+    
+    idx = p-1
+    for i in range(t):
+        answer += num[idx]
+        idx += m
+    return answer
