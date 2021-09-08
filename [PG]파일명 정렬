@@ -1,0 +1,8 @@
+import re
+def solution(files):
+    arr = [re.split(r'([0-9]+)', x) for x in files]
+    
+    arr.sort(key=lambda x: (x[0].lower(), int(x[1])))
+    
+    answer = [''.join(arr[i]) for i in range(len(arr))]
+    return answer
