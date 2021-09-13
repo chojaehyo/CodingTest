@@ -1,0 +1,112 @@
+#include <cstdio>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 55;
+
+int n, m, arr[MAX][MAX], tmp[MAX][MAX];
+queue <pair<int, int>> cloud;
+queue <pair<int, int>> new_cloud;
+bool visited[MAX][MAX];
+int dx[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
+int dy[] = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
+int dx2[] = { -1, -1, 1, 1 };
+int dy2[] = { -1, 1, -1, 1 };
+
+void move(int d, int s) {
+	while(!cloud.empty()){
+		int ns = s % n;
+		int x = cloud.front().first;
+		int y = cloud.front().second;
+		cloud.pop();
+
+		int nx = x + dx[d] * ns;
+		int ny = y + dy[d] * ns;
+		
+		if (nx < 1) nx += n;
+		if (nx > n) nx -= n;
+		if (ny < 1) ny += n;
+		if (ny > n) ny -= n;
+
+		arr[nx][ny]++;
+		new_cloud.push(make_pair(nx, ny));
+		visited[nx][ny] = true;
+	}
+}
+
+void add_water() {
+	memset(tmp, 0, sizeof(tmp));
+	queue <pair<int, int>> q;
+
+	while (!new_cloud.empty()) {
+		int x = new_cloud.front().first;
+		int y = new_cloud.front().second;
+		new_cloud.pop();
+
+		int cnt = 0;
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx2[i];
+			int ny = y + dy2[i];
+
+			if (nx < 1 || nx > n || ny < 1 || ny > n) continue;
+			if (arr[nx][ny] > 0) cnt++;
+		}
+		tmp[x][y] += cnt;
+		q.push(make_pair(x, y));
+	}
+
+	while (!q.empty()) {
+		int x = q.front().first;
+		int y = q.front().second;
+		q.pop();
+
+		arr[x][y] += tmp[x][y];
+	}
+}
+
+void find_cloud() {
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++) {
+			if (!visited[i][j] && arr[i][j] >= 2) {
+				arr[i][j] -= 2;
+				cloud.push(make_pair(i, j));
+			}
+		}
+	}
+}
+
+int count_water() {
+	int total = 0;
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++) total += arr[i][j];
+	}
+	return total;
+}
+
+int main() {
+	scanf("%d %d", &n, &m);
+
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++) {
+            scanf("%d", &arr[i][j]);
+        }
+	}
+
+	cloud.push(make_pair(n, 1));
+	cloud.push(make_pair(n, 2));
+	cloud.push(make_pair(n-1, 1));
+	cloud.push(make_pair(n-1, 2));
+
+	for (int i = 0; i < m; i++) {
+		int d, s;
+		scanf("%d %d", &d, &s);
+		memset(visited, 0, sizeof(visited));
+		move(d, s);
+		add_water();
+		find_cloud();
+	}
+
+	int result = count_water();
+	printf("%d\n", result);
+	return 0;
+}
