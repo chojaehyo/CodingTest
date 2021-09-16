@@ -1,0 +1,143 @@
+#include <cstdio>
+#include <cmath>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+const int MAX = 100;
+
+int n, q, arr[MAX][MAX], arr2[MAX][MAX];
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+bool visited[MAX][MAX];
+
+void rotate(int x, int y, int cnt) {
+	int a = cnt - 1, b = 0;
+	for (int k = 0; k < cnt / 2; k++) {
+		for (int i = 0; i < a - b; i++) arr2[x + k][y + a - i - k] = arr[x + i + k][y + k];
+
+		for (int i = 0; i < a - b; i++) arr2[x + a - i - k][y + a - k] = arr[x + k][y + a - i - k];
+
+		for (int i = 0; i < a - b; i++) arr2[x + a - k][y + i + k] = arr[x + a - i - k][y + a - k];
+
+		for (int i = 0; i < a - b; i++) arr2[x + i + k][y + k] = arr[x + a - k][y + i + k];
+		b += 2;
+	}
+}
+
+void update_arr(int N) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) arr[i][j] = arr2[i][j];
+	}
+}
+
+int check_ice(int a, int b, int N) {
+	queue <pair<int, int> > q;
+	queue <pair<int, int> > ice;
+	q.push(make_pair(a, b));
+	ice.push(make_pair(a, b));
+	visited[a][b] = true;
+
+	int cnt = 0;
+	while (!q.empty()) {
+		int x = q.front().first;
+		int y = q.front().second;
+		q.pop();
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+
+			if (nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
+			if (!visited[nx][ny] && arr[nx][ny] > 0) {
+				visited[nx][ny] = true;
+				cnt++;
+				q.push(make_pair(nx, ny));
+				ice.push(make_pair(nx, ny));
+			}
+		}
+	}
+
+	if (ice.size() >= 3) return ice.size();
+
+	while (!ice.empty()) {
+		int x = ice.front().first;
+		int y = ice.front().second;
+		ice.pop();
+		arr2[x][y]--;
+	}
+	return ice.size();
+}
+
+int melt_ice(int x, int y, int N) {
+	int cnt = 0;
+	for (int i = 0; i < 4; i++) {
+		int nx = x + dx[i];
+		int ny = y + dy[i];
+
+		if (nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
+		if (arr[nx][ny] > 0) cnt++;
+	}
+	return cnt;
+}
+
+void solve(int l, int N) {
+	int cnt = pow(2, l);
+
+	for (int i = 0; i < N; i += cnt) {
+		for (int j = 0; j < N; j += cnt) rotate(i, j, cnt);
+	}
+	update_arr(N);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (arr2[i][j] == 0) continue;
+			int adj = melt_ice(i, j, N);
+			if (adj < 3) arr2[i][j]--;
+		}
+	}
+	update_arr(N);
+}
+
+int main() {
+	scanf("%d %d", &n, &q);
+
+	int N = pow(2, n);
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			scanf("%d", &arr[i][j]);
+			arr2[i][j] = arr[i][j];
+		}
+	}
+
+	for (int Q = 0; Q < q; Q++) {
+		int l_size;
+		scanf("%d", &l_size);
+		solve(l_size, N);
+	}
+
+	vector<int> v;
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (!visited[i][j] && arr[i][j] > 0) {
+				int res = check_ice(i, j, N);
+				v.push_back(res);
+			}
+		}
+	}
+
+	int max_val = 0;
+	if (v.size() > 0) {
+		sort(v.begin(), v.end(), greater<int>());
+		max_val = v[0];
+	}
+
+	int total = 0;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) total += arr[i][j];
+	}
+
+	printf("%d\n%d\n", total, max_val);
+	return 0;
+}
