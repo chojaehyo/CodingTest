@@ -1,0 +1,157 @@
+#include <cstdio>
+#include <queue>
+#include <vector>
+#include <cstring>
+using namespace std;
+const int MAX = 25;
+
+int N, M, fuel, arr[MAX][MAX];
+int tx, ty;
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+struct info {
+	int sx, sy, ex, ey;
+};
+vector <info> customer;
+bool visited[MAX][MAX];
+struct cus {
+	int x, y, d;
+};
+
+struct compare {
+	bool operator()(cus a, cus b){
+		if (a.d > b.d) return true;
+		else if (a.d == b.d) {
+			if (a.x > b.x) return true;
+			else if (a.x == b.x) {
+				if (a.y > b.y) return true;
+				else return false;
+			}
+			else return false;
+		}
+		else return false;
+	}
+};
+
+int find_customer() {
+	memset(visited, 0, sizeof(visited));
+	queue <cus> q;
+	priority_queue <cus, vector<cus>, compare> can_take;
+	q.push({ tx, ty, 0 });
+	visited[tx][ty] = true;
+
+	if (arr[tx][ty] >= 2) {
+		int num = arr[tx][ty] - 2;
+		arr[tx][ty] = 0;
+		return num;
+	}
+
+	while (!q.empty()) {
+		int x = q.front().x;
+		int y = q.front().y;
+		int d = q.front().d;
+		q.pop();
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			int nd = d + 1;
+
+			if (nx < 1 || nx > N || ny < 1 || ny > N || arr[nx][ny] == 1) continue;
+
+			if (!visited[nx][ny]) {
+				visited[nx][ny] = true;
+				q.push({ nx, ny, nd });
+				if (arr[nx][ny] >= 2) can_take.push({ nx, ny, nd });	
+			}
+		}
+	}
+
+	if (can_take.size() == 0) return -1;
+	else{
+		int x = can_take.top().x;
+		int y = can_take.top().y;
+		int d = can_take.top().d;
+		int num = arr[x][y] - 2;
+		tx = x, ty = y;
+		arr[x][y] = 0;
+		fuel -= d;
+		if (fuel <= 0) return -1;
+		else return num;
+	}
+}
+
+int move(int num) {
+	memset(visited, 0, sizeof(visited));
+	int ex = customer[num].ex;
+	int ey = customer[num].ey;
+	queue <cus> q;
+	q.push({ tx, ty });
+	while (!q.empty()) {
+		int x = q.front().x;
+		int y = q.front().y;
+		int d = q.front().d;
+		q.pop();
+
+		if (x == ex && y == ey) {
+			fuel -= d;
+			if (fuel < 0) return -1;
+			else {
+				fuel += (d * 2);
+				tx = ex, ty = ey;
+				return 1;
+			}
+		}
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			int nd = d + 1;
+
+			if (nx < 1 || nx > N || ny < 1 || ny > N || arr[nx][ny] == 1) continue;
+
+			if (!visited[nx][ny]) {
+				visited[nx][ny] = true;
+				q.push({ nx, ny, nd });
+			}
+		}
+	}
+    return -1;
+}
+
+int main() {
+	scanf("%d %d %d", &N, &M, &fuel);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	scanf("%d %d", &tx, &ty);
+
+	for (int i = 0; i < M; i++) {
+		int a, b, c, d;
+		scanf("%d %d %d %d", &a, &b, &c, &d);
+		customer.push_back({ a, b, c, d });
+		arr[a][b] = i + 2;
+	}
+	
+	bool fail = false;
+	for (int i = 0; i < M; i++) {
+		int res = find_customer();
+		if (res == -1) {
+			fail = true;
+			break;
+		}
+		int res2 = move(res);
+		if (res2 == -1) {
+			fail = true;
+			break;
+		}
+	}
+
+	if (fail) printf("-1\n");
+	else printf("%d\n", fuel);
+	return 0;
+}
