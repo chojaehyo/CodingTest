@@ -1,0 +1,31 @@
+import math
+def solution(answers):
+    answer = []
+    cnt_s1, cnt_s2, cnt_s3 = 0, 0, 0
+    s1 = [1, 2, 3, 4, 5]
+    s2 = [2, 1, 2, 3, 2, 4, 2, 5] 
+    s3 = [3, 3, 1, 1, 2, 2, 4, 4, 5, 5] 
+    if len(answers) >= len(s3):
+        s1 = s1 * math.ceil(len(answers)/len(s1))
+        s2 = s2 * math.ceil(len(answers)/len(s2))
+        s3 = s3 * math.ceil(len(answers)/len(s3))
+    else:
+        if len(answers) >= 5:
+            s1 = s1 * 2
+            s2 = s2 * 2
+    for i in range(len(answers)):
+        if answers[i] == s1[i]:
+            cnt_s1 += 1
+        if answers[i] == s2[i]:
+            cnt_s2 += 1
+        if answers[i] == s3[i]:
+            cnt_s3 += 1
+    max_cnt = max(cnt_s1, cnt_s2, cnt_s3)
+    
+    if max_cnt == cnt_s1:
+        answer.append(1)
+    if max_cnt == cnt_s2:
+        answer.append(2)
+    if max_cnt == cnt_s3:
+        answer.append(3)
+    return answer
