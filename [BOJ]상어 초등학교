@@ -1,0 +1,110 @@
+#include <cstdio>
+#include <vector>
+#include <queue>
+using namespace std;
+const int MAX = 25;
+
+int N, arr[MAX][MAX];
+int score[] = { 0, 1, 10, 100, 1000 };
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+vector <int> like[MAX*MAX];
+struct info {
+	int x, y, like_cnt, empty_cnt;
+};
+struct compare {
+	bool operator()(info a, info b) {
+		if (a.like_cnt < b.like_cnt) return true;
+		else if (a.like_cnt == b.like_cnt) {
+			if (a.empty_cnt < b.empty_cnt) return true;
+			else if (a.empty_cnt == b.empty_cnt) {
+				if (a.x > b.x) return true;
+				else if (a.x == b.x) {
+					if (a.y > b.y) return true;
+					return false;
+				}
+				else return false;
+			}
+			else return false;
+		}
+		else return false;
+	}
+};
+
+void find_place(int num) {
+	priority_queue <info, vector<info>, compare> can_sit;
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			if (arr[i][j] == 0) {
+				int like_cnt = 0, empty_cnt = 0;
+				for (int d = 0; d < 4; d++) {
+					int nx = i + dx[d];
+					int ny = j + dy[d];
+
+					if (nx < 1 || nx > N || ny < 1 || ny > N) continue;
+					if (arr[nx][ny] == 0) empty_cnt++;
+					else {
+						bool flag = false;
+						for (int a = 0; a < 4; a++) {
+							if (arr[nx][ny] == like[num][a]) {
+								flag = true;
+								break;
+							}
+						}
+						if (flag) like_cnt++;
+					}
+				}
+				can_sit.push({ i, j, like_cnt, empty_cnt });
+			}
+		}
+	}
+
+	int x = can_sit.top().x;
+	int y = can_sit.top().y;
+
+	arr[x][y] = num;
+}
+
+int calc_score() {
+	int total_score = 0;
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			int cnt = 0;
+			for (int d = 0; d < 4; d++) {
+				int nx = i + dx[d];
+				int ny = j + dy[d];
+
+				if (nx < 1 || nx > N || ny < 1 || ny > N) continue;
+
+				for (int a = 0; a < 4; a++) {
+					if (arr[nx][ny] == like[arr[i][j]][a]) {
+						cnt++;
+						break;
+					}
+				}
+			}
+			total_score += score[cnt];
+		}
+	}
+	return total_score;
+}
+int main() {
+	scanf("%d", &N);
+
+	for (int i = 0; i < N*N; i++) {
+		int num, n1, n2, n3, n4;
+		scanf("%d %d %d %d %d", &num, &n1, &n2, &n3, &n4);
+
+		like[num].push_back(n1);
+		like[num].push_back(n2);
+		like[num].push_back(n3);
+		like[num].push_back(n4);
+
+		find_place(num);
+	}
+
+	int result = calc_score();
+	printf("%d\n", result);
+	return 0;
+}
