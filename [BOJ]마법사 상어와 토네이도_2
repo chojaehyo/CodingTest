@@ -1,0 +1,76 @@
+#include <cstdio>
+const int MAX = 505;
+int N, arr[MAX][MAX], arr2[MAX][MAX], result;
+int dx[] = { 0, 1, 0, -1 };
+int dy[] = { -1, 0, 1, 0 };
+int move_x[4][10] = {
+  {-1, 1, -1, 1, -2, 2, -1, 1, 0, 0},
+  {0, 0, 1, 1, 1, 1, 2, 2, 3, 2},
+  {-1, 1, -1, 1, -2, 2, -1, 1, 0, 0},
+  {0, 0, -1, -1, -1, -1, -2, -2, -3, -2} };
+int move_y[4][10] = {
+  {0, 0, -1, -1, -1, -1, -2, -2, -3, -2},
+  {-1, 1, -1, 1, -2, 2, -1, 1, 0, 0},
+  {0, 0, 1, 1, 1, 1, 2, 2, 3, 2},
+  {-1, 1, -1, 1, -2, 2, -1, 1, 0, 0} };
+
+int percent[9] = { 1, 1, 7, 7, 2, 2, 10, 10, 5 };
+
+bool outofrange(int x, int y) {
+	if (x < 1 || x > N || y < 1 || y > N) return true;
+	return false;
+}
+
+void move_sand(int x, int y, int nx, int ny, int dir) {
+	int sand = arr[nx][ny];
+	int tmp = 0;
+	for (int i = 0; i < 9; i++) {
+		int xx = x + move_x[dir][i];
+		int yy = y + move_y[dir][i];
+
+		tmp += sand * percent[i] / 100;
+		if (outofrange(xx, yy)) result += sand * percent[i] / 100;
+		else arr[xx][yy] += sand * percent[i] / 100;
+	}
+
+	int xx = x + move_x[dir][9];
+	int yy = y + move_y[dir][9];
+
+	if (outofrange(xx, yy)) result += sand - tmp;
+	else arr[xx][yy] += sand - tmp;
+}
+
+int main() {
+	scanf("%d", &N);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	int d = 0, num = 1;
+	int sx = (N + 1) / 2, sy = (N + 1) / 2;
+	bool stop = false;
+	for (int i = 1; i <= N; i++) {
+		for (int j = 0; j < 2; j++) {
+			for (int k = 1; k <= i; k++) {
+				int nx = sx + dx[d];
+				int ny = sy + dy[d];
+
+				if (outofrange(nx, ny)) {
+					stop = true;
+					break;
+				}
+				move_sand(sx, sy, nx, ny, d);
+				sx = nx, sy = ny;
+			}
+			if (stop) break;
+			d = (d + 1) % 4;
+		}
+		if (stop) break;
+	}
+
+	printf("%d\n", result);
+	return 0;
+}
