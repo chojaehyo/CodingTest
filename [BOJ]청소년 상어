@@ -1,0 +1,126 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 20;
+
+int arr[4][4], result;
+int dx[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+int dy[] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+struct info {
+	int x, y, dir;
+	bool dead;
+};
+info fish[MAX];
+
+bool outofrange(int x, int y) {
+	if (x < 0 || x >= 4 || y < 0 || y >= 4) return true;
+	return false;
+}
+
+void move_fish() {
+	for (int i = 1; i <= 16; i++) {
+		if (fish[i].dead) continue;
+		int x = fish[i].x;
+		int y = fish[i].y;
+		int d = fish[i].dir;
+
+		int nx = x + dx[d];
+		int ny = y + dy[d];
+
+		if (outofrange(nx, ny) || arr[nx][ny] == -1) {
+			bool check = false;
+
+			for (int a = 0; a < 8; a++) {
+				d = (d + 1) % 8;
+				nx = x + dx[d];
+				ny = y + dy[d];
+
+				if (!outofrange(nx, ny) && arr[nx][ny] != -1) {
+					check = true;
+					fish[i].dir = d;
+					break;
+				}
+			}
+			if (!check) continue;
+		}
+		
+		if (arr[nx][ny] == 0) {
+			fish[i].x = nx;
+			fish[i].y = ny;
+			arr[nx][ny] = i;
+			arr[x][y] = 0;
+		}
+		else if (arr[nx][ny] != -1) {
+			swap(fish[i].x, fish[arr[nx][ny]].x);
+			swap(fish[i].y, fish[arr[nx][ny]].y);
+			swap(arr[x][y], arr[nx][ny]);
+		}
+	}
+}
+
+void copy_arr(int a1[4][4], int a2[4][4], info a3[MAX], info a4[MAX]) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			a2[i][j] = a1[i][j];
+		}
+	}
+	for (int i = 1; i <= 16; i++) a4[i] = a3[i];
+}
+
+void make_state(int x, int y, int nx, int ny, int fish_num, int flag){
+	if (flag == 1){
+		arr[x][y] = 0;
+		arr[nx][ny] = -1;
+		fish[fish_num].dead = true;
+	}
+	else{
+		arr[x][y] = -1;
+		arr[nx][ny] = fish_num;
+		fish[fish_num].dead = false;
+	}
+}
+
+void dfs(int x, int y, int d, int score) {
+	result = max(result, score);
+
+	int arr2[4][4] = { 0 };
+	info tmp[MAX] = { 0 };
+	copy_arr(arr, arr2, fish, tmp);
+	move_fish();
+
+	for (int i = 1; i <= 3; i++) {
+		int nx = x + dx[d]*i;
+		int ny = y + dy[d]*i;
+		if (!outofrange(nx, ny)) {
+			if (arr[nx][ny] >= 1) {
+				int fish_num = arr[nx][ny];
+				int nd = fish[fish_num].dir;
+
+				make_state(x, y, nx, ny, fish_num, 1);
+				dfs(nx, ny, nd, score + fish_num);
+				make_state(x, y, nx, ny, fish_num, 2);
+			}
+		}
+		else break;
+	}
+	copy_arr(arr2, arr, tmp, fish);
+}
+
+int main() {
+	int dir;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			scanf("%d %d", &arr[i][j], &dir);
+			fish[arr[i][j]] = { i, j, dir - 1, false };
+		}
+	}
+
+	int total = arr[0][0];
+	int sd = fish[arr[0][0]].dir;
+	fish[arr[0][0]].dead = true;
+	arr[0][0] = -1;
+	
+	dfs(0, 0, sd, total);
+	printf("%d\n", result);
+	return 0;
+}
