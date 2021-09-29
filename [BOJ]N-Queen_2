@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cmath>
+const int MAX = 20;
+
+int N, result, arr[MAX][MAX],comb[MAX];
+bool use[MAX];
+
+bool check(int idx) {
+	for (int i = 0; i < idx; i++) {
+		if ((idx - i) == abs(comb[idx]-comb[i])) return false;
+	}
+	return true;
+}
+void nqueen(int idx) {
+	if (idx == N) result++;
+	else {
+		for (int i = 0; i < N; i++) {
+			comb[idx] = i;
+			if (use[i]) continue;
+			else {
+				use[i] = true;
+				if (check(idx)) nqueen(idx + 1);
+				use[i] = false;
+			}
+		}
+	}
+}
+int main() {
+	scanf("%d", &N);
+	nqueen(0);
+	printf("%d\n", result);
+	return 0;
+}
