@@ -1,0 +1,168 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 25;
+
+int N, M, K, shark_num;
+int dx[] = { -1, 1, 0, 0 };
+int dy[] = { 0, 0, -1, 1 };
+struct info {
+	int x, y, d;
+	bool dead;
+};
+struct smell_info {
+	int num, smell;
+};
+
+smell_info arr[MAX][MAX];
+vector <int> same_place[MAX][MAX];
+info shark[MAX*MAX];
+int direction[MAX*MAX][MAX][MAX];
+
+void remove_smell() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (arr[i][j].num > 0) {
+				arr[i][j].smell--;
+
+				if (arr[i][j].smell == 0) arr[i][j].num = 0;
+			}
+		}
+	}
+}
+
+bool outofrange(int x, int y) {
+	if (x < 0 || x >= N || y < 0 || y >= N) return true;
+	return false;
+}
+
+void move_shark() {
+	for (int i = 1; i <= M; i++) {
+		if (shark[i].dead) continue;
+
+		int x = shark[i].x;
+		int y = shark[i].y;
+		int d = shark[i].d;
+
+		bool can_move = false;
+		for (int a = 0; a < 4; a++) {
+			int nd = direction[i][d][a];
+			int nx = x + dx[nd];
+			int ny = y + dy[nd];
+            
+			if (outofrange(nx, ny)) continue;
+
+			if (arr[nx][ny].num == 0) {
+				can_move = true;
+
+				same_place[nx][ny].push_back(i);
+				shark[i].x = nx;
+				shark[i].y = ny;
+				shark[i].d = nd;
+				break;
+			}
+		}
+
+		if (can_move) continue;
+		
+        for (int a = 0; a < 4; a++) {
+            int nd = direction[i][d][a];
+            int nx = x + dx[nd];
+            int ny = y + dy[nd];
+
+            if (outofrange(nx, ny)) continue;
+
+            if (arr[nx][ny].num == i) {
+                same_place[nx][ny].push_back(i);
+                shark[i].x = nx;
+                shark[i].y = ny;
+                shark[i].d = nd;
+                break;
+            }
+        }
+	}
+}
+
+void check_same_place() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			sort(same_place[i][j].begin(), same_place[i][j].end());
+		}
+	}
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			for (int k = 0; k < same_place[i][j].size(); k++) {
+				if (k == 0) {
+					arr[i][j].num = same_place[i][j][k];
+					arr[i][j].smell = K;
+				}
+				else {
+					int num = same_place[i][j][k];
+					shark[num].dead = true;
+					shark_num--;
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			same_place[i][j].clear();
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d %d", &N, &M, &K);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			int a;
+			scanf("%d", &a);
+			
+			arr[i][j].num = a;
+			if (a > 0) arr[i][j].smell = K;
+			else arr[i][j].smell = 0;
+
+			shark[a].x = i;
+			shark[a].y = j;
+			shark[a].dead = false;
+		}
+	}
+
+	int dir;
+	for (int i = 1; i <= M; i++) {
+		scanf("%d", &dir);
+		shark[i].d = dir - 1;
+	}
+
+	for (int i = 1; i <= M; i++) {
+		for (int j = 0; j < 4; j++) {
+			for (int k = 0; k < 4; k++) {
+				int a;
+				scanf("%d", &a);
+				direction[i][j][k] = a - 1;
+			}
+		}
+	}
+    
+	shark_num = M;
+	int time = 0;
+	bool find = true;
+
+	while (shark_num > 1) {
+		if (time >= 1000) {
+			find = false;
+			break;
+		}
+		move_shark();
+		remove_smell();
+		check_same_place();
+		time++;
+	}
+	if (find) printf("%d\n", time);
+	else printf("-1\n");
+	return 0;
+}
