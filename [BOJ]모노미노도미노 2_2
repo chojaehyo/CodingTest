@@ -1,0 +1,178 @@
+#include <cstdio>
+
+int N, arr[10][10], score;
+
+void fill_block(int type, int idx) {
+	if (type == 1) {
+		for (int i = idx - 1; i >= 4; i--) {
+			for (int j = 0; j < 4; j++) arr[j][i + 1] = arr[j][i];
+		}
+		for (int i = 0; i < 4; i++) arr[i][4] = 0;
+	}
+	else {
+		for (int i = idx - 1; i >= 4; i--) {
+			for (int j = 0; j < 4; j++) arr[i + 1][j] = arr[i][j];
+		}
+		for (int i = 0; i < 4; i++) arr[4][i] = 0;
+	}
+}
+
+void check_full_line() {
+	int idx = 9;
+	while(idx > 4) {
+		int cnt = 0;
+		for (int j = 0; j < 4; j++) {
+			if (arr[j][idx] > 0) cnt++;
+		}
+		if (cnt == 4) {
+			score++;
+			fill_block(1, idx);
+		}
+		else idx--;
+	}
+
+	idx = 9;
+	while (idx > 4) {
+		int cnt = 0;
+		for (int j = 0; j < 4; j++) {
+			if (arr[idx][j] > 0) cnt++;
+		}
+		if (cnt == 4) {
+			score++;
+			fill_block(2, idx);
+		}
+		else idx--;
+	}	
+}
+
+void check_special_area() {
+	int cnt = 0;
+	for (int i = 5; i >= 4; i--) {
+		for (int j = 0; j < 4; j++) {
+			if (arr[j][i] > 0) {
+				cnt++;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < cnt; i++) fill_block(1, 9);
+	
+	cnt = 0;
+	for (int i = 5; i >= 4; i--) {
+		for (int j = 0; j < 4; j++) {
+			if (arr[i][j] > 0) {
+				cnt++;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < cnt; i++) fill_block(2, 9);
+}
+
+void move_block(int type, int x, int y) {
+	if (type == 1) {
+		bool flag = false;
+		for (int i = 4; i < 10; i++) {
+			if (arr[x][i] > 0) {
+				arr[x][i - 1] = type;
+				flag = true;
+				break;
+			}
+		}
+		if (!flag) arr[x][9] = type;
+
+		flag = false;
+		for (int i = 4; i < 10; i++) {
+			if (arr[i][y] > 0) {
+				arr[i - 1][y] = type;
+				flag = true;
+				break;
+			}
+		}
+		if (!flag) arr[9][y] = type;
+	}
+	else if (type == 2) {
+		bool flag = false;
+		for (int i = 4; i < 10; i++) {
+			if (arr[x][i] > 0) {
+				arr[x][i - 1] = type;
+				arr[x][i - 2] = type;
+				flag = true;
+				break;
+			}
+		}
+		if (!flag) {
+			arr[x][9] = type;
+			arr[x][8] = type;
+		}
+
+		flag = false;
+		for (int i = 4; i < 10; i++) {
+			if (arr[i][y] > 0 || arr[i][y + 1] > 0) {
+				arr[i - 1][y] = type;
+				arr[i - 1][y + 1] = type;
+				flag = true;
+				break;
+			}
+		}
+		if (!flag) {
+			arr[9][y] = type;
+			arr[9][y + 1] = type;
+		}
+	}
+	else {
+		bool flag = false;
+		for (int i = 4; i < 10; i++) {
+			if (arr[x][i] > 0 || arr[x + 1][i] > 0) {
+				arr[x][i - 1] = type;
+				arr[x + 1][i - 1] = type;
+				flag = true;
+				break;
+			}
+		}
+		if (!flag) {
+			arr[x][9] = type;
+			arr[x + 1][9] = type;
+		}
+
+		flag = false;
+		for (int i = 4; i < 10; i++) {
+			if (arr[i][y] > 0) {
+				arr[i - 1][y] = type;
+				arr[i - 2][y] = type;
+				flag = true;
+				break;
+			}
+		}
+		if (!flag) {
+			arr[9][y] = type;
+			arr[8][y] = type;
+		}
+	}
+}
+
+int count_block() {
+	int cnt = 0;
+	for (int i = 6; i < 10; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (arr[j][i] > 0) cnt++;
+			if (arr[i][j] > 0) cnt++;
+		}
+	}
+	return cnt;
+}
+
+int main() {
+	scanf("%d", &N);
+
+	int t, x, y;
+	for (int i = 0; i < N; i++) {
+		scanf("%d %d %d", &t, &x, &y);
+		move_block(t, x, y);
+		check_full_line();
+		check_special_area();
+	}
+	int res = count_block();
+	printf("%d\n%d", score, res);
+	return 0;
+}
