@@ -1,0 +1,24 @@
+#include <stdio.h>
+
+int arr[25];
+
+void change_num(int x, int y) {
+	for (int i = 0; i <= (y - x)/2; i++) {
+		int tmp = arr[x + i];
+		arr[x + i] = arr[y - i];
+		arr[y - i] = tmp;
+	}
+}
+int main() {
+	for (int i = 1; i <= 20; i++) arr[i] = i;
+
+	for (int i = 0; i < 10; i++) {
+		int a, b;
+		scanf("%d %d", &a, &b);
+		change_num(a, b);
+	}
+
+	for (int i = 1; i <= 20; i++) printf("%d ", arr[i]);
+	
+	return 0;
+}
