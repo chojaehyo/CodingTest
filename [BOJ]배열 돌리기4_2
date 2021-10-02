@@ -1,0 +1,102 @@
+# include <cstdio>
+# include <vector>
+# include <algorithm>
+using namespace std;
+const int MAX = 55;
+
+int N, M, K, arr[MAX][MAX], arr2[MAX][MAX];
+int ans[10], result = 987987987;;
+bool check[10];
+struct info {
+	int r, c, s;
+};
+vector <info> v;
+
+void reset_arr() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			arr[i][j] = arr2[i][j];
+		}
+	}
+}
+void rotate(int x, int y, int n) {
+	int tmp = arr[x][y];
+
+	for (int i = x + 1; i < x + n; i++) arr[i - 1][y] = arr[i][y];
+	for (int i = y + 1; i < y + n; i++) arr[x + n - 1][i - 1] = arr[x + n - 1][i];
+	for (int i = x + n - 2; i >= x; i--)arr[i + 1][y + n - 1] = arr[i][y + n - 1];
+	for (int i = y + n - 2; i >= y; i--)arr[x][i + 1] = arr[x][i];
+
+	arr[x][y + 1] = tmp;
+}
+
+int get_min() {
+	int min_total = 987987987;
+
+	for (int i = 0; i < N; i++) {
+		int total = 0;
+		for (int j = 0; j < M; j++) {
+			total += arr[i][j];
+		}
+		min_total = min(total, min_total);
+	}
+	return min_total;
+}
+
+void print_arr() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			printf("%d ", arr[i][j]);
+		}printf("\n");
+	}printf("\n");
+}
+void comb(int idx) {
+	if (idx >= K) {
+		reset_arr();
+		for (int i = 0; i < K; i++) {
+			int r = v[ans[i]].r;
+			int c = v[ans[i]].c;
+			int s = v[ans[i]].s;
+
+			for (int j = 0; j < (2 * s + 1) / 2; j++) {
+				int x = r - s + j;
+				int y = c - s + j;
+				int n = (2 * s + 1) - 2 * j;
+				rotate(x, y, n);	
+			}
+		}
+		
+		result = min(get_min(), result);
+	}
+	else {
+		for (int i = 0; i < K; i++) {
+			if (!check[i]) {
+				ans[idx] = i;
+				check[i] = true;
+				comb(idx + 1);
+				check[i] = false;
+			}
+		}
+	}
+}
+int main() {
+	scanf("%d %d %d", &N, &M, &K);
+	
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			scanf("%d", &arr[i][j]);
+			arr2[i][j] = arr[i][j];
+		}
+	}
+
+	for (int i = 0; i < K; i++) {
+		int r, c, s;
+		scanf("%d %d %d", &r, &c, &s);
+		
+		v.push_back({ r - 1, c - 1, s });
+	}
+
+	comb(0);
+	printf("%d\n", result);
+	return 0;
+}
