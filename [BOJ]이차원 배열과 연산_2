@@ -1,0 +1,129 @@
+#include <cstdio>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+
+int r, c, k, arr[MAX][MAX];
+
+struct info {
+	int num, cnt;
+};
+struct compare {
+	bool operator()(info a, info b) {
+		if (a.cnt > b.cnt) return true;
+		else if (a.cnt == b.cnt) {
+			if (a.num > b.num) return true;
+			else return false;
+		}
+		else return false;
+	}
+};
+
+void update_arr(int A[MAX][MAX], int B[MAX][MAX]) {
+	for (int i = 0; i < MAX; i++) {
+		for (int j = 0; j < MAX; j++) {
+			B[i][j] = A[i][j];
+		}
+	}
+}
+
+int r_operation(int rs, int cs) {
+	int max_size = 0;
+	int tmp_arr[MAX][MAX] = { 0 };
+
+	for (int i = 0; i < rs; i++) {
+		priority_queue <info, vector<info>, compare> pq;
+		int tmp[MAX] = { 0 };
+
+		for (int j = 0; j < cs; j++) {
+			if (arr[i][j] == 0) continue;
+			tmp[arr[i][j]]++;
+		}
+
+		for (int j = 1; j < MAX; j++) {
+			if (tmp[j] > 0) pq.push({ j, tmp[j] });
+		}
+		
+		int tmp_col_size = pq.size() * 2;
+		max_size = max(max_size, tmp_col_size);
+		
+		int idx = 0;
+		while (!pq.empty()) {
+			int num = pq.top().num;
+			int cnt = pq.top().cnt;
+			pq.pop();
+
+			tmp_arr[i][idx++] = num;
+			tmp_arr[i][idx++] = cnt;
+
+			if (idx >= 100) break;
+		}
+	}
+	update_arr(tmp_arr, arr);
+	return max_size;
+}
+
+int c_operation(int rs, int cs) {
+	int max_size = 0;
+	int tmp_arr[MAX][MAX] = { 0 };
+
+	for (int j = 0; j < cs; j++) {
+		priority_queue <info, vector<info>, compare> pq;
+		int tmp[MAX] = { 0 };
+
+		for (int i = 0; i < rs; i++) {
+			if (arr[i][j] == 0) continue;
+			tmp[arr[i][j]]++;
+		}
+
+		for (int i = 1; i < MAX; i++) {
+			if (tmp[i] > 0) pq.push({ i, tmp[i] });
+		}
+
+		int tmp_row_size = pq.size() * 2;
+		max_size = max(max_size, tmp_row_size);
+
+		int idx = 0;
+		while (!pq.empty()) {
+			int num = pq.top().num;
+			int cnt = pq.top().cnt;
+			pq.pop();
+
+			tmp_arr[idx++][j] = num;
+			tmp_arr[idx++][j] = cnt;
+
+			if (idx >= 100) break;
+		}
+	}
+	update_arr(tmp_arr, arr);
+	return max_size;
+}
+
+int main() {
+	scanf("%d %d %d", &r, &c, &k);
+	r--;
+	c--;
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	int time = 0, r_size = 3, c_size = 3;
+	bool find = false;
+	while (time <= 100) {
+		if (arr[r][c] == k) {
+			find = true;
+			break;
+		}
+		if (r_size >= c_size) c_size = r_operation(r_size, c_size);
+		else r_size = c_operation(r_size, c_size);
+		time++;	
+	}
+	if (find) printf("%d\n", time);
+	else printf("-1\n");
+	return 0;
+}
