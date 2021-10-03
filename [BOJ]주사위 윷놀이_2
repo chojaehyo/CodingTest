@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 70;
+
+int arr[MAX], cur_arr[MAX], order[10], result, ans[15];
+struct info {
+	int x;
+	bool finish;
+};
+info horse[5];
+
+int move_horse(int idx, int num) {
+	if (horse[idx].finish) return -1;
+
+	int x = horse[idx].x;
+	
+	int nx = x + order[num];
+	if (nx == 5) nx = 26;
+	else if (nx == 10) nx = 40;
+	else if (nx == 15) nx = 55;
+	else if (nx >= 43 && nx <= 51) nx -= 13;
+	else if (nx >= 59 && nx <= 67) nx -= 29;
+	if (nx >= 33 && nx <= 38) nx -= 13;
+    
+	if (nx >= 21 && nx <= 25) {
+		horse[idx].finish = true;
+		cur_arr[x] = 0;
+		return 0;
+	}
+	else if (cur_arr[nx] == 0) {
+		cur_arr[nx] = idx;
+		cur_arr[x] = 0;
+		horse[idx].x = nx;
+		return arr[nx];
+	}
+	else return -1;
+}
+
+void make_state(info A[5], info B[5], int C[MAX], int D[MAX]) {
+	for (int i = 1; i <= 4; i++) A[i] = B[i];
+	for (int i = 0; i < MAX; i++) C[i] = D[i];
+}
+
+void solve(int idx, int score) {
+	if (idx >= 10) result = max(result, score);
+	else {
+		info tmp_horse[5];
+		int tmp_arr[MAX];
+
+		make_state(tmp_horse, horse, tmp_arr, cur_arr);
+
+		for (int i = 1; i <= 4; i++) {
+			int res = move_horse(i, idx);
+			if (res != -1){
+				solve(idx + 1, score + res);
+				make_state(horse, tmp_horse, cur_arr, tmp_arr);
+			}
+		}
+	}
+}
+
+void set_arr() {
+	for (int i = 0; i <= 20; i++) arr[i] = i * 2;
+	for (int i = 0; i <= 3; i++) {
+		arr[i + 26] = 10 + 3 * i;
+		arr[i + 30] = 25 + 5 * i;
+	}
+	for (int i = 0; i <= 2; i++) arr[i + 40] = 20 + 2 * i;
+	arr[55] = 30;
+	for (int i = 1; i <= 3; i++) arr[i + 55] = 29 - i;
+}
+int main() {
+	for (int i = 0; i < 10; i++) scanf("%d", &order[i]);
+	for (int i = 1; i <= 4; i++) {
+		horse[i].x = 0;
+		horse[i].finish = false;
+	}
+	set_arr();
+	solve(0, 0);
+	printf("%d\n", result);
+	return 0;
+}
