@@ -1,0 +1,97 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+const int MAX = 15;
+
+int N, people[MAX], number[MAX], result = 987987987;
+bool visited[MAX];
+vector <int> arr[MAX];
+
+bool check_connect(vector <int> v, int g_num) {
+	memset(visited, 0, sizeof(visited));
+
+	if (v.size() == 1) return true;
+	int start = v[0];
+	queue <int> q;
+	q.push(start);
+	visited[start] = true;
+	int cnt = 1;
+
+	while (!q.empty()) {
+		int x = q.front();
+		q.pop();
+
+		for (int i = 0; i < arr[x].size(); i++) {
+			int next = arr[x][i];
+
+			if (!visited[next] && number[next] == g_num) {
+				visited[next] = true;
+				q.push(next);
+				cnt++;
+			}
+		}
+	}
+
+	if (cnt == v.size()) return true;
+	return false;
+}
+
+void seperate_group() {
+	int total_a = 0, total_b = 0;
+	vector <int> A, B;
+
+	for (int i = 1; i <= N; i++) {
+		if (number[i] == 1) {
+			total_a += people[i];
+			A.push_back(i);
+		}
+		else {
+			total_b += people[i];
+			B.push_back(i);
+		}
+	}
+
+	bool res_a = check_connect(A, 1);
+	bool res_b = check_connect(B, 0);
+
+	if (res_a && res_b) {
+		int diff = abs(total_a - total_b);
+		result = min(result, diff);
+	}
+}
+
+void comb(int idx, int x, int cnt) {
+	if (idx == cnt) seperate_group();
+	else {
+		for (int i = x; i <= N; i++) {
+			number[i] = 1;
+			comb(idx + 1, i + 1, cnt);
+			number[i] = 0;
+		}
+	}
+}
+int main() {
+	scanf("%d", &N);
+	for (int i = 1; i <= N; i++) scanf("%d", &people[i]);
+	
+	for (int i = 1; i <= N; i++) {
+		int a;
+		scanf("%d", &a);
+
+		for (int j = 0; j < a; j++) {
+			int b;
+			scanf("%d", &b);
+			arr[i].push_back(b);
+			arr[b].push_back(i);
+		}
+	}
+	
+	for (int i = 1; i <= N / 2; i++) comb(0, 1, i);
+	
+	if (result == 987987987) printf("-1\n");
+	else printf("%d\n", result);
+	return 0;
+}
