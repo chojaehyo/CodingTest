@@ -1,0 +1,100 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 25;
+
+int N, arr[MAX][MAX], people[MAX][MAX], ans[5], sum_arr[10];
+int result = 987987987;
+bool use[MAX];
+
+bool ispossible(int x, int y, int d1, int d2) {
+	if (x + d1 + d2 <= N && y - d1 >= 1 && y + d2 <= N) return true;
+	return false;
+}
+
+void fill_arr(int x, int y, int d1, int d2) {
+	memset(arr, 0, sizeof(arr));
+
+	int alpha = 0;
+	for (int i = 1; i < x + d1; i++) {
+		if (i >= x && i < x + d1) alpha++;
+		for (int j = 1; j <= y - alpha; j++) {
+			arr[i][j] = 1;
+		}
+	}
+
+	alpha = 0;
+	for (int i = 1; i <= x + d2; i++) {
+		if (i > x && i <= x + d2) alpha++;
+		for (int j = y + 1 + alpha; j <= N; j++) {
+			arr[i][j] = 2;
+		}
+	}
+
+	alpha = 0;
+	for (int i = N; i >= x + d1; i--) {
+		if (i < x + d1 + d2 && i >= x + d1) alpha++;
+		for (int j = y - d1 + d2 - 1 - alpha; j >= 1; j--) {
+			arr[i][j] = 3;
+		}
+	}
+
+	alpha = 0;
+	for (int i = N; i > x + d2; i--) {
+		if (i <= x + d1 + d2 && i >= x + d2) alpha++;
+		for (int j = N; j >= y - d1 + d2 + alpha; j--) {
+			arr[i][j] = 4;
+		}
+	}
+}
+
+void get_min_max_diff(int x, int y) {
+	memset(sum_arr, 0, sizeof(sum_arr));
+	int max_val = 0, min_val = 987987987;
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			sum_arr[arr[i][j]] += people[i][j];
+		}
+	}
+
+	for (int i = 0; i < 5; i++) {
+		max_val = max(max_val, sum_arr[i]);
+		min_val = min(min_val, sum_arr[i]);
+	}
+
+	result = min(result, max_val - min_val);
+}
+
+void get_result(int idx) {
+	if (idx >= 2) {
+		for (int i = 1; i <= N; i++) {
+			for (int j = 1; j <= N; j++) {
+				if (ispossible(i, j, ans[0], ans[1])) {
+					fill_arr(i, j, ans[0], ans[1]);
+					get_min_max_diff(i, j);
+				}
+			}
+		}
+	}
+	else {
+		for (int i = 1; i <= N; i++) {
+			ans[idx] = i;
+			get_result(idx + 1);	
+		}
+	}
+}
+int main() {
+	scanf("%d", &N);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			scanf("%d", &people[i][j]);
+		}
+	}
+
+	get_result(0);
+	printf("%d\n", result);
+	return 0;
+}
