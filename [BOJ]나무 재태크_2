@@ -1,0 +1,100 @@
+#include <cstdio>
+#include <deque>
+#include <algorithm>
+using namespace std;
+const int MAX = 15;
+
+int N, M, K, A[MAX][MAX], cur_A[MAX][MAX], total_tree;
+int dx[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+int dy[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+deque <int> arr[MAX][MAX];
+
+
+void spring_summer() {
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			if (arr[i][j].size() >= 1) {
+				sort(arr[i][j].begin(), arr[i][j].end());
+
+				deque <int> tmp;
+				int dead = 0;
+
+				for (int k = 0; k < arr[i][j].size(); k++) {
+					int age = arr[i][j][k];
+					
+					if (cur_A[i][j] >= age) {
+						cur_A[i][j] -= age;
+						tmp.push_back(age+1);
+					}
+					else {
+						dead += age / 2;
+						total_tree--;
+					}
+				}
+
+				arr[i][j].clear();
+				arr[i][j] = tmp;
+				cur_A[i][j] += dead;
+			}
+		}
+
+	}
+}
+
+void fall() {
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			for (int k = 0; k < arr[i][j].size(); k++) {
+				int age = arr[i][j][k];
+
+				if (age % 5 == 0) {
+					for (int d = 0; d < 8; d++) {
+						int nx = i + dx[d];
+						int ny = j + dy[d];
+
+						if (nx < 1 || nx > N || ny < 1 || ny > N) continue;
+
+						arr[nx][ny].push_back(1);
+						total_tree++;
+					}
+				}
+			}
+		}
+	}
+}
+
+void winter() {
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			cur_A[i][j] += A[i][j];
+		}
+	}
+}
+
+
+int main() {
+	scanf("%d %d %d", &N, &M, &K);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			scanf("%d", &A[i][j]);
+			cur_A[i][j] = 5;
+		}
+	}
+
+	int x, y, z;
+	for (int i = 0; i < M; i++) {
+		scanf("%d %d %d", &x, &y, &z);
+		arr[x][y].push_back(z);
+	}
+
+	total_tree = M;
+
+	for (int i = 1; i <= K; i++) {
+		spring_summer();
+		fall();
+		winter();
+	}
+	printf("%d\n", total_tree);
+	return 0;
+}
