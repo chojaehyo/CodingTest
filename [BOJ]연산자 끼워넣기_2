@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <deque>
+#include <algorithm>
+using namespace std;
+const int MAX = 15;
+
+int N, ope[MAX], ans[MAX], min_val = 1000000000, max_val = -1000000000;;
+deque <int> arr;
+bool use[MAX];
+
+void calc() {
+	deque <int> tmp = arr;
+
+	for (int i = 0; i < N - 1; i++) {
+		int val1 = tmp[0], val2 = tmp[1];
+		tmp.pop_front();
+		tmp.pop_front();
+
+		if (ope[ans[i]] == 1) tmp.push_front(val1 + val2);
+		else if (ope[ans[i]] == 2) tmp.push_front(val1 - val2);
+		else if (ope[ans[i]] == 3) tmp.push_front(val1 * val2);
+		else {
+			if (val1 < 0) tmp.push_front((-val1 / val2) * -1);
+			else tmp.push_front(val1 / val2);
+		}
+	}
+	min_val = min(min_val, tmp.front());
+	max_val = max(max_val, tmp.front());
+}
+
+void comb(int idx) {
+	if (idx >= N - 1) calc();
+	else {
+		for (int i = 0; i < N - 1; i++) {
+			if (!use[i]) {
+				ans[idx] = i;
+				use[i] = true;
+				comb(idx + 1);
+				use[i] = false;
+			}
+		}
+	}
+}
+
+int main() {
+	scanf("%d", &N);
+	for (int i = 0; i < N; i++) {
+		int val;
+		scanf("%d", &val);
+		arr.push_back(val);
+	}
+	
+	int cnt = 0;
+	for (int i = 1; i <= 4; i++) {
+		int val;
+		scanf("%d", &val);
+		for (int j = 0; j < val; j++) ope[cnt++] = i;
+	}
+
+	comb(0);
+	printf("%d\n%d", max_val, min_val);
+	return 0;
+}
