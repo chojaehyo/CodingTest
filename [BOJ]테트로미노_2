@@ -1,0 +1,108 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 505;
+
+int N, M, arr[MAX][MAX], result;
+
+void get_max1() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M - 4 + 1; j++) {
+			int tmp = arr[i][j] + arr[i][j + 1] + arr[i][j + 2] + arr[i][j + 3];
+			result = max(result, tmp);
+		}
+	}
+
+	for (int i = 0; i < N - 4 + 1; i++) {
+		for (int j = 0; j < M; j++) {
+			int tmp = arr[i][j] + arr[i + 1][j] + arr[i + 2][j] + arr[i + 3][j];
+			result = max(result, tmp);
+		}
+	}
+}
+
+void get_max2() {
+	for (int i = 0; i < N - 2 + 1; i++) {
+		for (int j = 0; j < M - 2 + 1; j++) {
+			int tmp = arr[i][j] + arr[i][j + 1] + arr[i + 1][j] + arr[i + 1][j + 1];
+			result = max(result, tmp);
+		}
+	}
+}
+
+void get_max3() {
+	for (int i = 0; i < N - 3 + 1; i++) {
+		for (int j = 0; j < M - 2 + 1; j++) {
+			int tmp1 = arr[i][j] + arr[i + 1][j] + arr[i + 2][j] + arr[i + 2][j + 1];
+			int tmp2 = arr[i][j] + arr[i][j + 1] + arr[i + 1][j + 1] + arr[i + 2][j + 1];
+			int tmp3 = arr[i][j + 1] + arr[i + 1][j + 1] + arr[i + 2][j + 1] + arr[i + 2][j];
+			int tmp4 = arr[i][j] + arr[i + 1][j] + arr[i + 2][j] + arr[i][j + 1];
+			result = max(result, max(tmp1, max(tmp2, max(tmp3, tmp4))));
+		}
+	}
+
+	for (int i = 0; i < N - 2 + 1; i++) {
+		for (int j = 0; j < M - 3 + 1; j++) {
+			int tmp1 = arr[i + 1][j] + arr[i][j] + arr[i][j + 1] + arr[i][j + 2];
+			int tmp2 = arr[i][j + 2] + arr[i + 1][j] + arr[i + 1][j + 1] + arr[i + 1][j + 2];
+			int tmp3 = arr[i + 1][j + 2] + arr[i][j] + arr[i][j + 1] + arr[i][j + 2];
+			int tmp4 = arr[i][j] + arr[i + 1][j] + arr[i + 1][j + 1] + arr[i + 1][j + 2];
+			result = max(result, max(tmp1, max(tmp2, max(tmp3, tmp4))));
+		}
+	}
+}
+
+void get_max4() {
+	for (int i = 0; i < N - 3 + 1; i++) {
+		for (int j = 0; j < M - 2 + 1; j++) {
+			int tmp1 = arr[i][j] + arr[i + 1][j] + arr[i + 1][j + 1] + arr[i + 2][j + 1];
+			int tmp2 = arr[i][j + 1] + arr[i + 1][j + 1] + arr[i + 1][j] + arr[i + 2][j];
+			result = max(result, max(tmp1, tmp2));
+		}
+	}
+
+	for (int i = 0; i < N - 2 + 1; i++) {
+		for (int j = 0; j < M - 3 + 1; j++) {
+			int tmp1 = arr[i][j + 1] + arr[i][j + 2] + arr[i + 1][j] + arr[i + 1][j + 1];
+			int tmp2 = arr[i][j] + arr[i][j + 1] + arr[i + 1][j + 1] + arr[i + 1][j + 2];
+			result = max(result, max(tmp1, tmp2));
+		}
+	}
+}
+
+void get_max5() {
+	for (int i = 0; i < N - 3 + 1; i++) {
+		for (int j = 0; j < M - 2 + 1; j++) {
+			int tmp1 = arr[i][j + 1] + arr[i + 1][j + 1] + arr[i + 1][j] + arr[i + 2][j + 1];
+			int tmp2 = arr[i][j] + arr[i + 1][j] + arr[i + 2][j] + arr[i + 1][j + 1];
+			result = max(result, max(tmp1, tmp2));
+		}
+	}
+
+	for (int i = 0; i < N - 2 + 1; i++) {
+		for (int j = 0; j < M - 3 + 1; j++) {
+			int tmp1 = arr[i][j] + arr[i][j + 1] + arr[i][j + 2] + arr[i + 1][j + 1];
+			int tmp2 = arr[i][j + 1] + arr[i + 1][j] + arr[i + 1][j + 1] + arr[i + 1][j + 2];
+			result = max(result, max(tmp1, tmp2));
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d", &N, &M);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	get_max1();
+	get_max2();
+	get_max3();
+	get_max4();
+	get_max5();
+	printf("%d\n", result);
+
+	return 0;
+}
