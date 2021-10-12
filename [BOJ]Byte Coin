@@ -1,0 +1,22 @@
+#include <cstdio>
+const int MAX = 55;
+
+long long int N, W, tmp, arr[MAX];
+
+int main() {
+	scanf("%d %d", &N, &W);
+
+	for (int i = 0; i < N; i++) scanf("%d", &arr[i]);
+	
+	for (int i = 0; i < N - 1; i++) {
+		if (arr[i] < arr[i + 1]) {
+			tmp = W / arr[i];
+			W %= arr[i];
+			tmp *= arr[i + 1];
+			W += tmp;
+		}
+	}
+
+	printf("%ld\n", W);
+	return 0;
+}
