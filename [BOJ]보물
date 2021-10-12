@@ -1,0 +1,35 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int N, result = 987987987;
+vector <int> A, B;
+
+void calc() {
+	int total = 0;
+	for (int i = 0; i < N; i++) total += A[i] * B[i];
+	result = min(result, total);
+}
+
+int main() {
+	scanf("%d", &N);
+
+	for (int i = 0; i < N; i++) {
+		int a;
+		scanf("%d", &a);
+		A.push_back(a);
+	}
+	for (int i = 0; i < N; i++) {
+		int b;
+		scanf("%d", &b);
+		B.push_back(b);
+	}
+
+	sort(A.begin(), A.end());
+	sort(B.begin(), B.end(), greater<int>());
+	
+	calc();
+	printf("%d\n", result);
+	return 0;
+}
