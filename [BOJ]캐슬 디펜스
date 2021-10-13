@@ -1,0 +1,150 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <algorithm>
+using namespace std;
+const int MAX = 20;
+
+int N, M, D, arr[MAX][MAX], arr2[MAX][MAX], ans[5], total_enermy, result;
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+struct info {
+	int num, x, y, d;
+};
+
+struct e_info {
+	int x, y;
+	bool dead;
+};
+
+vector <e_info> enermy;
+vector <e_info> tmp;
+
+struct compare {
+	bool operator()(info a, info b) {
+		if (a.d > b.d) return true;
+		else if (a.d == b.d) {
+			if (a.y > b.y) return true;
+			else return false;
+		}
+		else return false;
+	}
+};
+
+void move_enermy() {
+	for (int i = N - 1; i >= 1; i--) {
+		for (int j = 1; j <= M; j++) {
+			arr[i + 1][j] = arr[i][j];
+		}
+	}
+
+	for (int j = 1; j <= M; j++) arr[1][j] = 0;
+
+	for (int i = 0; i < enermy.size(); i++) {
+		if (enermy[i].dead) continue;
+
+		int x = enermy[i].x;
+		int y = enermy[i].y;
+
+		if (x + 1 <= N) enermy[i].x = x + 1;
+		else {
+			enermy[i].dead = true;
+			total_enermy--;
+		}
+	}
+}
+
+void find_enermy() {
+	int dead_enermy = 0;
+
+	while (total_enermy > 0) {
+		int check[MAX][MAX] = { 0 };
+
+		queue <int> dead_num;
+
+		for (int i = 0; i < 3; i++) {
+			int x1 = N + 1;
+			int y1 = ans[i];
+			priority_queue <info, vector<info>, compare> pq;
+
+			for (int i = 0; i < enermy.size(); i++) {
+				if (enermy[i].dead) continue;
+
+				int x2 = enermy[i].x;
+				int y2 = enermy[i].y;
+
+				int dist = abs(x1 - x2) + abs(y1 - y2);
+
+				if (dist <= D) pq.push({ i, x2, y2, dist });
+			}
+
+			if (!pq.empty()) {
+				int x = pq.top().x;
+				int y = pq.top().y;
+				int num = pq.top().num;
+				if (check[x][y] == 0) {
+					check[x][y] = 1;
+					dead_enermy++;
+					total_enermy--;
+					dead_num.push(num);
+				}
+			}
+		}
+		while (!dead_num.empty()) {
+			int num = dead_num.front();
+			enermy[num].dead = true;
+			dead_num.pop();
+		}
+		move_enermy();
+	}
+	result = max(result, dead_enermy);
+}
+
+void reset_state() {
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= M; j++) {
+			arr[i][j] = arr2[i][j];
+		}
+	}
+
+	for (int i = 0; i < tmp.size(); i++) {
+		enermy[i].x = tmp[i].x;
+		enermy[i].y = tmp[i].y;
+		enermy[i].dead = tmp[i].dead;
+	}
+}
+
+void comb(int idx, int x) {
+	if (idx == 3) {
+		int tmp_enermy = total_enermy;
+		find_enermy();
+		reset_state();
+		total_enermy = tmp_enermy;
+	}
+	else {
+		for (int i = x; i <= M; i++) {
+			ans[idx] = i;
+			comb(idx + 1, i + 1);
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d %d", &N, &M, &D);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= M; j++) {
+			scanf("%d", &arr[i][j]);
+			arr2[i][j] = arr[i][j];
+			if (arr[i][j] == 1) {
+				total_enermy++;
+				enermy.push_back({ i, j, false });
+				tmp.push_back({ i, j, false });
+			}
+		}
+	}
+	
+	comb(0, 1);
+	printf("%d\n", result);
+	return 0;
+}
