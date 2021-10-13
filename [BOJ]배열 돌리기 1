@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <deque>
+#include <algorithm>
+using namespace std;
+const int MAX = 305;
+
+int N, M, R, arr[MAX][MAX];
+deque <int> dq[MAX];
+
+void rotate() {
+	for (int i = 0; i < min(N, M) / 2; i++) {
+		int row = i, col = i;
+
+		while (col < M - 1 - i) {
+			dq[i].push_back(arr[row][col]);
+			col++;
+		}
+
+		while (row < N - 1 - i) {
+			dq[i].push_back(arr[row][col]);
+			row++;
+		}
+
+		while (col > i) {
+			dq[i].push_back(arr[row][col]);
+			--col;
+		}
+
+		while (row > i) {
+			dq[i].push_back(arr[row][col]);
+			--row;
+		}
+
+		int val = dq[i].front();
+		dq[i].pop_front();
+		dq[i].push_back(val);
+	}
+}
+
+void update_arr() {
+	for (int i = 0; i < min(N, M) / 2; i++) {
+		int row = i, col = i;
+
+		while (col < M - 1 - i) {
+			int val = dq[i].front();
+			dq[i].pop_front();
+			arr[row][col] = val;
+			col++;
+		}
+
+		while (row < N - 1 - i) {
+			int val = dq[i].front();
+			dq[i].pop_front();
+			arr[row][col] = val;
+			row++;
+		}
+
+		while (col > i) {
+			int val = dq[i].front();
+			dq[i].pop_front();
+			arr[row][col] = val;
+			--col;
+		}
+
+		while (row > i) {
+			int val = dq[i].front();
+			dq[i].pop_front();
+			arr[row][col] = val;
+			--row;
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d %d", &N, &M, &R);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	for (int r = 0; r < R; r++) {
+		rotate();
+		update_arr();
+	}
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			printf("%d ", arr[i][j]);
+		}printf("\n");
+	}
+	return 0;
+}
