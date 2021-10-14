@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 25;
+
+int N, arr[MAX][MAX], ans[MAX], result = 987987987;
+
+void calc_value() {
+	int team[MAX] = { 0 }, ans2[MAX] = { 0 }, t1 = 0, t2 = 0, idx = 0;
+
+	for (int i = 0; i < N / 2; i++) team[ans[i]] = 1;
+	for (int i = 1; i <= N; i++) {
+		if (team[i] == 0) ans2[idx++] = i;
+	}
+
+	for (int i = 0; i < N / 2; i++) {
+		for (int j = 0; j < N / 2; j++) {
+			if (i == j) continue;
+			else {
+				t1 += arr[ans[i]][ans[j]];
+				t2 += arr[ans2[i]][ans2[j]];
+			}
+		}
+	}
+	result = min(result, abs(t1 - t2));
+}
+void comb(int idx, int x) {
+	if (idx >= N / 2) calc_value();
+	else {
+		for (int i = x; i <= N; i++) {
+			ans[idx] = i;
+			comb(idx + 1, i + 1);
+		}
+	}
+}
+
+int main() {
+	scanf("%d", &N);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	comb(0, 1);
+	printf("%d\n", result);
+	return 0;
+}
