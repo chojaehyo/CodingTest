@@ -1,0 +1,28 @@
+#include <cstdio>
+const int MAX = 1000005;
+
+long long int N, A[MAX], B, C;
+
+int main() {
+	scanf("%ld", &N);
+
+	for (int i = 0; i < N; i++) scanf("%ld", &A[i]);
+	scanf("%ld %ld", &B, &C);
+
+	long long int result = 0;
+	for (int i = 0; i < N; i++) {
+		long long int tmp = A[i] - B;
+		result++;
+
+		if (tmp <= 0) continue;
+		else {
+			long long int need_c = tmp / C;
+
+			if (need_c * C < tmp) result += need_c + 1;
+			else result += need_c;
+		}
+	}
+
+	printf("%ld\n", result);
+	return 0;
+}
