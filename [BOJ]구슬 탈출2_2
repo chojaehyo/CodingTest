@@ -1,0 +1,108 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 15;
+
+int N, M, arr[MAX][MAX], result = 987987987;
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+
+int opposite_dir(int dir) {
+	if (dir == 0) return 2;
+	else if (dir == 1) return 3;
+	else if (dir == 2) return 0;
+	else return 1;
+}
+
+void move(int rx, int ry, int bx, int by, int d, int time) {
+	if (time > 10) return;
+	if (time >= result) return;
+
+	bool r_goal = false, b_goal = false;
+	int nRx = rx + dx[d];
+	int nRy = ry + dy[d];
+
+	while (1) {
+		if (arr[nRx][nRy] == 1) break;
+		if (arr[nRx][nRy] == 5) {
+			r_goal = true;
+			break;
+		}
+		nRx = nRx + dx[d]; 
+		nRy = nRy + dy[d];
+	}
+
+	nRx = nRx - dx[d];
+	nRy = nRy - dy[d];
+
+	int nBx = bx + dx[d];
+	int nBy = by + dy[d];
+
+	while (1) {
+		if (arr[nBx][nBy] == 1) break;
+		if (arr[nBx][nBy] == 5) {
+			b_goal = true;
+			break;
+		}
+		nBx = nBx + dx[d];
+		nBy = nBy + dy[d];
+	}
+	nBx = nBx - dx[d];
+	nBy = nBy - dy[d];
+
+	if (b_goal) return;
+	else {
+		if (r_goal) {
+			result = min(result, time);
+			return;
+		}
+	}
+
+	if (nRx == nBx && nRy == nBy) {
+		int rdist = abs(nRx - rx) + abs(nRy - ry);
+		int bdist = abs(nBx - bx) + abs(nBy - by);
+
+		if (rdist > bdist) {
+			nRx = nRx - dx[d];
+			nRy = nRy - dy[d];
+		}
+		else if(rdist < bdist) {
+			nBx = nBx - dx[d];
+			nBy = nBy - dy[d];
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if (i == d) continue;
+		if (i == opposite_dir(d)) continue;
+		move(nRx, nRy, nBx, nBy, i, time + 1);
+	}
+}
+
+int main() {
+	scanf("%d %d", &N, &M);
+	int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			char tmp;
+			scanf(" %1c", &tmp);
+			if (tmp == '#') arr[i][j] = 1;
+			else if (tmp == '.') arr[i][j] = 0;
+			else if (tmp == 'O') arr[i][j] = 5;
+			else if (tmp == 'R') {
+				x1 = i, y1 = j;
+				arr[i][j] = 0;
+			}
+			else if (tmp == 'B') {
+				x2 = i, y2 = j;
+				arr[i][j] = 0;
+			}
+		}
+	}
+	for (int d = 0; d < 4; d++) move(x1, y1, x2, y2, d, 1);
+
+	if (result > 10) printf("-1\n");
+	else printf("%d\n", result);
+	return 0;
+}
