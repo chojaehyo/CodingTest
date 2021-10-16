@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <deque>
+#include <algorithm>
+using namespace std;
+const int MAX = 55;
+
+int N, arr[MAX][10], ans[15], result;
+bool use[15];
+
+void calc_score() {
+	int order[15] = { 0 };
+	for (int i = 1; i < 10; i++) order[ans[i]] = i;
+	int player_idx = 1, score = 0;
+
+	for (int i = 1; i <= N; i++) {
+		int out = 0;
+		deque <int> dq;
+		dq.push_back(0);
+		dq.push_back(0);
+		dq.push_back(0);
+		
+		while (out < 3) {
+			if (arr[i][order[player_idx]] == 0) {
+				out++;
+				player_idx++;
+				if (player_idx == 10) player_idx = 1;
+			}
+			else {
+				int val = arr[i][order[player_idx]];
+				bool flag = false;
+				for (int j = 0; j < val; j++) {
+					if (!flag) {
+						flag = true;
+						dq.push_back(order[player_idx]);
+					}
+					else dq.push_back(0);
+
+					int pnum = dq.front();
+					dq.pop_front();
+
+					if (pnum > 0) score++;
+				}
+				player_idx++;
+				if (player_idx == 10) player_idx = 1;
+			}
+		}
+	}
+	result = max(result, score);
+}
+
+void comb(int idx) {
+	if (idx >= 10) calc_score();
+	else {
+		for (int i = 1; i <= 9; i++) {
+			if (i == 4 || use[i]) continue;
+			ans[idx] = i;
+			use[i] = true;
+			comb(idx + 1);
+			use[i] = false;
+		}
+	}
+}
+
+int main() {
+	scanf("%d", &N);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= 9; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+	
+	ans[1] = 4;
+	comb(2);
+	printf("%d\n", result);
+
+	return 0;
+}
