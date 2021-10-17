@@ -1,0 +1,23 @@
+#include <cstdio>
+const int MAX = 50;
+
+int N, M, arr[MAX][MAX], arr2[MAX][MAX];
+
+int main() {
+	scanf("%d %d", &N, &M);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			scanf("%d", &arr[i][j]);
+			arr2[j][N - 1 - i] = arr[i][j];
+		}
+	}
+
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < N; j++) {
+			printf("%d ", arr2[i][j]);
+		}
+		printf("\n");
+	}
+	return 0;
+}
