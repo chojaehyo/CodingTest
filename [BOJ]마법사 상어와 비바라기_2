@@ -1,0 +1,114 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+const int MAX = 55;
+
+int N, M, arr[MAX][MAX], arr2[MAX][MAX];
+int dx[] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+int dy[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+int dx2[] = { -1, -1, 1, 1 };
+int dy2[] = { -1, 1, -1, 1 };
+vector <pair<int, int> > cloud;
+bool visited[MAX][MAX];
+
+void print_arr() {
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			printf("%d ", arr[i][j]);
+		}printf("\n");
+	}printf("\n");
+}
+
+void move(int dir, int s) {
+	for (int i = 0; i < cloud.size(); i++) {
+		int x = cloud[i].first;
+		int y = cloud[i].second;
+
+		int nx = x + dx[dir] * s;
+		int ny = y + dy[dir] * s;
+
+		if (nx < 1) nx += N;
+		if (nx > N) nx -= N;
+		if (ny < 1) ny += N;
+		if (ny > N) ny -= N;
+
+		cloud[i].first = nx;
+		cloud[i].second = ny;
+
+		arr[nx][ny]++;
+	}
+}
+
+void magic() {
+	memset(arr2, 0, sizeof(arr2));
+	memset(visited, 0, sizeof(visited));
+
+	for (int i = 0; i < cloud.size(); i++) {
+		int x = cloud[i].first;
+		int y = cloud[i].second;
+		visited[x][y] = true;
+
+		int cnt = 0;
+		for (int j = 0; j < 4; j++) {
+			int nx = x + dx2[j];
+			int ny = y + dy2[j];
+			
+			if (nx < 1 || nx > N || ny < 1 || ny > N) continue;
+			if (arr[nx][ny] > 0) cnt++;
+		}
+		arr2[x][y] = cnt;
+	}
+	cloud.clear();
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			if (arr2[i][j] > 0) arr[i][j] += arr2[i][j];
+			else if (!visited[i][j] && arr[i][j] >= 2) {
+				cloud.push_back({ i, j });
+				arr[i][j] -= 2;
+			}
+		}
+	}
+}
+
+int calc_water() {
+	int res = 0;
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			if (arr[i][j] > 0) res += arr[i][j];
+		}
+	}
+	return res;
+}
+
+
+int main() {
+	scanf("%d %d", &N, &M);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	cloud.push_back(make_pair(N, 1));
+	cloud.push_back(make_pair(N, 2));
+	cloud.push_back(make_pair(N - 1, 1));
+	cloud.push_back(make_pair(N - 1, 2));
+
+	for (int i = 0; i < M; i++) {
+		int d, s;
+		scanf("%d %d", &d, &s);
+
+		int ns = s % N;
+		move(d-1, ns);
+		magic();
+	}
+
+	int result = calc_water();
+
+	printf("%d\n", result);
+	return 0;
+}
