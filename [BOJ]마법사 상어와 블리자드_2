@@ -1,0 +1,177 @@
+#include <cstdio>
+#include <cstring>
+#include <deque>
+using namespace std;
+const int MAX = 55;
+
+int N, M, arr[MAX][MAX];
+int score[5] = { 0 };
+int dx[] = { 0, 1, 0, -1 };
+int dy[] = { -1, 0, 1, 0 };
+deque <int> dq;
+
+void make_deque() {
+	dq.clear();
+
+	int x = (N + 1) / 2, y = (N + 1) / 2, dir = 0;
+
+	for (int i = 1; i <= N - 1; i++) {
+		for (int k = 0; k < 2; k++) {
+			for (int j = 1; j <= i; j++) {
+				int nx = x + dx[dir];
+				int ny = y + dy[dir];
+
+				if(arr[nx][ny] != 0) dq.push_back(arr[nx][ny]);
+				x = nx, y = ny;
+			}
+			dir = (dir + 1) % 4;
+		}
+	}
+
+	for (int i = N - 1; i >= 1; i--) {
+		if (arr[1][i] == 0) continue;
+		dq.push_back(arr[1][i]);
+	}
+}
+
+void destroy(int x, int y, int d, int s) {
+	for (int i = 0; i < s; i++) {
+		int nx = x + dx[d];
+		int ny = y + dy[d];
+
+		arr[nx][ny] = 0;
+		x = nx, y = ny;
+	}
+}
+
+bool destroy_over4() {
+	bool flag = false;
+    if (dq.empty()) return flag;
+
+    deque <int> tmp;
+	int val = dq.front();
+	dq.pop_front();
+	tmp.push_back(val);
+
+	int size = dq.size();
+	for (int i = 0; i < size; i++) {
+		int val2 = dq.front();
+		dq.pop_front();
+
+		if (val == val2) tmp.push_back(val2);
+		else {
+			if (tmp.size() >= 4) {
+				score[val] += tmp.size();
+				flag = true;
+				tmp.clear();
+			}
+			else {
+				while (!tmp.empty()) {
+					int t_val = tmp.front();
+					tmp.pop_front();
+					dq.push_back(t_val);
+				}
+			}
+			tmp.push_back(val2);
+		}
+		val = val2;
+	}
+
+	if (tmp.size() >= 4) {
+		score[val] += tmp.size();
+		flag = true;
+		tmp.clear();
+	}
+	else {
+		while (!tmp.empty()) {
+			int t_val = tmp.front();
+			tmp.pop_front();
+			dq.push_back(t_val);
+		}
+	}
+	return flag;
+}
+
+void change_group() {
+    if (dq.empty()) return;
+    
+	deque <int> new_dq;
+    int cnt = 1, val = dq[0];
+
+	for (int i = 1; i < dq.size(); i++) {
+		if (val == dq[i]) cnt++;
+		else {
+			new_dq.push_back(cnt);
+			new_dq.push_back(val);
+			cnt = 1;
+			val = dq[i];
+		}
+	}
+	new_dq.push_back(cnt);
+	new_dq.push_back(val);
+    
+	memset(arr, 0, sizeof(arr));
+
+	int x = (N + 1) / 2, y = (N + 1) / 2, dir = 0, num = 0;
+	bool stop = false;
+
+	for (int i = 1; i <= N - 1; i++) {
+		for (int k = 0; k < 2; k++) {
+			for (int j = 1; j <= i; j++) {
+				int nx = x + dx[dir];
+				int ny = y + dy[dir];
+
+				arr[nx][ny] = new_dq[num];
+				num++;
+				if (num == new_dq.size()) {
+					stop = true;
+					break;
+				}
+				x = nx, y = ny;
+			}
+			if (stop) break;
+			dir = (dir + 1) % 4;
+		}
+		if (stop) break;
+	}
+	
+	if (!stop) {
+		for (int i = N - 1; i >= 1; i--) {
+			arr[1][i] = new_dq[num++];
+			if (num == new_dq.size()) break;
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d", &N, &M);
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	for (int k = 0; k < M; k++) {
+		int D, S;
+		scanf("%d %d", &D, &S);
+		if (D == 1) D = 3;
+		else if (D == 2) D = 1;
+		else if (D == 3) D = 0;
+		else D = 2;
+
+		int sx = (N + 1) / 2, sy = (N + 1) / 2;
+
+		destroy(sx, sy, D, S);
+		make_deque();		
+		while (1) {
+			if (!destroy_over4()) break;
+		}
+		change_group();
+	}
+	int total = 0;
+	for (int i = 1; i <= 3; i++) total += score[i] * i;
+	
+	printf("%d\n", total);
+	return 0;
+}
