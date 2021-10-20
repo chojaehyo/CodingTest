@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <queue>
+#include <vector>
+#include <cstring>
+using namespace std;
+const int MAX = 55;
+
+int T, N, M, R, C, L, arr[MAX][MAX];
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+bool visited[MAX][MAX];
+vector <int> dir[10];
+
+struct info {
+	int x, y, dist;
+};
+
+bool check(int nx, int ny) {
+	if (nx < 0 || nx >= N || ny < 0 || ny >= M || arr[nx][ny] == 0) return false;
+	return true;
+}
+
+int bfs(int a, int b) {
+	memset(visited, 0, sizeof(visited));
+	queue <info> q;
+	q.push({ a, b, 1 });
+	visited[a][b] = true;
+    
+	while (!q.empty()) {
+		int x = q.front().x;
+		int y = q.front().y;
+		int dist = q.front().dist;
+		q.pop();
+		
+		for (int i = 0; i < dir[arr[x][y]].size(); i++) {
+			int d = dir[arr[x][y]][i];
+			int nx = x + dx[d];
+			int ny = y + dy[d];
+
+			if (!check(nx, ny) || visited[nx][ny]) continue;
+			if (arr[nx][ny] >= 1) {
+				if (dist + 1 > L) continue;
+
+				bool flag = false;
+				for (int j = 0; j < dir[arr[nx][ny]].size(); j++) {
+					if ((d + 2) % 4 == dir[arr[nx][ny]][j]) {
+						flag = true;
+						break;
+					}
+				}
+
+				if (flag) {
+					visited[nx][ny] = true;
+					q.push({ nx, ny, dist + 1 });
+				}
+			}
+		}
+	}
+
+	int cnt = 0;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (visited[i][j]) cnt++;
+		}
+	}
+	return cnt;
+}
+
+int main() {
+	scanf("%d", &T);
+
+	for (int t = 1; t <= T; t++) {
+		scanf("%d %d %d %d %d", &N, &M, &R, &C, &L);
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				scanf("%d", &arr[i][j]);
+			}
+		}
+		
+		for (int i = 0; i < 4; i++) dir[1].push_back(i);
+
+		dir[2].push_back(0);
+		dir[2].push_back(2);
+		dir[3].push_back(1);
+		dir[3].push_back(3);
+		dir[4].push_back(0);
+		dir[4].push_back(1);
+		dir[5].push_back(1);
+		dir[5].push_back(2);
+		dir[6].push_back(2);
+		dir[6].push_back(3);
+		dir[7].push_back(0);
+		dir[7].push_back(3);
+
+		int result = bfs(R, C);
+
+		printf("#%d %d\n", t, result);
+	}
+	return 0;
+}
