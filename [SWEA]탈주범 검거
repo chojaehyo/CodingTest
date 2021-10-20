@@ -25,22 +25,21 @@ int bfs(int a, int b) {
 	queue <info> q;
 	q.push({ a, b, 1 });
 	visited[a][b] = true;
-    
+
 	while (!q.empty()) {
 		int x = q.front().x;
 		int y = q.front().y;
 		int dist = q.front().dist;
 		q.pop();
+
 		
 		for (int i = 0; i < dir[arr[x][y]].size(); i++) {
 			int d = dir[arr[x][y]][i];
 			int nx = x + dx[d];
 			int ny = y + dy[d];
 
-			if (!check(nx, ny) || visited[nx][ny]) continue;
-			if (arr[nx][ny] >= 1) {
-				if (dist + 1 > L) continue;
-
+			if (!check(nx, ny) || visited[nx][ny] || dist + 1 > L) continue;
+			if (arr[nx][ny] >= 1) {	
 				bool flag = false;
 				for (int j = 0; j < dir[arr[nx][ny]].size(); j++) {
 					if ((d + 2) % 4 == dir[arr[nx][ny]][j]) {
