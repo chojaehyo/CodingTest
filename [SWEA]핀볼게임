@@ -1,0 +1,96 @@
+#include <cstdio>
+#include <vector>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+
+int T, N, arr[MAX][MAX], result;
+int dx[4] = { -1, 0, 1, 0 };
+int dy[4] = { 0, 1, 0, -1 };
+int nd[6][4] = {
+	{0, 1, 2, 3},
+	{2, 3, 1, 0},
+	{1, 3, 0, 2},
+	{3, 2, 0, 1},
+	{2, 0, 3, 1},
+	{2, 3, 0, 1}
+};
+struct info {
+	int x, y;
+};
+vector <info> wormhole[15];
+
+void solve(int sx, int sy, int d) {
+	int x = sx;
+	int y = sy;
+	int cnt = 0;
+
+	while (1) {
+		int nx = x + dx[d];
+		int ny = y + dy[d];
+
+		if ((nx == sx && ny == sy) || arr[nx][ny] == -1) {
+			result = max(result, cnt);
+			return;
+		}
+
+		if (nx < 0 || nx >= N || ny < 0 || ny >= N) {
+			d = nd[5][d];
+			cnt++;
+		}
+
+		else if (arr[nx][ny]) {
+			if (arr[nx][ny] < 6) {
+				d = nd[arr[nx][ny]][d];
+				cnt++;
+			}
+			else {
+				int num = arr[nx][ny];
+
+				if (nx == wormhole[num][0].x && ny == wormhole[num][0].y) {
+					nx = wormhole[num][1].x;
+					ny = wormhole[num][1].y;
+				}
+
+				else {
+					nx = wormhole[num][0].x;
+					ny = wormhole[num][0].y;
+				}
+			}
+		}
+		x = nx, y = ny;
+	}
+}
+
+
+int main() {
+	scanf("%d", &T);
+
+	for (int t = 1; t <= T; t++) {
+		scanf("%d", &N);
+		result = 0;
+		memset(wormhole, 0, sizeof(wormhole));
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				scanf("%d", &arr[i][j]);
+				if (arr[i][j] >= 6) {
+					wormhole[arr[i][j]].push_back({ i, j });
+				}
+			}
+		}
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				if (arr[i][j]) continue;
+				for (int d = 0; d < 4; d++) {
+					solve(i, j, d);
+				}
+			}
+		}
+
+		printf("#%d %d\n", t, result);
+	}
+	return 0;
+}
