@@ -1,0 +1,104 @@
+#include <cstdio>
+#include <vector>
+using namespace std;
+const int MAX = 105;
+
+int R, C, M, arr[MAX][MAX], result;
+int dx[] = { -1, 1, 0, 0 };
+int dy[] = { 0, 0, 1, -1 };
+
+struct SHARK {
+	int x, y, s, d, z;
+};
+
+vector <SHARK> shark;
+
+void find_shark(int col) {
+	for (int i = 0; i < R; i++) {
+		if (arr[i][col] > 0) {
+			result += shark[arr[i][col] - 1].z;
+			shark[arr[i][col] - 1].x = -1;
+			shark[arr[i][col] - 1].y = -1;
+			arr[i][col] = 0;
+			break;
+		}
+	}
+}
+
+void move_shark() {
+	int arr2[MAX][MAX] = { 0, };
+
+	for (int i = 0; i < shark.size(); i++) {
+		if (shark[i].x == -1) continue;
+
+		int x = shark[i].x;
+		int y = shark[i].y;
+		int s = shark[i].s;
+		int d = shark[i].d;
+		int size = shark[i].z;
+		arr[x][y] = 0;
+
+		int ns;
+		if (d == 0 || d == 1) ns = s % ((R - 1) * 2);
+		else ns = s % ((C - 1) * 2);
+
+		for (int j = 0; j < ns; j++) {
+			int nx = x + dx[d];
+			int ny = y + dy[d];
+
+			if (nx < 0 || nx >= R || ny < 0 || ny >= C) {
+				if (d == 0 || d == 2) d++;
+				else d--;
+
+				nx = x + dx[d];
+				ny = y + dy[d];
+			}
+			x = nx, y = ny;
+		}
+		if (arr2[x][y] == 0) {
+			arr2[x][y] = i + 1;
+			shark[i].x = x, shark[i].y = y, shark[i].d = d;
+		}
+		else {
+			if (shark[arr2[x][y] - 1].z < size) {
+				shark[arr2[x][y] - 1].x = -1;
+				shark[arr2[x][y] - 1].y = -1;
+				arr2[x][y] = i + 1;
+				shark[i].x = x, shark[i].y = y, shark[i].d = d;
+			}
+			else {
+				shark[i].x = -1;
+				shark[i].y = -1;
+			}
+		}
+	}
+
+	for (int i = 0; i < R; i++) {
+		for (int j = 0; j < C; j++) {
+			arr[i][j] = arr2[i][j];
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d %d", &R, &C, &M);
+
+	for (int i = 0; i < M; i++) {
+		int r, c, s, d, z;
+		scanf("%d %d %d %d %d", &r, &c, &s, &d, &z);
+		--r, --c, --d;
+
+		arr[r][c] = i + 1;
+		shark.push_back({ r, c, s, d, z });
+	}
+
+	if (M == 0) printf("0\n");
+	else {
+		for (int i = 0; i < C; i++) {
+			find_shark(i);
+			move_shark();
+		}
+		printf("%d\n", result);
+	}
+	return 0;
+}
