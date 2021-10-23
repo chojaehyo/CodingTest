@@ -1,0 +1,146 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+using namespace std;
+const int MAX = 25;
+
+int N, M, arr[MAX][MAX], result;
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+bool visited[MAX][MAX];
+
+bool find_delete_group() {
+	memset(visited, 0, sizeof(visited));
+	
+	queue <pair<int, int>> max_group;
+	int max_rainbow = 0, max_row = 0, max_col = 0;
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			bool visited_rainbow[MAX][MAX] = { 0, };
+
+			if (!visited[i][j] && arr[i][j] > 0) {
+				int color = arr[i][j];
+				int rb = 0;
+				queue <pair <int, int>> q;
+				queue <pair <int, int>> group;
+				q.push(make_pair(i, j));
+				group.push(make_pair(i, j));
+				visited[i][j] = true;
+
+				while (!q.empty()) {
+					int x = q.front().first;
+					int y = q.front().second;
+					q.pop();
+
+					for (int d = 0; d < 4; d++) {
+						int nx = x + dx[d];
+						int ny = y + dy[d];
+
+						if (nx < 0 || nx >= N || ny < 0 || ny >= N || arr[nx][ny] == -1) continue;
+
+						if (!visited[nx][ny] && !visited_rainbow[nx][ny]) {
+							if (color == arr[nx][ny]) {
+								visited[nx][ny] = true;
+								q.push(make_pair(nx, ny));
+								group.push(make_pair(nx, ny));
+							}
+							else if (arr[nx][ny] == 0) {
+								visited_rainbow[nx][ny] = true;
+								rb++;
+								q.push(make_pair(nx, ny));
+								group.push(make_pair(nx, ny));
+							}
+						}
+					}
+				}
+
+				bool flag = false;
+				if (group.size() >= 2) {
+					if (max_group.size() < group.size()) flag = true; 
+					else if (max_group.size() == group.size()) {
+						if (max_rainbow < rb) flag = true;
+						else if (max_rainbow == rb) {
+							if (max_row < group.front().first) flag = true;
+							else if (max_row == group.front().first) {
+								if (max_col < group.front().second) flag = true;
+							}
+						}
+					}
+				}
+
+				if (flag) {
+					max_group = group;
+					max_row = group.front().first;
+					max_col = group.front().second;
+					max_rainbow = rb;
+				}
+			}
+		}
+	}
+
+	int B_cnt = max_group.size();
+
+	if (B_cnt < 2) return false;
+	result += B_cnt * B_cnt;
+	while (!max_group.empty()) {
+		int x = max_group.front().first;
+		int y = max_group.front().second;
+		max_group.pop();
+
+		arr[x][y] = -5;
+	}
+	return true;
+}
+
+void gravity() {
+	for (int j = 0; j < N; j++) {
+		for (int i = N - 1; i >= 1; i--) {
+			if (arr[i][j] == -5) {
+				for (int ii = i - 1; ii >= 0; ii--) {
+					if (arr[ii][j] == -1) break;
+					if (arr[ii][j] >= 0) {
+						arr[i][j] = arr[ii][j];
+						arr[ii][j] = -5;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+void rotate() {
+	int tmp[MAX][MAX] = { 0, };
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			tmp[N - 1 - j][i] = arr[i][j];
+		}
+	}
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			arr[i][j] = tmp[i][j];
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d", &N, &M);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	while(1){
+		if (!find_delete_group()) break;
+		gravity();
+		rotate();
+		gravity();
+	}
+
+	printf("%d\n", result);
+}
