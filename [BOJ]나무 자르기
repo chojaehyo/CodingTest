@@ -1,0 +1,36 @@
+#include <cstdio>
+int N;
+long long M;
+long long trees[1000001];
+
+bool isPossible(int height) {
+	int taken = 0;
+	for (int i = 0; i < N; i++) {
+		if (trees[i] >= height) taken += (trees[i] - height);
+		if (taken >= M) return true;
+	}
+	return false;
+}
+
+int solve() {
+	int left = 0, right = 1000000000;
+	int mid, ret;
+	while (left <= right) {
+		mid = (left + right) / 2;
+		if (isPossible(mid)) {
+			ret = mid;
+			left = mid + 1;
+		}
+		else right = mid - 1;
+	}
+	return ret;
+}
+
+int main() {
+	scanf("%d %d", &N, &M);
+	
+	for (int i = 0; i < N; i++) scanf("%d", &trees[i]);
+
+	int res = solve();
+	printf("%d\n", res);
+}
