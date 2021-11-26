@@ -1,0 +1,20 @@
+#include <cstdio>
+#include <cmath>
+
+int T, x, y, length, d, cnt;
+
+int main() {
+    scanf("%d", &T);
+    
+    for(int i = 0; i < T; i++) {
+        scanf("%d %d", &x, &y);
+        length = y - x;
+        d = sqrt(length); 
+        
+        if (pow(d, 2) == length) cnt = 2 * d - 1;
+        else cnt = 2 * d;
+        
+        if (length > d * (d + 1)) cnt += 1; 
+        printf("%d\n", cnt);
+    }
+}
