@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int n, k, result;
+vector <int> v;
+
+int main() {
+	scanf("%d %d", &n, &k);
+    
+	for (int i = 0; i < n; i++) {
+        int input;
+        scanf("%d", &input);
+        v.push_back(input);
+    }
+    
+	sort(v.begin(), v.end(), greater<int>());
+	for (int i = 0; i < n; i++) {
+		while (k - v[i] >= 0) {
+			result++;
+			k -= v[i];
+		}
+	}
+	printf("%d\n", result);
+}
