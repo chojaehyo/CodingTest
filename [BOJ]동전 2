@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 110;
+    
+int N, K;
+int arr[MAX], dp[100010];
+
+int main(){
+    scanf("%d %d", &N, &K);
+    for (int i = 1; i <= N; i++) scanf("%d", &arr[i]);
+    
+    for (int i = 1; i <= K; i++) dp[i] = 2e9;
+    for (int i = 1; i <= N; i++) dp[arr[i]] = 1;
+    dp[0] = 0;
+    for (int i = 1; i <= N; i++){
+        for (int j = arr[i]; j <= K; j++){
+            dp[j] = min(dp[j], dp[j - arr[i]] + 1);
+        }
+    }
+ 
+    if (dp[K] == 2e9) printf("-1\n");
+    else printf("%d\n", dp[K]);
+    
+    return 0;
+}
