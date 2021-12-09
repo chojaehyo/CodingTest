@@ -1,0 +1,51 @@
+#include <cstdio> 
+#include <queue>
+#include <vector> 
+#include <algorithm> 
+using namespace std; 
+const int MAX = 1005;
+
+int n, m, dp[MAX]; 
+vector<pair <int, int>> road[MAX]; 
+
+void bfs(int start) { 
+    priority_queue<pair<int, int>,vector<pair<int,int>>, greater<pair<int,int>>> pq; 
+    pq.push({ 0, start }); 
+    
+    while (!pq.empty()) { 
+        int cur = pq.top().second; 
+        int cost = pq.top().first; 
+        pq.pop(); 
+        
+        if (cost > dp[cur]) continue; 
+        
+        for (int i = 0; i < road[cur].size(); i++) { 
+            int next = road[cur][i].first; 
+            int next_cost = dp[cur] + road[cur][i].second; 
+            
+            if (next_cost < dp[next]) { 
+                dp[next] = next_cost; 
+                pq.push({ next_cost, next }); 
+            } 
+        } 
+    } 
+} 
+
+int main() { 
+    scanf("%d %d", &n, &m);
+    
+    for (int i = 0; i < m; i++) { 
+        int a, b, c; 
+        scanf("%d %d %d", &a, &b, &c);
+        road[a].push_back({ b, c }); 
+    } 
+    
+    int start, end; 
+    scanf("%d %d", &start, &end);
+    fill_n(dp, MAX, 987987987); 
+    dp[start] = 0; 
+    bfs(start); 
+    printf("%d\n", dp[end]);
+    return 0; 
+}
+
