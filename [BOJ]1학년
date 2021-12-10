@@ -1,0 +1,20 @@
+#include <cstdio>
+const int MAX = 105;
+
+long long dp[MAX][25];
+int n, arr[MAX];
+ 
+int main() {
+    scanf("%d", &n);    
+    for (int i = 1; i <= n; i++) scanf("%d", &arr[i]);
+    dp[1][arr[1]] = 1;
+    for (int i = 2; i <= n; i++) {
+        for (int j = 0; j <= 20; j++) {
+            if (j - arr[i] >= 0) dp[i][j] += dp[i - 1][j - arr[i]];
+            
+            if (j + arr[i] <= 20) dp[i][j] += dp[i - 1][j + arr[i]];
+        }
+    }
+    printf("%ld\n", dp[n-1][arr[n]]);
+}
+
