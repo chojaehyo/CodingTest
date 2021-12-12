@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+const int MAX = 105;
+
+int t, n;
+vector <int> graph[MAX];
+bool visited[MAX];
+
+int distance(pair<int, int> p1, pair<int, int> p2){
+    return abs(p1.first - p2.first) + abs(p1.second - p2.second);
+}
+ 
+void dfs(int now){
+    visited[now] = true;
+    for (int i=0; i<graph[now].size(); i++){
+        int next = graph[now][i];
+        if (visited[next] == false)
+            dfs(next);
+    }
+}
+ 
+int main(){
+    scanf("%d",&t);
+    for (int T=0; T<t; T++){
+        for (int i=0; i<MAX; i++) graph[i].clear();
+        memset(visited, false, sizeof(visited));
+ 
+        scanf("%d",&n);
+        vector<pair<int, int>> loc;
+ 
+        for (int i=0; i<n+2; i++){
+            int y, x;
+            scanf("%d %d", &y,&x);
+            loc.push_back(make_pair(y, x));
+        }
+ 
+        for(int i=0; i<n+2; i++)
+            for(int j=i+1; j<n+2; j++)
+                if (distance(loc[i],loc[j]) <= 50*20){
+                    graph[i].push_back(j);
+                    graph[j].push_back(i);
+                }
+        dfs(0);
+ 
+        if (visited[n + 1]) printf("happy\n");
+        else printf("sad\n");
+    }
+}
+
