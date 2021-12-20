@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+
+int T, L, N;
+int main() { 
+    scanf("%d", &T); 
+    
+    for (int t = 0; t < T; t++) { 
+        scanf("%d %d", &L, &N);
+        
+        int minTime = 0, maxTime = 0; 
+        for (int i = 0; i < N; i++) { 
+            int ant; 
+            scanf("%d", &ant); 
+            
+            int antMin = min(ant, L - ant); 
+            int antMax = max(ant, L - ant); 
+            
+            minTime = max(minTime, antMin);
+            maxTime = max(maxTime, antMax); 
+        } 
+        printf("%d %d\n", minTime, maxTime); 
+    } 
+    return 0; 
+}
