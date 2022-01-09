@@ -1,0 +1,21 @@
+#include <cstdio>
+
+int T, N, M;
+long long result = 1;
+
+int main(){
+    scanf("%d", &T);
+    
+    for(int t = 0; t < T; t++){
+        result = 1;
+        scanf("%d %d", &N, &M);
+        
+        if(N > (M/2)) N = M - N;
+        
+        for(int i = 0; i < N; i++) result *= M - i;
+        for(int i = 0; i < N; i++) result /= i + 1;
+        
+        printf("%ld\n", result);
+    }
+    return 0;
+}
