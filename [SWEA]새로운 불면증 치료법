@@ -1,0 +1,31 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+
+int T, N, result, cnt, number[10];
+
+void get_result(int val){
+    while (val > 0){
+        if(number[val % 10] == 0){
+            number[val % 10] = 1;
+            cnt++;
+        }
+        val /= 10;
+    }
+}
+
+int main(){
+    scanf("%d", &T);
+    for(int t=1; t<=T; t++){
+        scanf("%d", &N);
+        result = 0, cnt = 0;
+        memset(number, 0, sizeof(number));
+
+        while(cnt < 10){
+            result++;
+            get_result(result * N);
+        }
+        printf("#%d %d\n", t, result*N);
+    }
+    return 0;
+}
