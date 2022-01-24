@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <vector>
+using namespace std;
+
+int T, N, M, L, num;
+char comm;
+
+int main(){
+    scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+        scanf("%d %d %d", &N, &M, &L);
+        
+        vector <int> v;
+        for(int i=0;i<N;i++){
+            scanf("%d", &num);
+            v.push_back(num);
+        }
+        
+        int idx, new_num;
+        
+        for(int i=0;i<M;i++){
+            scanf(" %c", &comm);
+            
+            if(comm == 'I'){
+                scanf("%d %d", &idx, &new_num);
+                v.insert(v.begin()+idx, new_num);
+            }
+            else if (comm == 'D'){
+                scanf("%d", &idx);
+                v.erase(v.begin()+idx);
+            }
+            else{
+                scanf("%d %d", &idx, &new_num);
+                v[idx] = new_num;
+            }
+        }
+        printf("#%d ", t);
+        if(v.size() < L+1) printf("-1\n");
+        else printf("%d\n", v[L]);
+    }
+    return 0;
+}
+
