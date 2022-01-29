@@ -1,0 +1,26 @@
+#include <cstdio>
+
+int T, N;
+
+int main(){
+    scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+        scanf("%d", &N);
+        
+        int tmp = N, cnt = 1, flag = 0;
+        
+        while(1){
+            while(tmp){
+                flag |= 1 << (tmp % 10);
+                tmp /= 10;
+            }
+            
+            if(flag == ((1 << 10) - 1)) break;
+            cnt++;
+            tmp = cnt * N;
+        }
+        printf("#%d %d\n", t, cnt * N);
+    }
+    return 0;
+}
