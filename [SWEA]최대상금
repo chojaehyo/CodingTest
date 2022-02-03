@@ -1,0 +1,37 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int T, change_cnt, result;
+string val;
+
+void get_result(int cnt){
+    if(cnt >= change_cnt){
+        result = result >= stoi(val) ? result : stoi(val);
+    }
+    else{
+        for(int i=0;i<val.size()-1;i++){
+            for(int j=i+1;j<val.size();j++){
+                swap(val[i], val[j]);
+                get_result(cnt+1);
+                swap(val[i], val[j]);
+            }
+        }
+    }
+    
+}
+
+int main(){
+    cin >> T;
+    
+    for(int t=1;t<=T;t++){
+        result = 0;
+        cin >> val >> change_cnt;
+        change_cnt = change_cnt >= val.size() ? val.size() : change_cnt;
+        
+        get_result(0);
+        cout << "#" << t << ' ' << result << "\n";
+        
+    }
+    return 0;
+}
