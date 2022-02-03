@@ -1,0 +1,25 @@
+#include <iostream>
+#include <string>
+#include <cstring>
+using namespace std;
+const int MAX = 1005;
+
+int T, arr[MAX][MAX];
+string a, b;
+
+int main(){
+    cin >> T;
+    for(int t=1;t<=T;t++){
+        cin >> a >> b;
+        
+        memset(arr, 0, sizeof(arr));
+        for(int i=1;i<=a.size();i++){
+            for(int j=1;j<=b.size();j++){
+                if(a[i-1] == b[j-1]) arr[i][j] = arr[i-1][j-1] + 1;
+                else arr[i][j] = arr[i-1][j] >= arr[i][j-1] ? arr[i-1][j] : arr[i][j-1];
+            }
+        }
+        cout << "#" << t << " " << arr[a.size()][b.size()] << "\n";
+    }
+    return 0;
+}
