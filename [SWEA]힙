@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <queue>
+using namespace std;
+
+int T, N, comm, num;
+
+int main(){
+	scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+     	scanf("%d", &N);
+        priority_queue<int, vector<int>, less<int> > pq;
+        
+        printf("#%d ", t);
+        for(int i=0;i<N;i++){
+         	scanf("%d", &comm);
+            
+            if(comm == 1){
+                scanf("%d", &num);
+                pq.push(num);
+            }
+            else{
+                if(pq.empty()) printf("-1 ");
+                else {
+                    printf("%d ", pq.top());
+                    pq.pop();
+                }
+            }
+        }
+        printf("\n");
+    }
+    return 0;
+}
