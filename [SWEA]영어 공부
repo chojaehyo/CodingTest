@@ -1,0 +1,47 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 1000005;
+
+int T, n, p, day, arr[MAX], last_day, result;
+
+int main(){
+	scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+     	memset(arr, 0, sizeof(arr));
+        scanf("%d %d", &n, &p);
+        result = p + 1;
+        
+        for(int i=0;i<n;i++) {
+            scanf("%d", &day);
+            arr[day] = 1;
+            last_day = day;
+        }
+        
+        int s_idx = 1, e_idx = 1, use_p = 0, cur_result = 0;
+        
+        while(e_idx < last_day + 1){
+            if(arr[e_idx] == 1){
+                e_idx++;
+                cur_result++;
+            }
+            else{
+                if(use_p == p){
+                    if(arr[s_idx] != 1) use_p--;
+                    cur_result--;
+                    s_idx++;
+                }
+                else{
+                    use_p++;
+                    cur_result++;
+                    e_idx++;
+                }
+            }
+            result = max(result, cur_result);
+        }
+        printf("#%d %d\n", t, result);
+    }
+    return 0;
+}
