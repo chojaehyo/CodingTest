@@ -1,0 +1,51 @@
+#include <cstdio>
+#include <queue>
+using namespace std;
+
+int T, N, A, X, Y, result;
+
+int main(){
+    scanf("%d", &T);
+    
+    for(int t=1;t<=T;t++){
+        result = 0;
+        priority_queue <int> max_heap;
+        priority_queue<int, vector<int>, greater<int> > min_heap;
+        
+     	scanf("%d %d", &N, &A);
+        
+        max_heap.push(A);
+        
+        for(int i=0;i<N;i++){
+            scanf("%d %d", &X, &Y);
+            
+            if(X < max_heap.top()) max_heap.push(X);
+            else  min_heap.push(X);
+            
+            if(max_heap.size() < min_heap.size()){
+                max_heap.push(min_heap.top());
+                min_heap.pop();
+            }
+            else if(max_heap.size() > min_heap.size() + 1){
+             	min_heap.push(max_heap.top());
+                max_heap.pop();
+            }
+            
+            if(Y < max_heap.top()) max_heap.push(Y);
+            else min_heap.push(Y);
+            
+            if(max_heap.size() < min_heap.size()){
+                max_heap.push(min_heap.top());
+                min_heap.pop();
+            }
+            else if(max_heap.size() > min_heap.size() + 1){
+             	min_heap.push(max_heap.top());
+                max_heap.pop();
+            }
+            
+            result = (result + max_heap.top()) % 20171109;
+        }
+        printf("#%d %d\n", t, result);
+    }
+    return 0;
+}
