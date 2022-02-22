@@ -1,0 +1,38 @@
+#include <stdio.h>
+const int MAX = 105;
+
+int N, num, cnt, ch1, ch2;
+char val, arr[MAX];
+
+void inorder(int idx){
+    if(idx > N) return;
+    inorder(idx*2);
+    printf("%c", arr[idx]);
+    inorder(idx*2 + 1);
+}
+
+int main() {
+    for(int t=1;t<=10;t++){
+        scanf("%d", &N);
+        cnt = 0;
+
+        for(int i=0;i<N;i++){
+            scanf("%d %c", &num, &val);
+            arr[num] = val;
+
+            if(cnt < N - 1){
+                scanf("%d", &ch1);
+                cnt++;
+
+                if(ch1 != N) {
+                    scanf("%d", &ch2);
+                    cnt++;
+                }
+            }
+        }
+		printf("#%d ", t);
+        inorder(1);
+        printf("\n");
+    }
+  return 0;
+}
