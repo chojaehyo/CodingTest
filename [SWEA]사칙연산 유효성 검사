@@ -1,0 +1,56 @@
+#include <stdio.h>
+const int MAX = 205;
+
+int N, num, cnt, ch1, ch2, result_idx;
+char val, arr[MAX], result[MAX];
+
+void inorder(int idx){
+    if(idx > N) return;
+    inorder(idx*2);
+    result[result_idx++] = arr[idx];
+    inorder(idx*2+1);
+}
+
+int main(){
+    for(int t=1;t<=10;t++){
+        scanf("%d", &N);
+        cnt = 0;
+		result_idx = 0;
+        
+        for(int i=0;i<N;i++){
+            scanf("%d %c", &num, &val);
+            arr[num] = val;
+
+            if(cnt < N - 1){
+                scanf("%d", &ch1);
+                cnt++;
+
+                if(ch1 != N) {
+                    scanf("%d", &ch2);
+                    cnt++;
+                }
+            }
+        }
+        inorder(1);
+        
+        bool possible = true;
+        
+        for(int i=0;i<result_idx;i++){
+         	if(i % 2 != 0) {
+                if(result[i] - '0' >= 0 && result[i] - '0' <= 9){
+                 	possible = false;
+                    break;
+                }
+            }
+            else{
+             	if(result[i] == '*' || result[i] == '/' || result[i] == '+' || result[i] == '-' ){
+                    possible = false;
+                    break;
+                }
+            }
+        }
+        if(possible) printf("#%d 1\n", t);
+        else printf("#%d 0\n", t);
+    }
+    return 0;
+}
