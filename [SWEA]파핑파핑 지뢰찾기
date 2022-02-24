@@ -1,0 +1,98 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+using namespace std;
+const int MAX = 305;
+
+int T, N, arr[MAX][MAX], count_arr[MAX][MAX], left_block;
+char input;
+int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+int dy[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+bool visited[MAX][MAX];
+
+void init(){
+    memset(count_arr, 0, sizeof(count_arr));
+    memset(visited, 0, sizeof(visited));
+    left_block = 0;
+}
+
+void bfs(int a, int b){
+    queue <pair<int, int>> q;
+    q.push({a, b});
+    visited[a][b] = true;
+    left_block--;
+
+    while(!q.empty()){
+        int x = q.front().first;
+        int y = q.front().second;
+        q.pop();
+
+        for(int i=0;i<8;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
+            if(!visited[nx][ny]){
+                visited[nx][ny] = true;
+                left_block--;
+                if(count_arr[nx][ny] == 0) q.push({nx, ny});
+            }
+        }
+    }
+}
+
+int main(){
+    //freopen("input.txt", "r", stdin);
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%d", &N);
+        init();
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N;j++){
+                scanf(" %1c", &input);
+                if(input == '.') {
+                    arr[i][j] = 0;
+                    left_block++;
+                }
+                else  arr[i][j] = 1;
+            }
+        }
+        for(int i=0;i<N;i++) {
+            for (int j = 0; j < N; j++) {
+                if(arr[i][j] == 0) {
+                    int bomb = 0;
+                    for (int d = 0; d < 8; d++) {
+                        int ni = i + dx[d];
+                        int nj = j + dy[d];
+
+                        if (ni < 0 || ni >= N || nj < 0 || nj >= N) continue;
+                        if(arr[ni][nj] == 1) bomb++;
+                    }
+                    count_arr[i][j] = bomb;
+                }
+                else count_arr[i][j] = -1;
+            }
+        }
+
+        int result = 0;
+        bool flag = false;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (!visited[i][j] && count_arr[i][j] == 0) {
+                    bfs(i, j);
+                    result++;
+                    if(left_block == 0) {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+            if(flag) break;
+        }
+        result += left_block;
+
+        printf("#%d %d\n", t, result);
+    }
+    return 0;
+}
