@@ -1,0 +1,79 @@
+const int MAX = 100001;
+
+int heapSize;
+struct HEAP{
+    int idx;
+    int income;
+} heap[MAX];
+
+void init()
+{
+    heapSize = 0;
+}
+
+void swap_node(HEAP &A, HEAP &B){
+    HEAP tmp = A;
+    A = B;
+    B = tmp;
+};
+
+HEAP get_max(){
+    HEAP ret = heap[0];
+    heapSize--;
+    heap[0] = heap[heapSize];
+
+    int idx = 0;
+    while(idx*2+1 < heapSize){
+        int child;
+        if(idx*2+2 == heapSize) child = idx*2+1;
+        else {
+            if(heap[idx*2+1].income > heap[idx*2+2].income) child = idx*2+1;
+            else if(heap[idx*2+1].income < heap[idx*2+2].income) child = idx*2+2;
+            else child = heap[idx*2+1].idx < heap[idx*2+2].idx ? idx*2+1 : idx*2+2;
+        }
+
+        if(heap[idx].income > heap[child].income || (heap[idx].idx < heap[child].idx) && (heap[idx].income == heap[child].income)) break;
+
+        swap_node(heap[idx], heap[child]);
+        idx = child;
+    }
+    return ret;
+}
+
+void addUser(int uID, int height)
+{
+    heap[heapSize].idx = uID;
+    heap[heapSize].income = height;
+
+    int cur = heapSize;
+    while(cur > 0 && (heap[cur].income > heap[(cur-1)/2].income || (heap[cur].income == heap[(cur-1)/2].income && heap[cur].idx < heap[(cur-1)/2].idx))){
+        swap_node(heap[cur], heap[(cur-1)/2]);
+        cur = (cur-1)/2;
+    }
+    heapSize++;
+}
+
+int getTop10(int result[10])
+{
+    int cnt = 0;
+    HEAP tmp[10];
+    if(heapSize < 10){
+        cnt = heapSize;
+        for(int i=0;i<cnt;i++) {
+            HEAP ret = get_max();
+            tmp[i] = ret;
+            result[i] = ret.idx;
+        }
+    }
+    else{
+        cnt = 10;
+        for(int i=0;i<10;i++){
+            HEAP ret = get_max();
+            tmp[i] = ret;
+            result[i] = ret.idx;
+        }
+    }
+
+    for(int i=0;i<cnt;i++) addUser(tmp[i].idx, tmp[i].income);
+    return cnt;
+}
