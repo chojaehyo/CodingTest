@@ -1,0 +1,30 @@
+#include<cstdio>
+#include <string>
+#include<unordered_map>
+using namespace std;
+
+unordered_map<string, int> um;
+
+int T, N, M, cnt;
+char input[51];
+
+int main(){
+    scanf("%d", &T);
+    for (int t=1;t<=T;t++) {
+        um.clear();
+        cnt = 0;
+
+        scanf("%d %d", &N, &M);
+
+        for (int i = 0; i < N; i++) {
+            scanf("%s", input);
+            um[input] = 1;
+        }
+        for (int i = 0; i < M; i++) {
+            scanf("%s", input);
+            if(um.count(input)) cnt++;
+        }
+        printf("#%d %d\n", t, cnt);
+    }
+    return 0;
+}
