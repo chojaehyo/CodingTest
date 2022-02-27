@@ -1,0 +1,138 @@
+#define MAX_NODE 10000
+
+struct Node {
+	int data;
+	Node* prev;
+	Node* next;
+};
+
+Node node[MAX_NODE];
+int nodeCnt;
+Node* head;
+
+Node* getNode(int data) {
+	node[nodeCnt].data = data;
+	node[nodeCnt].prev = nullptr;
+	node[nodeCnt].next = nullptr;
+	return &node[nodeCnt++];
+}
+
+void init()
+{
+	nodeCnt = 0;
+    head = getNode(-1);
+}
+
+void addNode2Head(int data) 
+{
+	Node * new_node = getNode(data);
+    
+    if(head->next == nullptr) {
+     	new_node->prev = head;
+        head->next = new_node;
+    }
+    else{
+        Node * next_node = head->next;
+        
+     	new_node->next = next_node;
+        new_node->prev = head;
+        head->next = new_node;
+        next_node->prev = new_node;
+    }
+}
+
+void addNode2Tail(int data) 
+{
+    Node * node = head;
+    Node * new_node = getNode(data);
+    
+    while(node->next){
+     	   node = node->next;
+    }
+	
+    node->next = new_node;
+    new_node->prev = node;
+}
+
+void addNode2Num(int data, int num) 
+{
+	Node * node = head;
+    Node * new_node = getNode(data);
+    
+    for(int i=0;i<num-1;i++) {
+        node = node->next;
+	}
+    
+    if(node->next == nullptr){
+        node->next = new_node;
+        new_node->prev = node;
+    }
+    else{
+        new_node->next = node->next;
+        new_node->prev = node;
+        node->next = new_node;
+        new_node->next->prev = new_node;
+    }
+}
+
+int findNode(int data) 
+{
+	int idx = 0;
+    Node * node = head;
+    
+    while(node->next){
+     	node = node->next;
+        idx++;
+        if(node->data == data) break;
+    }
+    return idx;
+}
+
+void removeNode(int data) 
+{
+	Node * node = head;
+    bool find = false;
+    
+    while(node->next){
+     	if(node->next->data == data){
+            find = true;
+            break;
+        }
+        node = node->next;
+    }
+    if(find) {
+        if(node->next->next == nullptr) node->next = node->next->next;
+        else{
+            node->next = node->next->next;
+			node->next->prev = node;
+        }
+    }
+}
+
+int getList(int output[MAX_NODE]) 
+{
+	int cnt = 0;
+    Node * node = head;
+    
+    while(node->next){
+     	node = node->next;
+        output[cnt++] = node->data;
+    }
+    return cnt;
+}
+
+int getReversedList(int output[MAX_NODE]) 
+{
+	int cnt = 0;
+    Node * node = head;
+    
+    while(node->next){
+        node = node->next;
+    }
+    
+    while(node->prev){
+        output[cnt++] = node->data;
+        node = node->prev;
+    }
+    return cnt;
+}
