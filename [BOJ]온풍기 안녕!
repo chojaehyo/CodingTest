@@ -2,12 +2,10 @@
 #include <cstring>
 #include <vector>
 #include <queue>
-#include <algorithm>
 using namespace std;
 const int MAX = 25;
 
-int R, C, K, W, map[MAX][MAX], arr[MAX][MAX], tmp[MAX][MAX];
-int x, y, t;
+int R, C, K, W, arr[MAX][MAX], tmp[MAX][MAX], x, y, t;
 vector <int> wall[MAX][MAX];
 bool visited[MAX][MAX];
 struct INFO{
@@ -45,27 +43,23 @@ void start_heater(int type, int x, int y){
             if(!check_range(cx, cy)) continue;
 
             if(check_range(cx-1, cy+1) && !visited[cx-1][cy+1]) {
-                if (wall[cx][cy].size() == 0) {
-                    arr[cx - 1][cy + 1] += ct - 1;
-                    visited[cx - 1][cy + 1] = true;
-                    q.push({cx - 1, cy + 1, ct - 1});
+                if(check_range(cx-1, y) && (wall[cx-1][cy].size() == 0 || (wall[cx-1][cy].size() == 1 && wall[cx-1][cy].front() != 2))){
+                    if(wall[cx][cy].size() == 0 || (wall[cx][cy].size() == 1 && wall[cx][cy].front() != 1)){
+                        arr[cx - 1][cy + 1] += ct - 1;
+                        visited[cx - 1][cy + 1] = true;
+                        q.push({cx - 1, cy + 1, ct - 1});
+                    }
                 }
             }
 
             if (check_range(cx, cy + 1) && !visited[cx][cy+1]) {
-                if (wall[cx][cy].size() == 0) {
+                if (wall[cx][cy].size() == 0 || (wall[cx][cy].size() == 1 && wall[cx][cy].front() != 2)) {
                     arr[cx][cy + 1] += ct - 1;
                     visited[cx][cy + 1] = true;
                     q.push({cx, cy + 1, ct - 1});
                 }
             }
-            if(check_range(cx, cy+1) && !visited[cx][cy+1]) {
-                if(wall[cx][cy].size() == 1 && wall[cx][cy].front() != 2){
-                    arr[cx][cy+1] += ct-1;
-                    visited[cx][cy+1] = true;
-                    q.push({cx, cy+1, ct-1});
-                }
-            }
+
             if(check_range(cx+1, cy+1) && !visited[cx+1][cy+1]){
                 if(check_range(cx+1, cy) && wall[cx+1][cy].size() == 0){
                     arr[cx+1][cy+1] += ct-1;
@@ -90,9 +84,8 @@ void start_heater(int type, int x, int y){
             if(!check_range(cx, cy)) continue;
 
             if(check_range(cx-1, cy-1) && !visited[cx-1][cy-1]) {
-                if (wall[cx][cy].size() == 0 || (wall[cx][cy].size() == 1 && wall[cx][cy].front() != 1)) {
-                    if (wall[cx - 1][cy - 1].size() == 0 ||
-                        (wall[cx - 1][cy - 1].size() == 1 && wall[cx - 1][cy - 1].front() != 2)) {
+                if(wall[cx-1][cy-1].size() == 0 || (wall[cx-1][cy-1].size() == 1 && wall[cx-1][cy-1].front() != 2)){
+                    if(wall[cx][cy].size() == 0 || (wall[cx][cy].size() == 1 && wall[cx][cy].front() != 1)){
                         arr[cx - 1][cy - 1] += ct - 1;
                         visited[cx - 1][cy - 1] = true;
                         q.push({cx - 1, cy - 1, ct - 1});
@@ -100,17 +93,15 @@ void start_heater(int type, int x, int y){
                 }
             }
             if(check_range(cx, cy-1) && !visited[cx][cy-1]){
-                if(check_range(cx, cy-1) && (wall[cx][cy-1].size() == 0 || (wall[cx][cy-1].size() == 1 && wall[cx][cy-1].front() != 2))){
+                if(wall[cx][cy-1].size() == 0 || (wall[cx][cy-1].size() == 1 && wall[cx][cy-1].front() != 2)){
                     arr[cx][cy-1] += ct-1;
                     visited[cx][cy-1] = true;
                     q.push({cx, cy-1, ct-1});
                 }
             }
             if(check_range(cx+1, cy-1) && !visited[cx+1][cy-1]) {
-                if (check_range(cx + 1, cy) &&
-                    (wall[cx + 1][cy].size() == 0 || (wall[cx + 1][cy].size() == 1 && wall[cx + 1][cy].front() != 1))) {
-                    if (wall[cx + 1][cy - 1].size() == 0 ||
-                        (wall[cx + 1][cy - 1].size() == 1 && wall[cx + 1][cy - 1].front() != 2)) {
+                if (check_range(cx + 1, cy) && (wall[cx + 1][cy].size() == 0 || (wall[cx + 1][cy].size() == 1 && wall[cx + 1][cy].front() != 1))) {
+                    if (wall[cx + 1][cy - 1].size() == 0 || (wall[cx + 1][cy - 1].size() == 1 && wall[cx + 1][cy - 1].front() != 2)) {
                         arr[cx + 1][cy - 1] += ct - 1;
                         visited[cx + 1][cy - 1] = true;
                         q.push({cx + 1, cy - 1, ct - 1});
@@ -148,8 +139,7 @@ void start_heater(int type, int x, int y){
                 }
             }
             if(check_range(cx-1, cy+1) && !visited[cx-1][cy+1]){
-                if (check_range(cx, cy + 1) &&
-                    (wall[cx][cy + 1].size() == 0 || (wall[cx][cy + 1].size() == 1 && wall[cx][cy + 1].front() != 1))) {
+                if (check_range(cx, cy + 1) && (wall[cx][cy + 1].size() == 0 || (wall[cx][cy + 1].size() == 1 && wall[cx][cy + 1].front() != 1))) {
                     if (wall[cx][cy].size() == 0 || (wall[cx][cy].size() == 1 && wall[cx][cy].front() != 2)) {
                         arr[cx - 1][cy + 1] += ct - 1;
                         visited[cx - 1][cy + 1] = true;
@@ -175,7 +165,7 @@ void start_heater(int type, int x, int y){
 
             if(check_range(cx+1, cy-1) && !visited[cx+1][cy-1]) {
                 if (check_range(cx, cy-1) && (wall[cx][cy - 1].size() == 0 || (wall[cx][cy-1].size() == 1 && wall[cx][cy-1].front() != 2))) {
-                    if(check_range(cx+1, cy-1) && (wall[cx+1][cy-1].size() == 0 || (wall[cx+1][cy-1].size() == 1 && wall[cx+1][cy-1].front() != 1))) {
+                    if(wall[cx+1][cy-1].size() == 0 || (wall[cx+1][cy-1].size() == 1 && wall[cx+1][cy-1].front() != 1)) {
                         arr[cx + 1][cy - 1] += ct - 1;
                         visited[cx + 1][cy - 1] = true;
                         q.push({cx + 1, cy - 1, ct - 1});
@@ -224,6 +214,11 @@ void control_temp(){
                         tmp[i][j] -= val;
                         tmp[nx][ny] += val;
                     }
+                    else if(arr[i][j] < arr[nx][ny]){
+                        int val = (arr[nx][ny] - arr[i][j]) / 4;
+                        tmp[i][j] += val;
+                        tmp[nx][ny] -= val;
+                    }
                 }
             }
         }
@@ -254,12 +249,10 @@ void reduce_temp(){
         if(arr[i][0] > 0) arr[i][0]--;
         if(arr[i][C-1] > 0) arr[i][C-1]--;
     }
-
     for(int j=1;j<C-1;j++){
         if(arr[0][j] > 0) arr[0][j]--;
         if(arr[R-1][j] > 0) arr[R-1][j]--;
     }
-
 }
 
 int main(){
@@ -267,9 +260,15 @@ int main(){
 
     for(int i=0;i<R;i++){
         for(int j=0;j<C;j++){
-            scanf("%d", &map[i][j]);
-            if(map[i][j] > 0 && map[i][j] < 5) heater.push_back({i, j, map[i][j]});
-            else if (map[i][j] == 5) target.push_back({i, j});
+            scanf("%d", &arr[i][j]);
+            if(arr[i][j] > 0 && arr[i][j] < 5) {
+                heater.push_back({i, j, arr[i][j]});
+                arr[i][j] = 0;
+            }
+            else if (arr[i][j] == 5) {
+                target.push_back({i, j});
+                arr[i][j] = 0;
+            }
         }
     }
 
@@ -293,7 +292,6 @@ int main(){
         chocolate++;
         if(check()) break;
     }
-    if(chocolate <= 100) printf("%d\n", chocolate);
-    else printf("101\n");
+    printf("%d\n", chocolate);
     return 0;
 }
