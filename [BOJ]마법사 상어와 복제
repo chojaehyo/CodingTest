@@ -1,0 +1,156 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+const int MAX = 5;
+
+int M, S, sx, sy;
+int max_out_fish = -1, max_sx, max_sy, smell[MAX][MAX];
+vector <int> arr[MAX][MAX];
+struct FISH{
+    int x, y, d;
+    bool dead;
+};
+vector <FISH> fish;
+vector <FISH> cur_fish;
+vector <int> remove_fish;
+vector <int> final_remove_fish;
+
+int f_dx[] = {0, -1, -1, -1, 0, 1, 1, 1};
+int f_dy[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+int s_dx[] = {-1, 0, 1, 0};
+int s_dy[] = {0, -1, 0, 1};
+
+void copy_magic(){
+    fish.clear();
+    for(int i=0;i<cur_fish.size();i++){
+        if(!cur_fish[i].dead) {
+            fish.push_back(cur_fish[i]);
+        }
+    }
+}
+
+bool check_range(int x, int y){
+    if(x < 0 || x >= 4 || y < 0 || y >= 4) return false;
+    else return true;
+}
+
+void move_fish(){
+    memset(arr, 0, sizeof(arr));
+    for (int i=0;i<cur_fish.size();i++){
+        if(cur_fish[i].dead) continue;
+        int x = cur_fish[i].x;
+        int y = cur_fish[i].y;
+        int d = cur_fish[i].d;
+        int nx, ny; bool can_move = false;
+
+        for(int j=0;j<8;j++) {
+            nx = x + f_dx[d];
+            ny = y + f_dy[d];
+            if (!(nx == sx && ny == sy) && smell[nx][ny] == 0 && check_range(nx, ny)) {
+                can_move = true;
+                break;
+            }
+            d = (d + 7) % 8;
+        }
+        if (can_move) {
+            cur_fish[i].x = nx, cur_fish[i].y = ny, cur_fish[i].d = d;
+            arr[nx][ny].push_back(i);
+        }
+        else{
+            cur_fish[i].x = x, cur_fish[i].y = y, cur_fish[i].d = d;
+            arr[x][y].push_back(i);
+        }
+    }
+}
+
+void move_shark(int idx, int out_fish, int x, int y){
+    if(idx >= 3){
+        if(max_out_fish < out_fish){
+            max_out_fish = out_fish;
+            max_sx = x, max_sy = y;
+            final_remove_fish = remove_fish;
+        }
+    }
+    else{
+        for(int i=0;i<4;i++){
+            int nx = x + s_dx[i];
+            int ny = y + s_dy[i];
+
+            if(!check_range(nx, ny)) continue;
+            vector <int> tmp = arr[nx][ny];
+
+            for(int j=0;j<arr[nx][ny].size();j++) remove_fish.push_back(arr[nx][ny][j]);
+            arr[nx][ny].clear();
+            move_shark(idx+1, out_fish + tmp.size(), nx, ny);
+
+            arr[nx][ny] = tmp;
+            for(int j=0;j<arr[nx][ny].size();j++) remove_fish.pop_back();
+        }
+    }
+}
+
+void update_arr(int time){
+    sx = max_sx, sy = max_sy;
+    for(int i=0;i<final_remove_fish.size();i++){
+        int x = cur_fish[final_remove_fish[i]].x;
+        int y = cur_fish[final_remove_fish[i]].y;
+        cur_fish[final_remove_fish[i]].dead = true;
+        arr[x][y].clear();
+        smell[x][y] = time;
+    }
+}
+
+void remove_smell(int time){
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            if(smell[i][j] > 0 && smell[i][j] == time - 2) smell[i][j] = 0;
+        }
+    }
+}
+
+void duplicate_fish(){
+    int total_fish = cur_fish.size();
+
+    for(int i=0;i<fish.size();i++){
+        if(fish[i].dead) continue;
+        cur_fish.push_back({fish[i].x, fish[i].y, fish[i].d, fish[i].dead});
+        arr[fish[i].x][fish[i].y].push_back(total_fish);
+        total_fish++;
+    }
+}
+
+
+
+int main(){
+    scanf("%d %d", &M, &S);
+
+    for(int i=0;i<M;i++){
+        int fx, fy, fd;
+        scanf("%d %d %d", &fx, &fy, &fd);
+
+        cur_fish.push_back({fx-1, fy-1, fd-1, false});
+        arr[fx-1][fy-1].push_back(i);
+    }
+
+    scanf("%d %d", &sx, &sy);
+    sx--; sy--;
+
+    for(int i=1;i<=S;i++){
+        copy_magic();
+        move_fish();
+        remove_fish.clear();
+        max_out_fish = -1;
+        move_shark(0, 0, sx, sy);
+        update_arr(i);
+        remove_smell(i);
+        duplicate_fish();
+    }
+
+    int result = 0;
+    for(int i=0;i<cur_fish.size();i++){
+        if(!cur_fish[i].dead) result++;
+    }
+    printf("%d\n", result);
+    return 0;
+}
