@@ -1,0 +1,48 @@
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+using namespace std;
+
+map <string, int> m;
+
+bool compare(pair<string, int> a, pair<string, int> b){
+    if(a.second > b.second) return true;
+    else return false;
+}
+
+void get_substr(string Str, int idx, int x, int total, string tmp){
+    if(idx >= total) m[tmp] += 1;
+    else{
+        for(int i=x;i<Str.size();i++){
+            tmp += Str[i];
+            get_substr(Str, idx+1, i+1, total, tmp);
+            tmp.erase(tmp.end()-1);
+        }
+    }
+}
+
+vector<string> solution(vector<string> orders, vector<int> course) {
+    vector<string> answer;
+    
+    for(int i=0;i<course.size();i++){
+        for(int j=0;j<orders.size();j++){
+            sort(orders[j].begin(), orders[j].end());
+            get_substr(orders[j], 0, 0, course[i], "");
+            
+        }
+        vector <pair<string, int>> v(m.begin(), m.end());
+        sort(v.begin(), v.end(), compare);
+        
+        int max_count = v[0].second;
+        
+        if(max_count <= 1) continue;
+        for(int i=0;i<v.size();i++){
+            if(v[i].second == max_count) answer.push_back(v[i].first);
+            else break;
+        }
+        m = {};
+    }
+    sort(answer.begin(), answer.end());
+    return answer;
+}
