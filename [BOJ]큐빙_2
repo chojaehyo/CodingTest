@@ -1,0 +1,184 @@
+#include <cstdio>
+const int MAX = 15;
+int cube[12][9] = {
+        {0, 0, 0, 1, 1, 1, 0, 0, 0},
+        {0, 0, 0, 1, 1, 1, 0, 0, 0},
+        {0, 0, 0, 1, 1, 1, 0, 0, 0},
+        {2, 2, 2, 3, 3, 3, 4, 4, 4},
+        {2, 2, 2, 3, 3, 3, 4, 4, 4},
+        {2, 2, 2, 3, 3, 3, 4, 4, 4},
+        {0, 0, 0, 5, 5, 5, 0, 0, 0},
+        {0, 0, 0, 5, 5, 5, 0, 0, 0},
+        {0, 0, 0, 5, 5, 5, 0, 0, 0},
+        {0, 0, 0, 6, 6, 6, 0, 0, 0},
+        {0, 0, 0, 6, 6, 6, 0, 0, 0},
+        {0, 0, 0, 6, 6, 6, 0, 0, 0}
+};
+// o = 1, g = 2, w = 3, b = 4, r = 5, y = 6
+int T, N, cube2[MAX][MAX];
+
+void rotate(char type){
+    if(type == 'U'){
+        int tmp[3], tmp2[MAX][MAX];
+
+        for(int i=0;i<3;i++) tmp[i] = cube[3+i][2];
+        for(int j=3;j<=5;j++) cube[j][2] = cube[6][j];
+        for(int i=5;i>=3;i--) cube[6][8-i] = cube[i][6];
+        for(int j=5;j>=3;j--) cube[j][6] = cube[2][j];
+        for(int j=5;j>=3;j--) cube[2][j] = tmp[5-j];
+
+        for(int i=3;i<=5;i++){
+            for(int j=3;j<=5;j++){
+                tmp2[j][8-i] = cube[i][j];
+            }
+        }
+        for(int i=3;i<=5;i++){
+            for(int j=3;j<=5;j++){
+                cube[i][j] = tmp2[i][j];
+            }
+        }
+    }
+    else if(type == 'D'){
+        int tmp[3], tmp2[MAX][MAX];
+
+        for(int i=0;i<3;i++) tmp[i] = cube[5-i][0];
+        for(int j=3;j<=5;j++) cube[8-j][0] = cube[0][j];
+        for(int i=3;i<=5;i++) cube[0][i] = cube[i][8];
+        for(int j=3;j<=5;j++) cube[j][8] = cube[8][8-j];
+        for(int i=0;i<3;i++) cube[8][5-i] = tmp[i];
+
+        for(int i=9;i<=11;i++){
+            for(int j=3;j<=5;j++){
+                tmp2[6+j][14-i] = cube[i][j];
+            }
+        }
+        for(int i=9;i<=11;i++){
+            for(int j=3;j<=5;j++){
+                cube[i][j] = tmp2[i][j];
+            }
+        }
+    }
+    else if(type == 'F'){
+        int tmp[3], tmp2[MAX][MAX];
+
+        for(int i=0;i<3;i++) tmp[i] = cube[5][2-i];
+        for(int i=2;i>=0;i--) cube[5][i] = cube[9][5-i];
+        for(int j=3;j<=5;j++) cube[9][j] = cube[5][11-j];
+        for(int j=8;j>=6;j--) cube[5][j] = cube[5][j-3];
+        for(int j=5;j>=3;j--) cube[5][j] = tmp[5-j];
+
+        for(int i=6;i<=8;i++){
+            for(int j=3;j<=5;j++){
+                tmp2[3+j][11-i] = cube[i][j];
+            }
+        }
+        for(int i=6;i<=8;i++){
+            for(int j=3;j<=5;j++){
+                cube[i][j] = tmp2[i][j];
+            }
+        }
+    }
+    else if(type == 'B'){
+        int tmp[3], tmp2[MAX][MAX];
+
+        for(int i=0;i<3;i++) tmp[i] =cube[3][i];
+        for(int j=0;j<=2;j++) cube[3][j] = cube[3][3+j];
+        for(int j=3;j<=5;j++) cube[3][j] = cube[3][3+j];
+        for(int j=6;j<=8;j++) cube[3][j] = cube[11][11-j];
+        for(int i=0;i<3;i++) cube[11][5-i] = tmp[i];
+
+        for(int i=0;i<=2;i++){
+            for(int j=3;j<=5;j++){
+                tmp2[j-3][5-i] = cube[i][j];
+            }
+        }
+
+        for(int i=0;i<=2;i++){
+            for(int j=3;j<=5;j++){
+                cube[i][j] = tmp2[i][j];
+            }
+        }
+    }
+    else if(type == 'L'){
+        int tmp[3], tmp2[MAX][MAX];
+
+        for(int i=0;i<3;i++) tmp[i] = cube[11-i][3];
+        for(int i=11;i>=9;i--) cube[i][3] = cube[i-3][3];
+        for(int i=8;i>=6;i--) cube[i][3] = cube[i-3][3];
+        for(int i=5;i>=3;i--) cube[i][3] = cube[i-3][3];
+        for(int i=0;i<3;i++) cube[2-i][3] = tmp[i];
+
+        for(int i=3;i<=5;i++){
+            for(int j=0;j<=2;j++){
+                tmp2[j+3][5-i] = cube[i][j];
+            }
+        }
+        for(int i=3;i<=5;i++){
+            for(int j=0;j<=2;j++){
+                cube[i][j] = tmp2[i][j];
+            }
+        }
+    }
+    else {
+        int tmp[3], tmp2[MAX][MAX];
+
+        for(int i=0;i<3;i++) tmp[i] = cube[i][5];
+        for(int i=3;i<=5;i++) cube[i-3][5] = cube[i][5];
+        for(int i=6;i<=8;i++) cube[i-3][5] = cube[i][5];
+        for(int i=9;i<=11;i++) cube[i-3][5] = cube[i][5];
+        for(int i=0;i<3;i++) cube[9+i][5] = tmp[i];
+
+        for(int i=3;i<=5;i++){
+            for(int j=6;j<=8;j++){
+                tmp2[j-3][11-i] = cube[i][j];
+            }
+        }
+        for(int i=3;i<=5;i++){
+            for(int j=6;j<=8;j++){
+                cube[i][j] = tmp2[i][j];
+            }
+        }
+    }
+}
+
+void init_cube(){
+    for(int i=0;i<12;i++) {
+        for (int j = 0; j < 9; j++) {
+            cube[i][j] = cube2[i][j];
+        }
+    }
+}
+
+int main(){
+    for(int i=0;i<12;i++){
+        for(int j=0;j<9;j++){
+            cube2[i][j] = cube[i][j];
+        }
+    }
+    scanf("%d", &T);
+    for(int t=0;t<T;t++){
+        scanf("%d", &N);
+        init_cube();
+        for(int i=0;i<N;i++){
+            char a, b;
+            scanf(" %c %c", &a, &b);
+            if (b == '-'){
+                for(int j=0;j<3;j++) rotate(a);
+            }
+            else rotate(a);
+        }
+
+        for(int i=3;i<=5;i++){
+            for(int j=3;j<=5;j++){
+                if(cube[i][j] == 1) printf("o");
+                else if(cube[i][j] == 2) printf("g");
+                else if(cube[i][j] == 3) printf("w");
+                else if(cube[i][j] == 4) printf("b");
+                else if(cube[i][j] == 5) printf("r");
+                else printf("y");
+            }
+            printf("\n");
+        }
+    }
+    return 0;
+}
