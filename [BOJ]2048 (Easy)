@@ -1,0 +1,123 @@
+#include <cstdio>
+#include <queue>
+#include <vector>
+using namespace std;
+const int MAX = 25;
+
+int N, arr[MAX][MAX], result;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+vector <int> dir;
+
+void save_state(int A[][MAX], int B[][MAX]){
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            A[i][j] = B[i][j];
+        }
+    }
+}
+
+void move(){
+    queue <int> q;
+    int arr2[MAX][MAX] = {0};
+    for(int j=0;j<N;j++) {
+        int tmp = 0;
+        for (int i = 0; i < N; i++) {
+            if (arr[i][j] > 0) {
+                if (tmp == 0) tmp = arr[i][j];
+                else {
+                    if (arr[i][j] == tmp) {
+                        q.push(tmp * 2);
+                        tmp = 0;
+                    }
+                    else {
+                        q.push(tmp);
+                        tmp = arr[i][j];
+                    }
+                }
+            }
+        }
+        if (tmp != 0) q.push(tmp);
+        int idx = 0;
+        while (!q.empty()) {
+            int cur = q.front();
+            q.pop();
+            arr2[idx++][j] = cur;
+        }
+    }
+    save_state(arr, arr2);
+}
+
+int get_max_val(){
+    int ret = 0;
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            if(ret < arr[i][j]) ret = arr[i][j];
+        }
+    }
+    return ret;
+}
+
+void rotate_arr(int d){
+    int arr2[MAX][MAX] = {0};
+    if(d == 1){
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N;j++){
+                arr2[N-1-j][i] = arr[i][j];
+            }
+        }
+    }
+    else if(d == 2){
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N;j++){
+                arr2[N-1-i][N-1-j] = arr[i][j];
+            }
+        }
+    }
+    else{
+        for(int i=0;i<N;i++) {
+            for (int j = 0; j < N; j++) {
+                arr2[j][N - 1 - i] = arr[i][j];
+            }
+        }
+    }
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            arr[i][j] = arr2[i][j];
+        }
+    }
+}
+
+void comb(int idx){
+    if(idx >= 5){
+        int res = get_max_val();
+        if(result < res) result = res;
+    }
+    else{
+        for(int i=0;i<4;i++){
+            int tmp[MAX][MAX] = {0};
+            dir.push_back(i);
+            save_state(tmp, arr);
+            if(i != 0) rotate_arr(i);
+            move();
+            if(i != 0) {
+                if (i == 2) rotate_arr(i);
+                else rotate_arr((i+2)%4);
+            }
+            comb(idx+1);
+            dir.pop_back();
+            save_state(arr, tmp);
+        }
+    }
+}
+int main(){
+    scanf("%d", &N);
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+    comb(0);
+    printf("%d\n", result);
+    return 0;
+}
