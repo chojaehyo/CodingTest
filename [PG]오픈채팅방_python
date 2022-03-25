@@ -1,0 +1,21 @@
+def solution(record):
+    answer, nickname, message = [], [], []
+    uid = dict()
+    
+    for r in record:
+        tmp = r.split(" ")
+        if tmp[0] == "Enter":
+            uid[tmp[1]] = tmp[2]
+            nickname.append(tmp[1])
+            message.append("님이 들어왔습니다.")
+        elif tmp[0] == "Leave":
+            nickname.append(tmp[1])
+            message.append("님이 나갔습니다.")
+        else:
+            uid[tmp[1]] = tmp[2]
+            
+    for i in range(len(nickname)):
+        answer.append(uid[nickname[i]] + message[i])
+        
+    return answer
+            
