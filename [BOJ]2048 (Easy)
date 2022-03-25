@@ -1,13 +1,11 @@
 #include <cstdio>
 #include <queue>
-#include <vector>
 using namespace std;
 const int MAX = 25;
 
 int N, arr[MAX][MAX], result;
 int dx[] = {-1, 0, 1, 0};
 int dy[] = {0, 1, 0, -1};
-vector <int> dir;
 
 void save_state(int A[][MAX], int B[][MAX]){
     for(int i=0;i<N;i++){
@@ -96,7 +94,6 @@ void comb(int idx){
     else{
         for(int i=0;i<4;i++){
             int tmp[MAX][MAX] = {0};
-            dir.push_back(i);
             save_state(tmp, arr);
             if(i != 0) rotate_arr(i);
             move();
@@ -105,11 +102,11 @@ void comb(int idx){
                 else rotate_arr((i+2)%4);
             }
             comb(idx+1);
-            dir.pop_back();
             save_state(arr, tmp);
         }
     }
 }
+
 int main(){
     scanf("%d", &N);
     for(int i=0;i<N;i++){
