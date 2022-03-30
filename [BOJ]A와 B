@@ -1,0 +1,27 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+bool possible = false;
+
+int main(){
+    string a, b;
+    cin >> a >> b;
+
+    while(1){
+        if(a.size() == b.size()){
+            if(a == b) possible = true;
+            break;
+        }
+        char tmp = b.back();
+        b.pop_back();
+
+        if(tmp == 'B'){
+            reverse(b.begin(), b.end());
+        }
+    }
+    if(possible) cout << "1";
+    else cout << "0";
+    return 0;
+}
