@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 1005;
+
+int N, M, input[MAX], number[MAX];
+struct INFO{
+    int num, cnt, time;
+};
+vector <INFO> candidates;
+
+bool compare(INFO a, INFO b){
+    if(a.cnt < b.cnt) return true;
+    else if(a.cnt == b.cnt){
+        if(a.time < b.time) return true;
+        else return false;
+    }
+    else return false;
+}
+
+bool compare2(INFO a, INFO b){
+    if(a.num < b.num) return true;
+    else return false;
+}
+
+int main(){
+    scanf("%d %d", &N, &M);
+
+    for(int i=0;i<M;i++) scanf("%d", &input[i]);
+
+    for(int i=0;i<M;i++){
+        if(candidates.size() < N) {
+            if(number[input[i]] == 0){
+                candidates.push_back({input[i], 1, i});
+                number[input[i]] = 1;
+            }
+            else{
+                for(int j=0;j<candidates.size();j++){
+                    if(candidates[j].num == input[i]){
+                        candidates[j].cnt++;
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            if(number[input[i]] == 0){
+                sort(candidates.begin(), candidates.end(), compare);
+                number[candidates[0].num] = 0;
+                candidates[0].num = input[i];
+                candidates[0].cnt = 1;
+                candidates[0].time = i;
+                number[input[i]] = 1;
+            }
+            else{
+                for(int j=0;j<candidates.size();j++){
+                    if(candidates[j].num == input[i]){
+                        candidates[j].cnt++;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    sort(candidates.begin(), candidates.end(), compare2);
+    for(int i=0;i<candidates.size();i++){
+        printf("%d ", candidates[i].num);
+    }
+    return 0;
+}
