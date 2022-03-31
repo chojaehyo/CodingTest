@@ -1,0 +1,120 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+using namespace std;
+const int MAX = 105;
+
+int R, C, N, arr[MAX][MAX], row;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+bool visited[MAX][MAX];
+vector <pair<int, int>> cluster;
+
+void bfs(int a, int b){
+    queue <pair<int, int>> q;
+    q.push({a, b});
+    visited[a][b] = true;
+
+    while(!q.empty()){
+        int x = q.front().first;
+        int y = q.front().second;
+        q.pop();
+
+        for(int i=0;i<4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(nx < 0 || nx >= R || ny < 0 || ny >= C) continue;
+            if(!visited[nx][ny] && arr[nx][ny] == 1){
+                visited[nx][ny] = true;
+                q.push({nx, ny});
+            }
+        }
+    }
+}
+
+void check_cluster(){
+    cluster.clear();
+    memset(visited, 0, sizeof(visited));
+
+    for(int j=0;j<C;j++){
+        if(!visited[R-1][j] && arr[R-1][j] == 1){
+            bfs(R-1, j);
+        }
+    }
+
+    for(int i=0;i<R;i++){
+        for(int j=0;j<C;j++){
+            if(!visited[i][j] && arr[i][j] == 1){
+                cluster.push_back({i, j});
+                arr[i][j] = 0;
+            }
+        }
+    }
+
+    if(!cluster.empty()){
+        int gap = 10000;
+
+        for(int i=0;i<cluster.size();i++){
+            int x = cluster[i].first;
+            int y = cluster[i].second;
+            int cur = -1;
+
+            for(int k=1;k<R;k++){
+                if(x + k >= R || arr[x+k][y] == 1) break;
+                cur = cur < k ? k : cur;
+            }
+            gap = gap > cur ? cur : gap;
+        }
+        for (int i = 0; i < cluster.size(); i++) {
+            int x = cluster[i].first;
+            int y = cluster[i].second;
+
+            if(gap != 10000) arr[x+gap][y] = 1;
+            else arr[x][y] = 1;
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d", &R, &C);
+
+    for(int i=0;i<R;i++){
+        for(int j=0;j<C;j++){
+            char c;
+            scanf(" %c", &c);
+            if(c == '.') arr[i][j] = 0;
+            else arr[i][j] = 1;
+        }
+    }
+    scanf("%d", &N);
+    for(int i=0;i<N;i++){
+        scanf("%d", &row);
+        row = R - row;
+        if(i % 2 == 0){
+            for(int j=0;j<C;j++){
+                if(arr[row][j] == 1){
+                    arr[row][j] = 0;
+                    break;
+                }
+            }
+        }
+        else{
+            for(int j=C-1;j>=0;j--){
+                if(arr[row][j] == 1){
+                    arr[row][j] = 0;
+                    break;
+                }
+            }
+        }
+        check_cluster();
+    }
+    for(int i=0;i<R;i++){
+        for(int j=0;j<C;j++){
+            if(arr[i][j] == 0) printf(".");
+            else printf("x");
+        }
+        printf("\n");
+    }
+    return 0;
+}
