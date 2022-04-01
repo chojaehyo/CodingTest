@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 45;
+
+int N, M, K, R, C, arr[MAX][MAX], sticker[MAX][MAX];
+int result = 0;
+
+bool attach_sticker(int dir){
+    int x = R, y = C;
+    if(dir % 2 == 1) swap(x, y);
+
+    for(int i=0;i<N-x+1;i++){
+        for(int j=0;j<M-y+1;j++){
+            bool flag = true;
+            for(int a=i;a<i+x;a++){
+                for(int b=j;b<j+y;b++){
+                    if(arr[a][b] & sticker[a-i][b-j]){
+                        flag = false;
+                        break;
+                    }
+                }
+                if(!flag) break;
+            }
+            if(flag){
+                for(int a=i;a<i+x;a++) {
+                    for (int b = j; b < j + y; b++) {
+                        if(arr[a][b] | sticker[a-i][b-j]){
+                            arr[a][b] = 1;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void rotate(int r, int c){
+    int tmp[MAX][MAX] = {0};
+
+    for(int i=0;i<r;i++){
+        for(int j=0;j<c;j++){
+            tmp[j][r-1-i] = sticker[i][j];
+        }
+    }
+    memset(sticker, 0, sizeof(sticker));
+    for(int i=0;i<c;i++){
+        for(int j=0;j<r;j++){
+            sticker[i][j] = tmp[i][j];
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d %d", &N, &M, &K);
+
+    for(int k=0;k<K;k++){
+        scanf("%d %d", &R, &C);
+
+        int sticker_cnt = 0;
+        for(int i=0;i<R;i++){
+            for(int j=0;j<C;j++){
+                scanf("%d", &sticker[i][j]);
+                if(sticker[i][j] == 1) sticker_cnt++;
+            }
+        }
+        for(int d=0;d<4;d++){
+            if(!attach_sticker(d)){
+                if(d % 2 == 0) rotate(R, C);
+                else rotate(C, R);
+            }
+            else {
+                result += sticker_cnt;
+                break;
+            }
+        }
+    }
+    printf("%d\n", result);
+    return 0;
+}
