@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+
+int r, c, k, arr[MAX][MAX], row = 3, col = 3, num[MAX];
+
+struct compare{
+    bool operator()(pair<int,int> a, pair<int, int> b){
+        if(a.second > b.second) return true;
+        else if(a.second == b.second){
+            if(a.first > b.first) return true;
+            else return false;
+        }
+        else return false;
+    }
+};
+
+priority_queue <pair<int, int>, vector<pair<int, int>>, compare> pq;
+
+void r_operation(){
+    for(int i=0;i<row;i++){
+        memset(num, 0, sizeof(num));
+        pq = {};
+        int max_num = 0;
+        for(int j=0;j<col;j++) {
+            num[arr[i][j]]++;
+            max_num = max(max_num, arr[i][j]);
+            arr[i][j] = 0;
+        }
+        for(int j=1;j<=max_num;j++) {
+            if(num[j] > 0) pq.push({j, num[j]});
+        }
+
+        int idx = 0;
+        while(!pq.empty()){
+            if(idx >= 100) break;
+            int n = pq.top().first;
+            int cnt = pq.top().second;
+            pq.pop();
+            arr[i][idx++] = n;
+            arr[i][idx++] = cnt;
+        }
+        col = max(col, idx);
+        if(col >= 100) col = 99;
+    }
+}
+
+void c_operation(){
+    for(int i=0;i<col;i++){
+        memset(num, 0, sizeof(num));
+        pq = {};
+        int max_num = 0;
+        for(int j=0;j<row;j++) {
+            num[arr[j][i]]++;
+            max_num = max(max_num, arr[j][i]);
+            arr[j][i] = 0;
+        }
+        for(int j=1;j<=max_num;j++) {
+            if(num[j] > 0) pq.push({j, num[j]});
+        }
+
+        int idx = 0;
+        while(!pq.empty()){
+            if(idx >= 100) break;
+            int n = pq.top().first;
+            int cnt = pq.top().second;
+            pq.pop();
+            arr[idx++][i] = n;
+            arr[idx++][i] = cnt;
+        }
+        row = max(row, idx);
+        if(row >= 100) row = 99;
+    }
+}
+
+int main(){
+    scanf("%d %d %d", &r, &c, &k);
+    r--; c--;
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+    int time = 0;
+
+    while(1){
+        if(arr[r][c] == k) break;
+        if(time > 100) {
+            time = -1;
+            break;
+        }
+        if(row >= col) r_operation();
+        else c_operation();
+        time++;
+    }
+    printf("%d\n", time);
+    return 0;
+}
