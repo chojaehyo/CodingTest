@@ -1,0 +1,54 @@
+#include <cstdio>
+using namespace std;
+const int MAX = 55;
+
+int N, M, r, c, d, arr[MAX][MAX], result;
+int dr[] = {-1, 0, 1, 0};
+int dc[] = {0, 1, 0, -1};
+
+int main(){
+    scanf("%d %d", &N, &M);
+    scanf("%d %d %d", &r, &c, &d);
+    for(int i=0;i<N;i++){
+        for(int j=0;j<M;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+
+    while(1){
+        if(arr[r][c] == 0) {
+            arr[r][c] = 2;
+            result++;
+        }
+        bool flag = false;
+        for(int i=0;i<4;i++){
+            int nd = (d+3)%4;
+            int nr = r + dr[nd];
+            int nc = c + dc[nd];
+            if(nr < 0 || nr >= N || nc < 0 || nc >= M || arr[nr][nc] > 0) {
+                d = nd;
+                continue;
+            }
+            if(arr[nr][nc] == 0){
+                r = nr;
+                c = nc;
+                d = nd;
+                flag = true;
+                break;
+            }
+        }
+        if(!flag){
+            int nd = (d+2)%4;
+            int nr = r + dr[nd];
+            int nc = c + dc[nd];
+
+            if(arr[nr][nc] == 1) break;
+            else {
+                r = nr;
+                c = nc;
+            }
+        }
+    }
+    printf("%d\n", result);
+    return 0;
+}
