@@ -1,0 +1,112 @@
+// 실수했던 부분 : 말이 움직이다가 4개 쌓이면 바로 종료하는 부분, 파란색 만났을 때 바로 방향 전환하는 부분  
+#include <cstdio>
+#include <vector>
+#include <deque>
+using namespace std;
+const int MAX = 15;
+
+int N, K, arr[MAX][MAX];
+deque <int> cur_arr[MAX][MAX];
+struct HORSE {
+	int x, y, d;
+};
+vector <HORSE> horse;
+int dx[] = { 0, 0, -1, 1 };
+int dy[] = { 1, -1, 0, 0 };
+bool finish = false;
+
+bool check_range(int x, int y) {
+	return x >= 0 && x < N && y >= 0 && y < N;
+}
+
+void move_horse() {
+	for (int i = 0; i < K; i++) {
+		int x = horse[i].x;
+		int y = horse[i].y;
+		int d = horse[i].d;
+
+		int nx = x + dx[d];
+		int ny = y + dy[d];
+
+		if (!check_range(nx, ny) || arr[nx][ny] == 2) {
+			if (d % 2 == 0) d++;
+			else d--;
+            horse[i].d = d;
+			nx = x + dx[d];
+			ny = y + dy[d];
+
+			if (!check_range(nx, ny) || arr[nx][ny] == 2) continue;
+		}
+		
+		if (arr[nx][ny] == 0) {
+			deque <int> tmp;
+			bool find = false;
+			
+			while (!cur_arr[x][y].empty()) {
+				int val = cur_arr[x][y].front();
+				cur_arr[x][y].pop_front();
+				if (val == i) find = true;
+				if (!find) tmp.push_back(val);
+				else {
+					cur_arr[nx][ny].push_back(val);
+					horse[val].x = nx, horse[val].y = ny;
+				}
+			}
+			
+			cur_arr[x][y] = tmp;
+			if (cur_arr[nx][ny].size() >= 4) {
+				finish = true;
+				return;
+			}
+		}
+		else {
+			bool find = false;
+
+			while (!cur_arr[x][y].empty()) {
+				int val = cur_arr[x][y].back();
+				cur_arr[x][y].pop_back();
+				if (val == i) {
+					cur_arr[nx][ny].push_back(val);
+					horse[val].x = nx, horse[val].y = ny;
+					break;
+				}
+				else {
+					cur_arr[nx][ny].push_back(val);
+					horse[val].x = nx, horse[val].y = ny;
+				}
+			}
+			if (cur_arr[nx][ny].size() >= 4) {
+				finish = true;
+				return;
+			}
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d", &N, &K);
+	int input;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+	int x, y, d;
+	for (int i = 0; i < K; i++) {
+		scanf("%d %d %d", &x, &y, &d);
+		horse.push_back({ x - 1, y - 1, d - 1 });
+		cur_arr[x - 1][y - 1].push_back(i);
+	}
+
+	int turn = 0;
+	while (!finish) {
+		if (turn > 1000) {
+			turn = -1;
+			break;
+		}
+		move_horse();
+		turn++;
+	}
+	printf("%d\n", turn);
+	return 0;
+}
