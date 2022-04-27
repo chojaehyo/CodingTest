@@ -1,0 +1,99 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+const int MAX = 355;
+
+int T, N, M, K, arr[MAX][MAX], tmp_arr[MAX][MAX];
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+
+struct CELL {
+	int idx, x, y, val, cur, act;
+	bool dead;
+};
+vector <CELL> cell;
+vector <CELL> active_cell;
+
+void init() {
+	cell.clear();
+	memset(arr, 0, sizeof(arr));
+}
+
+int get_cnt() {
+	int cnt = 0;
+	for (int i = 0; i < cell.size(); i++) {
+		if (cell[i].dead) continue;
+		cnt++;
+	}
+	return cnt;
+}
+
+void find_active_cell() {
+	active_cell.clear();
+	for (int i = 0; i < cell.size(); i++) {
+		if (cell[i].dead) continue;
+		if (cell[i].val == cell[i].cur) {
+			cell[i].act++;
+			active_cell.push_back(cell[i]);
+		}
+		else cell[i].cur++;
+	}
+}
+
+void activate() {
+	memset(tmp_arr, 0, sizeof(tmp_arr));
+	for (int i = 0; i < active_cell.size(); i++) {
+		int x = active_cell[i].x;
+		int y = active_cell[i].y;
+		int val = active_cell[i].val;
+		int idx = active_cell[i].idx;
+		int act = active_cell[i].act;
+
+		if (act == val) cell[idx].dead = true;
+
+		for (int j = 0; j < 4; j++) {
+			int nx = x + dx[j];
+			int ny = y + dy[j];
+
+			if (arr[nx][ny]) continue;
+			if (!tmp_arr[nx][ny]) tmp_arr[nx][ny] = val;
+			else if (tmp_arr[nx][ny] < val) tmp_arr[nx][ny] = val;
+		}
+	}
+	int idx = cell.size();
+	for (int i = 0; i < MAX; i++) {
+		for (int j = 0; j < MAX; j++) {
+			if (tmp_arr[i][j]) {
+				arr[i][j] = tmp_arr[i][j];
+				cell.push_back({ idx++, i, j, tmp_arr[i][j], 0, 0, false });
+			}
+		}
+	}
+}
+
+int main() {
+	scanf("%d", &T);
+
+	for (int t = 1; t <= T; t++) {
+		scanf("%d %d %d", &N, &M, &K);
+
+		init();
+		int idx = 0;
+        int start = K/2 + 1;
+		for (int i = start; i < start + N; i++) {
+			for (int j = start; j < start + M; j++) {
+				scanf("%d", &arr[i][j]);
+				if(arr[i][j] > 0 ) cell.push_back({ idx++, i, j, arr[i][j], 0, 0, false });
+			}
+		}
+
+		for (int i = 0; i < K; i++) {
+			find_active_cell();
+			activate();
+		}
+		int result = get_cnt();
+		printf("#%d %d\n", t, result);
+	}
+	return 0;
+}
