@@ -1,0 +1,148 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 505;
+
+int N, M, arr[MAX][MAX], result;
+int s1[2][4][2] = { { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 } },
+					{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } } 
+};
+int s2[4][2] = { {0, 0}, {0, 1}, {1, 0}, {1, 1} };
+int s3[8][4][2] = { { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 2, 1 } },
+					{ { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 0 } },
+					{ { 0, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
+					{ { 1, 0 }, { 1, 1 }, { 1, 2 }, { 0, 2 } },
+					{ { 0, 1 }, { 1, 1 }, { 2, 1 }, { 2, 0 } },
+					{ { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 2 } },
+					{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 } },
+					{ { 0, 0 }, { 1, 0 }, { 1, 1 }, { 1, 2 } }
+};
+int s4[4][4][2] = { { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 } },
+					{ { 0, 1 }, { 0, 2 }, { 1, 0 }, { 1, 1 } },
+					{ { 0, 1 }, { 1, 0 }, { 1, 1 }, { 2, 0 } },
+					{ { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }
+};
+int s5[4][4][2] = { { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 1 } },
+					{ { 0, 1 }, { 1, 1 }, { 2, 1 }, { 1, 0 } },
+					{ { 0, 1 }, { 1, 0 }, { 1, 1 }, { 1, 2 } },
+					{ { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 0 } }
+};
+
+
+void check_shape1() {
+	int n = N, m = M - 3;
+	
+	for (int s = 0; s < 2; s++) {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				int sum_val = 0;
+				for (int k = 0; k < 4; k++) {
+					int ni = i + s1[s][k][0];
+					int nj = j + s1[s][k][1];
+
+					sum_val += arr[ni][nj];
+				}
+				result = max(result, sum_val);
+			}
+		}
+		n = N - 3, m = M;
+	}
+}
+
+void check_shape2() {
+	int n = N - 1, m = M - 1;
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			int sum_val = 0;
+			for (int k = 0; k < 4; k++) {
+				int ni = i + s2[k][0];
+				int nj = j + s2[k][1];
+
+				sum_val += arr[ni][nj];
+			}
+			result = max(result, sum_val);
+		}
+	}
+}
+
+void check_shape3() {
+	int n = N - 2, m = M - 1;
+
+	for (int s = 0; s < 8; s++) {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				int sum_val = 0;
+				for (int k = 0; k < 4; k++) {
+					int ni = i + s3[s][k][0];
+					int nj = j + s3[s][k][1];
+
+					sum_val += arr[ni][nj];
+				}
+				result = max(result, sum_val);
+			}
+		}
+		if (s % 2 == 0) n = N - 1, m = M - 2;
+		else n = N - 2, m = M - 1;
+	}
+}
+
+void check_shape4() {
+	int n = N - 2, m = M - 1;
+
+	for (int s = 0; s < 4; s++) {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				int sum_val = 0;
+				for (int k = 0; k < 4; k++) {
+					int ni = i + s4[s][k][0];
+					int nj = j + s4[s][k][1];
+
+					sum_val += arr[ni][nj];
+				}
+				result = max(result, sum_val);
+			}
+		}
+		if (s % 2 == 0) n = N - 1, m = M - 2;
+		else n = N - 2, m = M - 1;
+	}
+}
+
+void check_shape5() {
+	int n = N - 1, m = M - 2;
+
+	for (int s = 0; s < 4; s++) {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				int sum_val = 0;
+				for (int k = 0; k < 4; k++) {
+					int ni = i + s5[s][k][0];
+					int nj = j + s5[s][k][1];
+
+					sum_val += arr[ni][nj];
+				}
+				result = max(result, sum_val);
+			}
+		}
+		if (s % 2 == 0) n = N - 2, m = M - 1;
+		else n = N - 1, m = M - 2;
+	}
+}
+
+int main() {
+	scanf("%d %d", &N, &M);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	check_shape1();
+	check_shape2();
+	check_shape3();
+	check_shape4();
+	check_shape5();
+	printf("%d\n", result);
+	return 0;
+}
