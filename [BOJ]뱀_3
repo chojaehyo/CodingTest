@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <queue>
+#include <deque>
+using namespace std;
+const int MAX = 105;
+
+int N, K, L, ax, ay, arr[MAX][MAX], sd = 1;
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+queue <pair<int, char>> q;
+deque <pair<int ,int>> snake;
+
+bool move_snake() {
+	if (!snake.empty()) {
+		int x = snake.front().first;
+		int y = snake.front().second;
+
+		int nx = x + dx[sd];
+		int ny = y + dy[sd];
+
+		if (nx < 1 || nx > N || ny < 1 || ny > N) return false;
+		if (arr[nx][ny] == 5) return false;
+
+		if (arr[nx][ny] == 1) {
+			snake.push_front({ nx, ny });
+			arr[nx][ny] = 5;
+		}
+		else {
+			snake.push_front({ nx, ny });
+			arr[nx][ny] = 5;
+			int tx = snake.back().first;
+			int ty = snake.back().second;
+			snake.pop_back();
+			arr[tx][ty] = 0;
+		}
+		return true;
+	}
+	return false;
+}
+
+int main() {
+	scanf("%d\n%d", &N, &K);
+	for (int i = 1; i <= K; i++) {
+		scanf("%d %d", &ax, &ay);
+		arr[ax][ay] = 1;
+	}
+	scanf("%d", &L);
+	int X;
+	char C;
+
+	for (int i = 1; i <= L; i++) {
+		scanf("%d %c", &X, &C);
+		q.push({ X, C });
+	}
+
+	snake.push_back({ 1, 1 });
+	arr[1][1] = 5;
+
+	int time = 0;
+	while (1) {
+		time++;
+		if (!move_snake()) break;
+	
+		if (!q.empty() && time == q.front().first) {
+			if (q.front().second == 'L') sd = (sd + 3) % 4;
+			else sd = (sd + 1) % 4;
+			q.pop();
+		}
+	}
+	printf("%d\n", time);
+	return 0;
+}
