@@ -4,153 +4,146 @@
 using namespace std;
 const int MAX = 5;
 
-int M, S, sx, sy;
-int max_out_fish = -1, max_sx, max_sy, smell[MAX][MAX];
-vector <int> arr[MAX][MAX];
-struct FISH{
-    int x, y, d;
-    bool dead;
-};
-vector <FISH> fish;
-vector <FISH> cur_fish;
-vector <int> remove_fish;
-vector <int> final_remove_fish;
+int M, S, fx, fy, fd, sx, sy, smell[MAX][MAX];
+int dfx[] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+int dfy[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+int dsx[] = { -1, 0, 1, 0 };
+int dsy[] = { 0, -1, 0, 1 };
 
-int f_dx[] = {0, -1, -1, -1, 0, 1, 1, 1};
-int f_dy[] = {-1, -1, 0, 1, 1, 1, 0, -1};
-int s_dx[] = {-1, 0, 1, 0};
-int s_dy[] = {0, -1, 0, 1};
+vector <int> arr[MAX][MAX], tmp_arr[MAX][MAX];
+vector <int> shark_dir, final_shark_dir;
+int max_catch_fish;
 
-void copy_magic(){
-    fish.clear();
-    for(int i=0;i<cur_fish.size();i++){
-        if(!cur_fish[i].dead) {
-            fish.push_back(cur_fish[i]);
-        }
-    }
+void copy_arr(vector <int> A[][MAX], vector <int> B[][MAX]) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			A[i][j] = B[i][j];
+		}
+	}
 }
 
-bool check_range(int x, int y){
-    if(x < 0 || x >= 4 || y < 0 || y >= 4) return false;
-    else return true;
+bool check_range(int x, int y) {
+	return x >= 0 && x < 4 && y >= 0 && y < 4;
 }
 
-void move_fish(){
-    memset(arr, 0, sizeof(arr));
-    for (int i=0;i<cur_fish.size();i++){
-        if(cur_fish[i].dead) continue;
-        int x = cur_fish[i].x;
-        int y = cur_fish[i].y;
-        int d = cur_fish[i].d;
-        int nx, ny; bool can_move = false;
+void move_fish() {
+	vector <int> tmp[MAX][MAX];
 
-        for(int j=0;j<8;j++) {
-            nx = x + f_dx[d];
-            ny = y + f_dy[d];
-            if (!(nx == sx && ny == sy) && smell[nx][ny] == 0 && check_range(nx, ny)) {
-                can_move = true;
-                break;
-            }
-            d = (d + 7) % 8;
-        }
-        if (can_move) {
-            cur_fish[i].x = nx, cur_fish[i].y = ny, cur_fish[i].d = d;
-            arr[nx][ny].push_back(i);
-        }
-        else{
-            cur_fish[i].x = x, cur_fish[i].y = y, cur_fish[i].d = d;
-            arr[x][y].push_back(i);
-        }
-    }
+	for (int x = 0; x < 4; x++) {
+		for (int y = 0; y < 4; y++) {
+			for (int k = 0; k < arr[x][y].size(); k++) {
+				int d = arr[x][y][k];
+				bool can_move = false;
+
+				for (int dir = 0; dir < 8; dir++) {
+					int nx = x + dfx[d];
+					int ny = y + dfy[d];
+
+					if (!check_range(nx, ny) || (nx == sx && ny == sy) || smell[nx][ny]) d = (d + 7) % 8;
+					else {
+						can_move = true;
+						tmp[nx][ny].push_back(d);
+						break;
+					}
+				}
+				if (!can_move) tmp[x][y].push_back(d);
+			}
+		}
+	}
+	copy_arr(arr, tmp);
 }
 
-void move_shark(int idx, int out_fish, int x, int y){
-    if(idx >= 3){
-        if(max_out_fish < out_fish){
-            max_out_fish = out_fish;
-            max_sx = x, max_sy = y;
-            final_remove_fish = remove_fish;
-        }
-    }
-    else{
-        for(int i=0;i<4;i++){
-            int nx = x + s_dx[i];
-            int ny = y + s_dy[i];
+void find_shark_dir(int idx, int x, int y, int catch_fish) {
+	if (shark_dir.size() == 3) {
+		if (max_catch_fish < catch_fish) {
+			max_catch_fish = catch_fish;
+			final_shark_dir = shark_dir;
+		}
+	}
+	else {
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dsx[i];
+			int ny = y + dsy[i];
 
-            if(!check_range(nx, ny)) continue;
-            vector <int> tmp = arr[nx][ny];
+			if (!check_range(nx, ny)) continue;
 
-            for(int j=0;j<arr[nx][ny].size();j++) remove_fish.push_back(arr[nx][ny][j]);
-            arr[nx][ny].clear();
-            move_shark(idx+1, out_fish + tmp.size(), nx, ny);
+			shark_dir.push_back(i);
+			int cnt = arr[nx][ny].size();
 
-            arr[nx][ny] = tmp;
-            for(int j=0;j<arr[nx][ny].size();j++) remove_fish.pop_back();
-        }
-    }
+			vector <int> tmp = arr[nx][ny];
+			arr[nx][ny].clear();
+
+			find_shark_dir(idx + 1, nx, ny, catch_fish + cnt);
+
+			shark_dir.pop_back();
+			arr[nx][ny] = tmp;
+		}
+	}
 }
 
-void update_arr(int time){
-    sx = max_sx, sy = max_sy;
-    for(int i=0;i<final_remove_fish.size();i++){
-        int x = cur_fish[final_remove_fish[i]].x;
-        int y = cur_fish[final_remove_fish[i]].y;
-        cur_fish[final_remove_fish[i]].dead = true;
-        arr[x][y].clear();
-        smell[x][y] = time;
-    }
+void move_shark(int time) {
+	shark_dir = final_shark_dir;
+	for (int i = 0; i < shark_dir.size(); i++) {
+		int nx = sx + dsx[shark_dir[i]];
+		int ny = sy + dsy[shark_dir[i]];
+
+		if (arr[nx][ny].size() > 0) {
+			smell[nx][ny] = time;
+			arr[nx][ny].clear();
+		}
+		sx = nx; sy = ny;
+	}
 }
 
-void remove_smell(int time){
-    for(int i=0;i<4;i++){
-        for(int j=0;j<4;j++){
-            if(smell[i][j] > 0 && smell[i][j] == time - 2) smell[i][j] = 0;
-        }
-    }
+void remove_smell(int time) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (smell[i][j] == time - 2) {
+				smell[i][j] = 0;
+			}
+		}
+	}
 }
 
-void duplicate_fish(){
-    int total_fish = cur_fish.size();
-
-    for(int i=0;i<fish.size();i++){
-        if(fish[i].dead) continue;
-        cur_fish.push_back({fish[i].x, fish[i].y, fish[i].d, fish[i].dead});
-        arr[fish[i].x][fish[i].y].push_back(total_fish);
-        total_fish++;
-    }
+void finish_copy_magic() {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			for (int k = 0; k < tmp_arr[i][j].size(); k++) {
+				arr[i][j].push_back(tmp_arr[i][j][k]);
+			}
+		}
+	}
 }
 
+int main() {
+	scanf("%d %d", &M, &S);
 
+	for (int i = 0; i < M; i++) {
+		scanf("%d %d %d", &fx, &fy, &fd);
+		fx--; fy--; fd--;
+		arr[fx][fy].push_back(fd);
+	}
+	scanf("%d %d", &sx, &sy);
+	sx--; sy--;
 
-int main(){
-    scanf("%d %d", &M, &S);
+	for (int i = 0; i < S; i++) {
+		copy_arr(tmp_arr, arr);
+		move_fish();
+		shark_dir.clear();
+		final_shark_dir.clear();
+		max_catch_fish = -1;
+		find_shark_dir(0, sx, sy, 0);
+		move_shark(i + 3);
+		remove_smell(i + 3);
+		finish_copy_magic();
+	}
 
-    for(int i=0;i<M;i++){
-        int fx, fy, fd;
-        scanf("%d %d %d", &fx, &fy, &fd);
-
-        cur_fish.push_back({fx-1, fy-1, fd-1, false});
-        arr[fx-1][fy-1].push_back(i);
-    }
-
-    scanf("%d %d", &sx, &sy);
-    sx--; sy--;
-
-    for(int i=1;i<=S;i++){
-        copy_magic();
-        move_fish();
-        remove_fish.clear();
-        max_out_fish = -1;
-        move_shark(0, 0, sx, sy);
-        update_arr(i);
-        remove_smell(i);
-        duplicate_fish();
-    }
-
-    int result = 0;
-    for(int i=0;i<cur_fish.size();i++){
-        if(!cur_fish[i].dead) result++;
-    }
-    printf("%d\n", result);
-    return 0;
+	int result = 0;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result += arr[i][j].size();
+		}
+	}
+	printf("%d\n", result);
+	return 0;
 }
