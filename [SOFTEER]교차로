@@ -1,0 +1,75 @@
+#include<cstdio>
+#include<vector>
+#include<deque>
+#include<algorithm>
+using namespace std;
+const int MAX = 1000000005;
+
+int N;
+struct INFO{
+    int idx, time;
+};
+deque <INFO> road[4];
+
+bool check_road(){
+    for(int i=0;i<4;i++){
+        if(!road[i].empty()) return true;
+    }
+    return false;
+}
+
+int main(){
+    scanf("%d", &N);
+
+    vector<int> answer(N + 1, -1);
+
+    int t, cur_time;
+    char w;
+    for(int i = 0; i < N; ++i) {
+        scanf("%d %c", &t, &w);
+        road[w-'A'].push_back({i, t});
+
+        if (i == 0) cur_time = t;
+    }
+
+    while(check_road()) {
+        int min_time = MAX;
+        for(int i=0;i<4;i++){
+            if(!road[i].empty()) {
+                min_time = min(min_time, road[i].front().time);
+            }
+        }
+
+        if(min_time > cur_time){
+            cur_time = min_time;
+        }
+        bool can_go[4] = {false};
+        bool full_car[4] = {false};
+
+        for(int i=0;i<4;i++) {
+            if (!road[i].empty()) {
+                if (road[(i + 3) % 4].empty() && road[i].front().time <= cur_time) {
+                    can_go[i] = true;
+                }
+                if (!road[(i + 3) % 4].empty() && road[(i + 3) % 4].front().time > cur_time &&
+                    road[i].front().time <= cur_time) {
+                    can_go[i] = true;
+                }
+                if (!can_go[i] && road[i].front().time <= cur_time) {
+                    full_car[i] = true;
+                }
+            }
+        }
+        if (full_car[0] && full_car[1] && full_car[2] && full_car[3]) break;
+        for(int i=0;i<4;i++) {
+            if (can_go[i]) {
+                answer[road[i].front().idx] = cur_time;
+                road[i].pop_front();
+            }
+        }
+        cur_time++;
+    }
+
+    for(int i = 0; i < N; ++i) printf("%d\n", answer[i]);
+    return 0;
+}
