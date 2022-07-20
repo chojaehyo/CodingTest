@@ -1,0 +1,144 @@
+#define MAX_NODE 10000
+
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+};
+
+Node node[MAX_NODE];
+int nodeCnt;
+Node* head;
+
+Node* getNode(int data) {
+    node[nodeCnt].data = data;
+    node[nodeCnt].prev = nullptr;
+    node[nodeCnt].next = nullptr;
+    return &node[nodeCnt++];
+}
+
+// 초기화
+void init()
+{
+    nodeCnt = 0;
+    head = getNode(0);
+}
+
+// 맨 앞에 노드 추가
+void addNode2Head(int data)
+{
+    Node* new_node = getNode(data);
+
+    if (head->next != nullptr){
+        new_node->prev = head;
+        new_node->next = head->next;
+        head->next->prev = new_node;
+        head->next = new_node;
+    }
+    else{
+        new_node->prev = head;
+        head->next = new_node;
+    }
+}
+
+// 맨 뒤에 노드 추가
+void addNode2Tail(int data)
+{
+    Node* cur_node = head;
+    Node* new_node = getNode(data);
+
+    while(cur_node->next != nullptr){
+        cur_node = cur_node->next;
+    }
+
+    new_node->prev = cur_node;
+    cur_node->next = new_node;
+}
+
+// 지정된 순서(num)에 노드 추가
+void addNode2Num(int data, int num)
+{
+    Node* cur_node = head;
+    Node* new_node = getNode(data);
+
+    for(int i=1;i<num;i++){
+        cur_node = cur_node->next;
+    }
+
+    if (cur_node->next != nullptr){
+        new_node->next = cur_node->next;
+        new_node->prev = cur_node;
+        cur_node->next->prev = new_node;
+        cur_node->next = new_node;
+    }
+    else{
+        new_node->prev = cur_node;
+        cur_node->next = new_node;
+    }
+}
+
+// data를 가진 node의 순서를 리턴
+int findNode(int data)
+{
+    Node* cur_node = head;
+    int cnt = 0;
+
+    while(cur_node->next != nullptr && cur_node->next->data != data){
+        cur_node = cur_node->next;
+        cnt++;
+    }
+
+    if(cur_node->next != nullptr){
+        return cnt + 1;
+    }
+}
+
+// data를 가진 노드를 삭제
+void removeNode(int data)
+{
+    Node* cur_node = head;
+
+    while(cur_node->next != nullptr && cur_node->next->data != data){
+        cur_node = cur_node->next;
+    }
+
+    if(cur_node->next != nullptr){
+        if(cur_node->next->next != nullptr) {
+            cur_node->next->next->prev = cur_node;
+            cur_node->next = cur_node->next->next;
+        }
+        else{
+            cur_node->next = nullptr;
+        }
+    }
+}
+
+// 노드의 data 정보를 차례대로 output[]에 저장하고 노드 갯수를 리턴
+int getList(int output[MAX_NODE])
+{
+    int node_cnt = 0;
+    Node* cur_node = head;
+
+    while(cur_node->next != nullptr){
+        cur_node = cur_node->next;
+        output[node_cnt++] = cur_node->data;
+    }
+    return node_cnt;
+}
+
+// 노드의 data 정보를 역순으로 output[]에 저장하고 노드 갯수를 리턴
+int getReversedList(int output[MAX_NODE])
+{
+    int node_cnt = 0;
+    Node* cur_node = head;
+
+    while(cur_node->next != nullptr){
+        cur_node = cur_node->next;
+    }
+
+    while(cur_node->prev != nullptr){
+        output[node_cnt++] = cur_node->data;
+        cur_node = cur_node->prev;
+    }
+    return node_cnt;
+}
