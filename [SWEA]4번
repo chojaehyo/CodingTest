@@ -1,0 +1,89 @@
+#define MAX_NODE 10000
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+Node node[MAX_NODE];
+int nodeCnt;
+Node* head;
+
+Node* getNode(int data) {
+    node[nodeCnt].data = data;
+    node[nodeCnt].next = nullptr;
+    return &node[nodeCnt++];
+}
+
+// 초기화
+void init()
+{
+    nodeCnt = 0;
+    head = getNode(0);
+}
+
+// 맨 앞에 노드 추가
+void addNode2Head(int data)
+{
+    Node* new_node = getNode(data);
+
+    if(head->next != nullptr) {
+        new_node->next = head->next;
+        head->next = new_node;
+    }
+    else head->next = new_node;
+}
+
+// 맨 뒤에 노드 추가
+void addNode2Tail(int data)
+{
+    Node* cur_node = head;
+    Node* new_node = getNode(data);
+
+    while(cur_node->next != nullptr){
+        cur_node = cur_node->next;
+    }
+    cur_node->next = new_node;
+}
+
+// 지정된 순서(num)에 노드 추 (num 시작은 1부터)
+void addNode2Num(int data, int num)
+{
+    Node* cur_node = head;
+    Node* new_node = getNode(data);
+
+    for(int i=1;i<num;i++){
+        cur_node = cur_node->next;
+    }
+
+    new_node->next = cur_node->next;
+    cur_node->next = new_node;
+}
+
+// 주어진 data 값을 가진 노드 삭제
+void removeNode(int data)
+{
+    Node* cur_node = head;
+
+    while(cur_node->next != nullptr && cur_node->next->data != data){
+        cur_node = cur_node->next;
+    }
+
+    if(cur_node->next != nullptr){
+        cur_node->next = cur_node->next->next;
+    }
+}
+
+// output[] 배열에 리스트 노드의 data를 차례로 넣고, 총 노드 갯수를 리턴
+int getList(int output[MAX_NODE])
+{
+    int node_cnt = 0;
+    Node* cur_node = head;
+
+    while(cur_node->next != nullptr){
+        cur_node = cur_node->next;
+        output[node_cnt++] = cur_node->data;
+    }
+
+    return node_cnt;
+}
