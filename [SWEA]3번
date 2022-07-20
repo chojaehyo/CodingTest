@@ -1,0 +1,47 @@
+#include <iostream>
+#include <string>
+#include <cstring>
+using namespace std;
+const int MAX = 10005;
+const int MOD = 1000000007;
+
+int T;
+long long dp[MAX][16];
+
+int main(){
+    cin >> T;
+    string s;
+    
+    for(int t=1;t<=T;t++){
+        cin >> s;
+        memset(dp, 0, sizeof(dp));
+
+        for(int i=0;i<s.size();i++) {
+            int cur_ad = 1 << (s[i]-'A');
+
+            for(int j=1;j<16;j++){
+                if(i == 0){
+                    if((j & cur_ad) != 0 && (j & 1) != 0) dp[i][j] = 1;
+                }
+                else{
+                    if(dp[i-1][j] != 0){
+                        for(int k=1;k<16;k++){
+                            if((k & j) != 0 && (k & cur_ad) != 0){
+                                dp[i][k] += dp[i-1][j];
+                                dp[i][k] %= MOD;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        long long result = 0;
+
+        for(int i=1;i<16;i++){
+            result += dp[s.size()-1][i];
+            result %= MOD;
+        }
+        cout << '#' << t << ' ' << result << '\n';
+    }
+    return 0;
+}
