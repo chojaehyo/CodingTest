@@ -1,0 +1,111 @@
+#include <cstdio>
+
+int T, N, M, L, num, idx, val;
+char cmd;
+
+struct Node{
+    int data;
+    Node* next;
+};
+
+Node* get_node(int data){
+    Node* new_node = new Node;
+    new_node->data = data;
+    new_node->next = nullptr;
+    return new_node;
+}
+
+Node* head = get_node(0);
+
+void print_node(){
+    Node* start = head->next;
+    while(start->next != nullptr){
+        printf("%d ", start->data);
+        start = start->next;
+    }
+    printf("%d \n", start->data);
+}
+
+int main(){
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%d %d %d", &N, &M, &L);
+
+//        Node* head = get_node(0);
+        Node* cur_node = head;
+
+        for(int i=0;i<N;i++){
+            scanf("%d", &num);
+            Node* new_node = get_node(num);
+
+            if(i == 0){
+                head->next = new_node;
+                cur_node = cur_node->next;
+            }
+            else{
+                cur_node->next = new_node;
+                cur_node = cur_node->next;
+            }
+        }
+
+        for(int i=0;i<M;i++){
+            scanf(" %c", &cmd);
+
+            switch (cmd) {
+                case 'I':{
+                    scanf("%d %d", &idx, &val);
+
+                    Node* new_node = get_node(val);
+                    Node* cur_node = head;
+
+                    for(int j=1;j<=idx;j++) cur_node = cur_node->next;
+
+                    if(idx == 0){
+                        new_node->next = head->next;
+                        head->next = new_node;
+                    }
+                    else{
+                        new_node->next = cur_node->next;
+                        cur_node->next = new_node;
+                    }
+                    break;
+                }
+                case 'D':{
+                    scanf("%d", &idx);
+
+                    Node* cur_node = head;
+
+                    for(int j=1;j<=idx;j++) cur_node = cur_node->next;
+
+                    if(idx == 0) head->next = cur_node->next->next;
+                    else cur_node->next = cur_node->next->next;
+                    break;
+                }
+                case 'C':{
+                    scanf("%d %d", &idx, &val);
+
+                    Node* cur_node = head;
+
+                    for(int j=0;j<=idx;j++) cur_node = cur_node->next;
+
+                    cur_node->data = val;
+                    break;
+                }
+            }
+        }
+
+        cur_node = head;
+        int result = 0;
+        for(int i=0;i<=L;i++){
+            if(cur_node->next == nullptr) {
+                result = -1;
+                break;
+            }
+            else cur_node = cur_node->next;
+        }
+        if(result == -1) printf("#%d -1\n", t);
+        else printf("#%d %d\n", t, cur_node->data);
+    }
+    return 0;
+}
