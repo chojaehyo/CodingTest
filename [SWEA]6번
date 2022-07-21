@@ -1,0 +1,119 @@
+#include <cstdio>
+
+int N, M, input, x, y, s;
+char cmd;
+
+struct Node{
+    int data;
+    Node* next;
+};
+
+struct List{
+    Node* head;
+    Node* tail;
+};
+
+List CODE;
+
+void init(){
+    CODE.head = CODE.tail = nullptr;
+}
+
+Node* get_node(int data){
+    Node* node = new Node;
+
+    node->data = data;
+    node->next = nullptr;
+    return node;
+}
+
+int main(){
+    for(int t=1;t<=10;t++){
+        init();
+
+        scanf("%d", &N);
+        for(int i=0;i<N;i++){
+            scanf("%d", &input);
+            Node* new_node = get_node(input);
+
+            if(i == 0) CODE.head = CODE.tail = new_node;
+            else{
+                Node* cur_node = CODE.head;
+                while(cur_node->next != nullptr){
+                    cur_node = cur_node->next;
+                }
+                cur_node->next = new_node;
+                CODE.tail = new_node;
+            }
+        }
+
+        scanf("%d", &M);
+        for(int i=0;i<M;i++){
+            scanf(" %c", &cmd);
+
+            switch (cmd) {
+                case 'I': {
+                    scanf("%d %d", &x, &y);
+
+                    Node* cur_node = CODE.head;
+
+                    for (int j = 1; j < x; j++) cur_node = cur_node->next;
+
+                    bool flag = false;
+                    if (cur_node->next == nullptr) flag = true;
+
+                    for (int j = 0; j < y; j++) {
+                        scanf("%d", &s);
+
+                        Node *new_node = get_node(s);
+
+                        if(x == 0 && j == 0){
+                            new_node->next = cur_node;
+                            CODE.head = new_node;
+                            cur_node = CODE.head;
+                        }
+                        else{
+                            new_node->next = cur_node->next;
+                            cur_node->next = new_node;
+                            cur_node = cur_node->next;
+                        }
+                    }
+                    if (flag) CODE.tail = cur_node;
+                    break;
+                }
+                case 'D':{
+                    scanf("%d %d", &x, &y);
+
+                    Node* cur_node = CODE.head;
+                    for(int j=1;j<x;j++) cur_node = cur_node->next;
+                    for(int j=0;j<y;j++) cur_node->next = cur_node->next->next;
+
+                    if(cur_node->next == nullptr) CODE.tail = cur_node;
+                    break;
+                }
+                case 'A': {
+                    scanf("%d", &y);
+
+                    for(int j=0;j<y;j++){
+                        scanf("%d", &s);
+
+                        Node* new_node = get_node(s);
+                        Node* cur_node = CODE.tail;
+
+                        cur_node->next = new_node;
+                        CODE.tail = new_node;
+                    }
+                    break;
+                }
+            }
+        }
+        printf("#%d ", t);
+        Node* cur_node = CODE.head;
+        for(int i=0;i<10;i++){
+            printf("%d ", cur_node->data);
+            cur_node = cur_node->next;
+        }
+        printf("\n");
+    }
+    return 0;
+}
