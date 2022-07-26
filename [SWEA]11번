@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <string>
+using namespace std;
+const int MAX = 1005;
+
+int N, idx, left, right;
+char input[10];
+
+struct Node{
+    int x, left, right;
+} Tree[MAX];
+
+int calc(int idx){
+    if(Tree[idx].x > 0) return Tree[idx].x;
+
+    int val1 = calc(Tree[idx].left);
+    int val2 = calc(Tree[idx].right);
+
+    if(Tree[idx].x == -1) return val1 + val2;
+    else if(Tree[idx].x == -2) return val1 - val2;
+    else if(Tree[idx].x == -3) return val1 * val2;
+    else if(Tree[idx].x == -4) return val1 / val2;
+    else return -1;
+}
+
+int main(){
+    for(int t=1;t<=10;t++){
+        scanf("%d", &N);
+
+        for(int i=1;i<=N;i++) {
+            scanf("%d %s", &idx, input);
+
+            if(input[0]-'0' >= 0 && input[0]-'9'<=9) Tree[i].x = stoi(input);
+            else{
+                scanf("%d %d", &left, &right);
+
+                if(input[0] == '+') Tree[i].x = -1;
+                else if(input[0] == '-') Tree[i].x = -2;
+                else if(input[0] == '*') Tree[i].x = -3;
+                else if(input[0] == '/') Tree[i].x = -4;
+                Tree[i].left = left;
+                Tree[i].right = right;
+            }
+        }
+        printf("#%d %d\n", t, calc(1));
+    }
+    return 0;
+}
