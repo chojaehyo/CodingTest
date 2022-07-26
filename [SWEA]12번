@@ -1,0 +1,65 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAX = 10005;
+
+int T, V, E, num1, num2, e1, e2, result = 1;
+int parent[MAX], child[MAX][2], check[MAX];
+
+void init(){
+    memset(parent, 0, sizeof(parent));
+    memset(child, 0, sizeof(child));
+    memset(check, 0, sizeof(check));
+    result = 1;
+}
+
+int find_parent(int x, int y) {
+    while (parent[x] != 0) {
+        int p = parent[x];
+        check[p] = 1;
+        x = parent[x];
+    }
+
+    while(parent[y] != 0){
+        int p = parent[y];
+        if(check[p] == 1) return p;
+        check[p] = 1;
+        y = parent[y];
+    }
+}
+
+int count_tree(int x){
+    if(child[x][1]){
+        int left = count_tree(child[x][0]);
+        int right = count_tree(child[x][1]);
+        result += 2;
+        return left + right;
+    }
+    else if(child[x][0]){
+        int left = count_tree(child[x][0]);
+        result++;
+        return left;
+    }
+    else return 0;
+}
+
+int main(){
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%d %d %d %d", &V, &E, &num1, &num2);
+        init();
+        for(int i=0;i<E;i++){
+            scanf("%d %d", &e1, &e2);
+            parent[e2] = e1;
+            if(child[e1][0]) child[e1][1] = e2;
+            else child[e1][0] = e2;
+        }
+
+        int p = find_parent(num1, num2);
+        int cnt = count_tree(p);
+
+        printf("#%d %d %d\n", t, p, result);
+    }
+    return 0;
+}
