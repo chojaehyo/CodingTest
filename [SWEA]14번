@@ -1,0 +1,40 @@
+const int MAX = 105;
+int child_node[MAX][5], answer = -1;
+
+void dfs_init(int N, int path[100][2]){
+    for(int i=0;i<MAX;i++){
+        for(int j=0;j<5;j++){
+            child_node[i][j] = 0;
+        }
+    }
+
+    for(int i=0;i<N-1;i++){
+        for(int j=0;j<5;j++){
+            if(child_node[path[i][0]][j] == 0){
+                child_node[path[i][0]][j] = path[i][1];
+                break;
+            }
+        }
+    }
+}
+
+void find_answer(int n, int cur){
+    if(answer != -1) return;
+    if(n < cur){
+        answer = cur;
+        return;
+    }
+    else{
+        for(int i=0;i<5;i++){
+            if(child_node[cur][i] != 0){
+                find_answer(n, child_node[cur][i]);
+            }
+        }
+    }
+}
+
+int dfs(int n){
+    answer = -1;
+    find_answer(n, n);
+    return answer;
+}
