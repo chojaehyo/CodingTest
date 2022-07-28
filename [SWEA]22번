@@ -1,0 +1,21 @@
+#include <cstdio>
+
+int T, N, result[8];
+int money[] = {50000, 10000, 5000, 1000, 500, 100, 50, 10};
+
+int main(){
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%d", &N);
+
+        for(int i=0;i<8;i++){
+            result[i] = N / money[i];
+            N %= money[i];
+        }
+        printf("#%d\n", t);
+        for(int i=0;i<8;i++) printf("%d ", result[i]);
+        printf("\n");
+    }
+    return 0;
+}
