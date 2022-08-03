@@ -1,0 +1,92 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+using namespace std;
+const int MAX = 1e5 + 5;
+const int LOG = 17;
+
+int T, N, input, depth[MAX], parent[MAX][LOG];
+long long result;
+bool visited[MAX];
+vector <int> graph[MAX];
+vector <int> bfs_result;
+
+void bfs(int root){
+    queue <int> q;
+    q.push(root);
+    visited[root] = true;
+
+    while(!q.empty()){
+        int x = q.front();
+        bfs_result.push_back(x);
+        q.pop();
+
+        for(int i=0;i<graph[x].size();i++){
+            int next = graph[x][i];
+            if(!visited[next]){
+                visited[next] = true;
+                parent[next][0] = x;
+
+                for(int j=1;j<LOG;j++) parent[next][j] = parent[parent[next][j-1]][j-1];
+                depth[next] = depth[x] + 1;
+                q.push(graph[x][i]);
+            }
+        }
+    }
+}
+
+long long LCA(int a, int b){
+    if(depth[a] > depth[b]){
+        int tmp = a;
+        a = b;
+        b = tmp;
+    }
+    for(int i=LOG-1;i>=0;i--){
+        if(depth[b]-depth[a] >= (1 << i)){
+            b = parent[b][i];
+        }
+    }
+
+    if(a == b) return a;
+    for(int i=LOG-1;i>=0;i--){
+        if(parent[a][i] != parent[b][i]){
+            a = parent[a][i];
+            b = parent[b][i];
+        }
+    }
+    return parent[a][0];
+}
+
+void init(){
+    result = 0;
+    bfs_result.clear();
+    for(int i=1;i<=N;i++) graph[i].clear();
+    memset(visited, 0, sizeof(visited));
+    memset(depth, 0, sizeof(depth));
+    memset(parent, 0, sizeof(parent));
+}
+
+int main(){
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%d", &N);
+        init();
+        
+        for(int i=2;i<=N;i++){
+            scanf("%d", &input);
+            graph[input].push_back(i);
+        }
+        
+        bfs(1);
+        
+        for(int i=0;i<bfs_result.size()-1;i++) {
+            long long lca = LCA(bfs_result[i], bfs_result[i+1]);
+            result += depth[bfs_result[i]]-depth[lca];
+            result += depth[bfs_result[i+1]]-depth[lca];
+        }
+        printf("#%d %lld\n", t, result);
+    }
+    return 0;
+}
