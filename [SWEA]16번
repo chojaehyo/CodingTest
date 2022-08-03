@@ -1,0 +1,76 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 15;
+
+int T, N, map[MAX][MAX];
+int max_core, min_length;
+int dx[] = {0, 1, 0, -1};
+int dy[] = {1,0, -1, 0};
+vector<pair<int, int>> core;
+
+void dfs(int idx, int core_cnt, int length){
+    if(idx == core.size()){
+        if(core_cnt > max_core){
+            max_core = core_cnt;
+            min_length = length;
+        }
+        else if(core_cnt == max_core){
+            min_length = min(min_length, length);
+        }
+        return;
+    }
+    for(int i=0; i<4; i++){
+        vector<pair<int, int>> line;
+
+        bool flag = false;
+        int x = core[idx].first;
+        int y = core[idx].second;
+
+        while(1){
+            if(x == 0 || y == 0 || x == N-1 || y == N-1){
+                flag = true;
+                break;
+            }
+            x += dx[i];
+            y += dy[i];
+            
+            if(map[x][y] == 0) line.push_back({x, y});
+            else break;
+        }
+
+        if(flag){
+            for(int j=0; j<line.size(); j++) map[line[j].first][line[j].second] = 2;
+
+            dfs(idx+1,core_cnt+1,length + line.size());
+
+            for(int j=0; j<line.size(); j++) map[line[j].first][line[j].second] = 0;
+        }
+    }
+    dfs(idx+1, core_cnt, length);
+}
+
+int main() {
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        core.clear();
+        scanf("%d", &N);
+
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N;j++){
+                scanf("%d", &map[i][j]);
+
+                if(map[i][j] == 1){
+                    if(i == 0 || j == 0 || i == N-1 || j == N-1) continue;
+                    core.push_back({i,j});
+                }
+            }
+        }
+        max_core = 0; min_length = 1e8;
+        dfs(0,0,0);
+        printf("#%d %d\n", t, min_length);
+    }
+    return 0;
+}
