@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cmath>
+using namespace std;
+int T;
+long long N, result;
+
+int main(){
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%lld", &N);
+        result = -1;
+        long long start = 0, end = sqrt(N * 2);
+
+        while(start < end + 1){
+            long long mid = (start + end) / 2;
+
+            if (mid * (mid + 1) == N * 2) {
+                result = mid;
+                break;
+            }
+            else if (mid * (mid + 1) < N * 2) start = mid + 1;
+            else end = mid - 1;
+        }
+        printf("#%d %d\n", t, result);
+    }
+    return 0;
+}
