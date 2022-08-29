@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+
+int T, N;
+long long M, A[MAX];
+
+int main(){
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%d %lld", &N, &M);
+        for(int i=0;i<N;i++) scanf("%lld", &A[i]);
+
+        long long start = 1, end = *max_element(A, A+N);
+
+        while(start < end + 1){
+            long long mid = (start + end) / 2;
+            long long result = 0;
+
+            for(int i=0;i<N;i++) result += A[i] / mid;
+
+            if (result < M) end = mid - 1;
+            else start = mid + 1;
+        }
+        printf("#%d %lld\n", t, end);
+    }
+    return 0;
+}
