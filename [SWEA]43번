@@ -1,0 +1,34 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 100005;
+
+int T, L, N, result, s[MAX], e[MAX], pSum[MAX];
+
+int main(){
+    scanf("%d", &T);
+    for(int t=1;t<=T;t++) {
+        result = 0;
+        scanf("%d %d", &L, &N);
+
+        for(int i=0;i<N;i++){
+            scanf("%d %d", &s[i], &e[i]);
+            pSum[i+1] = pSum[i] + e[i] - s[i];
+        }
+
+        int idx = 0;
+        for(int i=0;i<N;i++){
+            while(idx <= i && s[idx] + L <= e[i]){
+                int tmp = pSum[i] - pSum[idx] + max(s[idx] + L - s[i], 0);
+                result = max(result, tmp);
+                idx++;
+            }
+        }
+
+        if(idx < N){
+            int tmp = pSum[N] - pSum[idx];
+            result = max(result, tmp);
+        }
+        printf("#%d %d\n", t, result);
+    }
+}
