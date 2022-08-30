@@ -1,0 +1,32 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+
+int T, A, B, K;
+long long P;
+
+long long solve(int x, int k) {
+    if (k == 0) return 1;
+    long long div, conq;
+    div = solve(x, k/2);
+    conq = (div * div) % x;
+    if(k % 2 == 0) return conq;
+    else {
+        conq = (2 * conq) % x;
+        return conq;
+    }
+}
+
+int main() {
+    scanf("%d", &T);
+
+    for(int t=1;t<=T;t++){
+        scanf("%d %d %d", &A, &B, &K);
+        int sum_AB = A + B;
+        int min_AB = min(A, B);
+        P = solve(sum_AB, K);
+        min_AB = (min_AB * P) % sum_AB;
+        printf("#%d %d\n", t, min(min_AB, sum_AB - min_AB));
+    }
+    return 0;
+}
