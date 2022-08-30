@@ -1,0 +1,27 @@
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int MAX = 405;
+
+int T, N, idx;
+string str, substr[MAX], result;
+
+int main(){
+    cin >> T;
+
+    for(int t=1;t<=T;t++){
+        cin >> N >> str;
+        idx = 0;
+        for(int i=0;i<str.size();i++){
+            string tmp = "";
+            for(int j=i;j<str.size();j++) tmp += str[j];
+            substr[idx++] = tmp;
+        }
+        sort(substr, substr+idx);
+        if (N >= idx) result = "none";
+        else result = substr[N-1];
+
+        cout << "#" << t << " " << result << "\n";
+    }
+    return 0;
+}
