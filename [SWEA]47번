@@ -1,0 +1,29 @@
+#include <iostream>
+#include <set>
+using namespace std;
+
+int T, K;
+string S, result;
+
+int main(){
+    cin >> T;
+    for(int t=1;t<=T;t++){
+        cin >> K >> S;
+
+        set<string> set_s;
+        for(int i=0;i<S.size();i++){
+            for(int j=0;j<S.size();j++){
+                set_s.insert(S.substr(i, j+1));
+            }
+        }
+
+        if (set_s.size() < K) result = "none";
+        else{
+            set<string>::iterator it = set_s.begin();
+            for(int i=0;i<K-1;i++) it++;
+            result = *it;
+        }
+        cout << "#" << t << ' ' << result << "\n";
+    }
+    return 0;
+}
