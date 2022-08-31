@@ -1,0 +1,65 @@
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+const int MAX = 1e5 + 5;
+
+int T, n, q, q1, q2, q3;
+int arr[MAX], max_segtree[MAX*2], min_segtree[MAX*2];
+
+void init(){
+    for(size_t i=0;i<n;i++) {
+        max_segtree[i+n] = arr[i];
+        min_segtree[i+n] = arr[i];
+    }
+    for(size_t i=n-1;i>0;i--){
+        max_segtree[i] = max(max_segtree[i<<1], max_segtree[i<<1|1]);
+        min_segtree[i] = min(min_segtree[i<<1], min_segtree[i<<1|1]);
+    }
+}
+void update(size_t i, int val){
+    max_segtree[i+n] = val;
+    min_segtree[i+n] = val;
+    i += n;
+
+    while(i >>= 1){
+        max_segtree[i] = max(max_segtree[i<<1], max_segtree[i<<1|1]);
+        min_segtree[i] = min(min_segtree[i<<1], min_segtree[i<<1|1]);
+    }
+}
+
+int query(size_t left, size_t right){
+    int min_res = 1e9;
+    int max_res = -1;
+
+    for(left+=n, right+=n; left!=right; left >>=1, right >>=1){
+        if(left & 1){
+            max_res = max(max_res, max_segtree[left]);
+            min_res = min(min_res, min_segtree[left]);
+            left++;
+        }
+        if(right & 1){
+            right--;
+            max_res = max(max_res, max_segtree[right]);
+            min_res = min(min_res, min_segtree[right]);
+        }
+    }
+    return max_res - min_res;
+}
+
+int main(){
+    scanf("%d", &T);
+    for(int t=1;t<=T;t++){
+        scanf("%d %d", &n, &q);
+        for(int i=0;i<n;i++) scanf("%d", &arr[i]);
+
+        init();
+        printf("#%d ", t);
+        for(size_t i=0;i<q;i++){
+            scanf("%d %d %d", &q1, &q2, &q3);
+            if(q1 == 0) update(q2, q3);
+            else printf("%d ", query(q2,q3));
+        }
+        printf("\n");
+    }
+    return 0;
+}
