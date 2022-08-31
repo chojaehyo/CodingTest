@@ -1,0 +1,53 @@
+#include<cstdio>
+const int MAX = 1e5 + 5;
+
+int T, n, q, q1, q2, q3, arr[MAX];
+long long segtree[MAX*2];
+
+void init(){
+    for(size_t i=0;i<n;i++) segtree[i+n] = arr[i];
+    for(size_t i=n-1;i>0;i--) segtree[i] = segtree[i<<1] + segtree[(i<<1)|1];
+}
+
+void update(size_t i, int val){
+    if (i & 1) segtree[i+=n] = -val;
+    else segtree[i+=n] = val;
+
+    while(i >>= 1){
+        segtree[i] = segtree[i<<1] + segtree[(i<<1)|1];
+    }
+}
+
+long long query(size_t left, size_t right){
+    bool flag = false;
+    if (left & 1) flag = true;
+
+    long long result = 0;
+    for(left+=n, right+=n; left!=right; left >>=1, right >>=1){
+        if(left & 1) result += segtree[left++];
+        if(right & 1) result += segtree[--right];
+    }
+    if (flag) result = -result;
+    return result;
+}
+
+int main(){
+    scanf("%d", &T);
+    for(int t=1;t<=T;t++){
+        scanf("%d %d", &n, &q);
+        for(int i=0;i<n;i++) {
+            scanf("%d", &arr[i]);
+            if (i & 1) arr[i] = -arr[i];
+        }
+
+        init();
+        printf("#%d ", t);
+        for(size_t i=0;i<q;i++){
+            scanf("%d %d %d", &q1, &q2, &q3);
+            if(q1 == 0) update(q2, q3);
+            else printf("%lld ", query(q2,q3));
+        }
+        printf("\n");
+    }
+    return 0;
+}
