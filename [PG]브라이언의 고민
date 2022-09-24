@@ -1,0 +1,133 @@
+#include <string>
+#include <vector>
+using namespace std;
+
+string solution(string s) {
+    string answer = "";
+    vector<string> words;
+    bool rule1 = false, rule2 = false, used[26] = {0};
+    char c1 = 0, c2 = 0;
+    string tmp = "";
+
+    for (int i = 0; i < s.size(); i++) {
+        if (rule1 && rule2) {
+            if (isupper(s[i])) {
+                tmp += s[i];
+                if (i + 1 == s.size()) return "invalid";
+                if (isupper(s[i + 1])) return "invalid";
+                if (c1 != s[i + 1] && c2 != s[i + 1]) return "invalid";
+            }
+            if (islower(s[i])) {
+                if (c2 == s[i]) {
+                    rule1 = false;
+                    used[c1 - 'a'] = true;
+                    c1 = 0;
+
+                    rule2 = false;
+                    used[c2 - 'a'] = true;
+                    c2 = 0;
+
+                    words.push_back(tmp);
+                    tmp = "";
+                    continue;
+                }
+                if (i + 1 == s.size()) return "invalid";
+                if (islower(s[i + 1])) return "invalid";
+            }
+        }
+        else if (rule1) {
+            if (isupper(s[i])) {
+                tmp += s[i];
+
+                if ((i + 1 == s.size()) || isupper(s[i + 1]) || c1 != s[i + 1]) {
+                    rule1 = false;
+                    used[c1 - 'a'] = true;
+                    c1 = 0;
+                    words.push_back(tmp);
+                    tmp = "";
+                }
+            }
+            if (islower(s[i])) {
+                if (i + 1 == s.size()) return "invalid";
+                if (islower(s[i + 1])) return "invalid";
+            }
+        }
+        else if (rule2) {
+            if (isupper(s[i])) {
+                tmp += s[i];
+
+                if (i + 1 == s.size()) return "invalid";
+                if (islower(s[i + 1]) && c2 != s[i + 1]) { // aAb
+                    if (c2 == s[i - 1]) {
+                        if (used[s[i + 1] - 'a']) return "invalid";
+                        rule1 = true;
+                        c1 = s[i + 1];
+                    }
+                    else return "invalid";
+                }
+            }
+            if (islower(s[i])) {
+                rule2 = false;
+                used[c2 - 'a'] = true;
+                c2 = 0;
+                words.push_back(tmp);
+                tmp = "";
+            }
+        }
+        else {
+            if (isupper(s[i])) {
+                tmp += s[i];
+                rule1 = true;
+       
+                if (i + 1 == s.size()) {
+                    rule1 = false;
+                    words.push_back(tmp);
+                    tmp = "";
+                }
+                else if (isupper(s[i + 1])) {
+                    rule1 = false;
+                    words.push_back(tmp);
+                    tmp = "";
+                }
+                else if (islower(s[i + 1])) {
+                    if (used[s[i + 1] - 'a']) return "invalid"; 
+                    c1 = s[i + 1];
+                    vector<int> pos;
+                    for (int j = i + 1; j < s.size(); j++) {
+                        if (s[j] == c1) pos.push_back(j);
+                    }
+                    if (pos.size() == 1) continue;
+                    else if (pos.size() >= 3) {
+                        bool flag = true;
+                        for (int j = 1; j < pos.size(); j++) {
+                            if (pos[i + 1] - pos[i] != 2) { 
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if (flag) continue;
+                    }
+                    else {
+                        rule1 = false;
+                        c1 = 0;
+                        words.push_back(tmp);
+                        tmp = "";
+                    }
+                }
+            }
+            if (islower(s[i])) {
+                if (used[s[i] - 'a']) return "invalid";
+                if (i + 1 == s.size()) return "invalid";
+                if (islower(s[i + 1])) return "invalid";
+                rule2 = true;
+                c2 = s[i];
+            }
+        }
+    }
+
+    for (int i = 0; i < words.size(); i++) {
+        answer += (words[i] + " ");
+    }
+    answer.pop_back();
+    return answer;
+}
