@@ -1,0 +1,70 @@
+#include <string>
+#include <vector>
+#include <iostream>
+using namespace std;
+
+int max_diff = -1;
+vector<int> answer(1, -1);
+
+void calc(vector<int>& apeach, vector<int>& ryan){
+    int a_score = 0, r_score = 0;
+    
+    for(int i=0;i<11;i++){
+        if(apeach[i] == 0 && ryan[i] == 0) continue;
+        else if(apeach[i] >= ryan[i]) a_score += 10-i; 
+        else r_score += 10-i;
+    }
+    
+    int diff = r_score - a_score;
+    
+    if(diff > 0){
+        if(diff > max_diff){
+            answer = ryan;
+            max_diff = diff;
+        }
+        else if(diff == max_diff){
+            bool flag = false;
+            
+            for(int i=10;i>=0;i--){
+                if(answer[i] < ryan[i]){
+                    flag = true;
+                    break;
+                }
+                else if(answer[i] > ryan[i]){
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag){
+                answer = ryan;
+                max_diff = diff;
+            }
+        }
+    }
+}
+
+void comb(int idx, int arrow_cnt, vector<int>& apeach, vector<int>& ryan){
+    if(idx == 11){
+        if (arrow_cnt == 0) calc(apeach, ryan);
+        else{
+            ryan[10] += arrow_cnt;
+            calc(apeach, ryan);
+            ryan[10] -= arrow_cnt;
+        }
+    }
+    else{
+        if(apeach[idx] < arrow_cnt){
+            ryan[idx] += apeach[idx] + 1;
+            comb(idx+1, arrow_cnt-apeach[idx]-1, apeach, ryan);
+            ryan[idx] -= apeach[idx] + 1;
+        }
+        comb(idx+1, arrow_cnt, apeach, ryan);
+    }
+}
+
+vector<int> solution(int n, vector<int> info) {
+    vector<int> ryan(11);
+    
+    comb(0, n, info, ryan);
+    return answer;
+}
