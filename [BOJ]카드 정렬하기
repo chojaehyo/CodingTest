@@ -1,0 +1,27 @@
+#include <cstdio>
+#include <queue>
+using namespace std;
+
+int N, input, result;
+priority_queue<int, vector<int>, greater<int>> card;
+
+int main(){
+    scanf("%d", &N);
+
+    for(int i=0;i<N;i++) {
+        scanf("%d", &input);
+        card.push(input);
+    }
+
+    while(card.size() > 1){
+        int card1 = card.top();
+        card.pop();
+        int card2 = card.top();
+        card.pop();
+
+        card.push(card1 + card2);
+        result += (card1 + card2);
+    }
+    printf("%d\n", result);
+    return 0;
+}
