@@ -1,0 +1,103 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+const int MAX = 105;
+
+int n, m, k, x, y, s, d, b, result;
+int dx[] = {-1, 1, 0, 0};
+int dy[] = {0, 0, 1, -1};
+struct INFO{
+    int x, y, s, d, b;
+    bool catched;
+};
+vector <INFO> mold;
+vector <int> arr[MAX][MAX];
+
+void catch_mold(int idx){
+    for(int i=1;i<=n;i++){
+        if(arr[i][idx].size()){
+            result += mold[arr[i][idx][0]].b;
+            mold[arr[i][idx][0]].catched = true;
+            arr[i][idx].pop_back();
+            break;
+        }
+    }
+}
+
+void print_arr(){
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            if(arr[i][j].size()) printf("%d ", arr[i][j][0]);
+            else printf("0 ");
+        }printf("\n");
+    }printf("\n");
+}
+void move_mold(){
+    memset(arr, 0, sizeof(arr));
+    for(int i=1;i<=k;i++){
+        if(mold[i].catched) continue;
+        int x = mold[i].x, y = mold[i].y;
+        int s = mold[i].s, d = mold[i].d;
+        int ns;
+
+        if(d == 0 || d == 1) ns = s % ((n-1)*2);
+        else ns = s % ((m-1)*2);
+
+        for(int j=0;j<ns;j++){
+            int nx = x + dx[d];
+            int ny = y + dy[d];
+
+            if(nx < 1){
+                nx += 2;
+                if (d == 0 || d == 2) d++;
+                else d--;
+            }
+            if(nx > n){
+                nx -= 2;
+                if (d == 0 || d == 2) d++;
+                else d--;
+            }
+            if(ny < 1){
+                ny += 2;
+                if (d == 0 || d == 2) d++;
+                else d--;
+            }
+            if(ny > m){
+                ny -= 2;
+                if (d == 0 || d == 2) d++;
+                else d--;
+            }
+            x = nx; y = ny;
+        }
+        mold[i].x = x;
+        mold[i].y = y;
+        mold[i].d = d;
+
+        if(arr[x][y].size() > 0){
+            if(mold[arr[x][y][0]].b < mold[i].b){
+                mold[arr[x][y][0]].catched = true;
+                arr[x][y][0] = i;
+            }
+            else mold[i].catched = true;
+        }
+        else arr[x][y].push_back(i);
+    }
+}
+
+int main(){
+    scanf("%d %d %d", &n, &m, &k);
+    mold.push_back({0, 0, 0, 0, 0, true});
+
+    for(int i=1;i<=k;i++){
+        scanf("%d %d %d %d %d", &x, &y, &s, &d, &b);
+        mold.push_back({x, y, s, d-1, b, false});
+        arr[x][y].push_back(i);
+    }
+    for(int i=1;i<=m;i++){
+        catch_mold(i);
+        move_mold();
+    }
+    printf("%d\n", result);
+    return 0;
+}
