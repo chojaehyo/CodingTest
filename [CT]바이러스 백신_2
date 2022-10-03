@@ -1,0 +1,89 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <queue>
+using namespace std;
+const int MAX = 55;
+
+int N, M, arr[MAX][MAX], tmp[MAX][MAX], virus, min_time = 1e9;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+struct INFO{
+    int x, y, dist;
+};
+vector <INFO> hospital;
+vector <int> selected;
+bool visited[MAX][MAX];
+
+void spread_vaccine(){
+    memset(visited, 0, sizeof(visited));
+    queue <INFO> q;
+
+    for(int i=0;i<selected.size();i++){
+        q.push({hospital[selected[i]].x, hospital[selected[i]].y});
+        visited[hospital[selected[i]].x][hospital[selected[i]].y] = true;
+    }
+
+    int removed_virus = 0, time = 0;
+    while(!q.empty()){
+        int x = q.front().x;
+        int y = q.front().y;
+        int dist = q.front().dist;
+        q.pop();
+
+        for(int i=0;i<4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(nx < 1 || nx > N || ny < 1 || ny > N || arr[nx][ny] == 1) continue;
+            if(!visited[nx][ny]){
+                visited[nx][ny] = true;
+                if(arr[nx][ny] == 0) {
+                    removed_virus++;
+                    time = max(time, dist+1);
+                }
+                q.push({nx, ny, dist + 1});
+            }
+        }
+    }
+    if(virus == removed_virus) min_time = min(min_time, time);
+}
+
+void copy_arr(int A[MAX][MAX], int B[MAX][MAX]){
+    for(int i=1;i<=N;i++){
+        for(int j=1;j<=N;j++){
+            A[i][j] = B[i][j];
+        }
+    }
+}
+
+void comb(int idx, int x){
+    if(idx >= M){
+        copy_arr(tmp, arr);
+        spread_vaccine();
+        copy_arr(arr, tmp);
+    }
+    else{
+        for(int i=x;i<hospital.size();i++){
+            selected.push_back(i);
+            comb(idx+1, i+1);
+            selected.pop_back();
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d", &N, &M);
+
+    for(int i=1;i<=N;i++){
+        for(int j=1;j<=N;j++){
+            scanf("%d", &arr[i][j]);
+            if(arr[i][j] == 0) virus++;
+            else if(arr[i][j] == 2) hospital.push_back({i, j});
+        }
+    }
+    comb(0, 0);
+    if(min_time != 1e9) printf("%d\n", min_time);
+    else printf("-1\n");
+    return 0;
+}
