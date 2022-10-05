@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <vector>
+#include <deque>
+using namespace std;
+const int MAX = 15;
+
+int n, k, x, y, d, board[MAX][MAX];
+int dx[] = {0, 0, -1, 1};
+int dy[] = {1, -1, 0, 0};
+struct INFO{
+    int x, y, d;
+};
+vector <INFO> horse;
+deque <int> state[MAX][MAX];
+
+int main(){
+    scanf("%d %d", &n, &k);
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            scanf("%d", &board[i][j]);
+        }
+    }
+    horse.push_back({-1, -1, -1});
+    for(int i=1;i<=k;i++){
+        scanf("%d %d %d", &x, &y, &d);
+        horse.push_back({x, y, d-1});
+        state[x][y].push_back(i);
+    }
+
+    int turn = 1;
+    bool stack4 = false;
+    while(!stack4){
+        if(turn > 1000){
+            turn = -1;
+            break;
+        }
+        for(int i=1;i<=k && !stack4;i++){
+            int x = horse[i].x;
+            int y = horse[i].y;
+            int d = horse[i].d;
+            int nx = x + dx[d];
+            int ny = y + dy[d];
+
+            if(board[nx][ny] == 2 || nx < 1 || nx > n || ny < 1 || ny > n){
+                if(d % 2) d--;
+                else d++;
+                nx = x + dx[d];
+                ny = y + dy[d];
+
+                if(board[nx][ny] == 2 || nx < 1 || nx > n || ny < 1 || ny > n) {
+                    horse[i].d = d;
+                    continue;
+                }
+            }
+            horse[i].d = d;
+
+            deque <int> leave;
+            deque <int> move;
+            bool find = false;
+            for(int j=0;j<state[x][y].size();j++){
+                if(!find){
+                    if(state[x][y][j] == i){
+                        find = true;
+                        move.push_back(i);
+                    }
+                    else leave.push_back(state[x][y][j]);
+                }
+                else move.push_back(state[x][y][j]);
+            }
+            state[x][y] = leave;
+
+            if(board[nx][ny] == 0){
+                while(!move.empty()){
+                    int num = move.front();
+                    horse[num].x = nx;
+                    horse[num].y = ny;
+                    move.pop_front();
+                    state[nx][ny].push_back(num);
+                }
+            }
+            else{
+                while(!move.empty()){
+                    int num = move.back();
+                    horse[num].x = nx;
+                    horse[num].y = ny;
+                    move.pop_back();
+                    state[nx][ny].push_back(num);
+                }
+            }
+            if(state[nx][ny].size() >= 4) {
+                stack4 = true;
+                break;
+            }
+        }
+        if(stack4) break;
+        turn++;
+    }
+
+    printf("%d\n", turn);
+    return 0;
+}
