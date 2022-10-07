@@ -1,0 +1,24 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 1500005;
+
+int n, t, p, dp[MAX], result, cur_max;
+pair <int, int> input[MAX];
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d %d", &t, &p);
+        input[i] = {t, p};
+	}
+	for (int i = 0; i <= n; i++) {
+		cur_max = max(cur_max, dp[i]);
+		
+        if (i + input[i].first > n) continue;
+		dp[i + input[i].first] = max(dp[i + input[i].first], cur_max + input[i].second);
+		result = max(result, dp[i + input[i].first]);
+	}
+    printf("%d\n", result);
+	return 0;
+}
