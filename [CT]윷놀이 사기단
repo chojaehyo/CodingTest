@@ -1,83 +1,60 @@
 #include <cstdio>
-#include <algorithm>
-using namespace std;
-const int MAX = 70;
+const int MAX = 100;
 
-int arr[MAX], cur_arr[MAX], order[10], result, ans[15];
-struct info {
-	int x;
-	bool finish;
-};
-info horse[5];
+int board[MAX], check[MAX], order[15], horse[5], result;
 
-int move_horse(int idx, int num) {
-	if (horse[idx].finish) return -1;
+int possible(int h_num, int loc, int step){
+    int cur_loc = loc;
+    int next = loc + step;
 
-	int x = horse[idx].x;
-	
-	int nx = x + order[num];
-	if (nx == 5) nx = 26;
-	else if (nx == 10) nx = 40;
-	else if (nx == 15) nx = 55;
-	else if (nx >= 43 && nx <= 51) nx -= 13;
-	else if (nx >= 59 && nx <= 67) nx -= 29;
-	if (nx >= 33 && nx <= 38) nx -= 13;
-    
-	if (nx >= 21 && nx <= 25) {
-		horse[idx].finish = true;
-		cur_arr[x] = 0;
-		return 0;
-	}
-	else if (cur_arr[nx] == 0) {
-		cur_arr[nx] = idx;
-		cur_arr[x] = 0;
-		horse[idx].x = nx;
-		return arr[nx];
-	}
-	else return -1;
+    if(next == 5) next = 26;
+    else if(next == 10) next = 40;
+    else if(next == 15) next = 55;
+
+    if(next >= 43 && next < 55) next -= 13;
+    else if(next >= 59) next -= 29;
+
+    if(next >= 20 && next < 26) next += 13;
+    if(check[next] && next < 34) return -1;
+
+    check[cur_loc] = 0;
+    check[next] = 1;
+
+    horse[h_num] = next;
+    return next;
 }
 
-void make_state(info A[5], info B[5], int C[MAX], int D[MAX]) {
-	for (int i = 1; i <= 4; i++) A[i] = B[i];
-	for (int i = 0; i < MAX; i++) C[i] = D[i];
+void comb(int idx, int score){
+    if(idx == 10){
+        if(score > result) result = score;
+    }
+    else{
+        for(int i=0;i<4;i++){
+            int prev_loc = horse[i];
+            if(horse[i] >= 34 && horse[i] < 40) continue;
+
+            int res = possible(i, horse[i], order[idx]);
+            if(res > 0) {
+                comb(idx+1, score + board[horse[i]]);
+                check[horse[i]] = 0;
+                horse[i] = prev_loc;
+                check[horse[i]] = 1;
+            }
+        }
+    }
 }
 
-void solve(int idx, int score) {
-	if (idx >= 10) result = max(result, score);
-	else {
-		info tmp_horse[5];
-		int tmp_arr[MAX];
+int main(){
+    for(int i=0;i<10;i++) scanf("%d", &order[i]);
 
-		make_state(tmp_horse, horse, tmp_arr, cur_arr);
+    for(int i=0, j=2;i<= 20; i++) board[i] = i*j;
+    for(int i=26, j=10;i<=29; i++, j+=3) board[i] = j;
+    for(int i=30, j=25;i<=33;i++, j+=5) board[i] = j;
+    for(int i=40, j=20;i<=42;i++, j+=2) board[i] = j;
+    board[55] = 30;
+    for(int i=56, j=28;i<=59;i++, j--) board[i] = j;
 
-		for (int i = 1; i <= 4; i++) {
-			int res = move_horse(i, idx);
-			if (res != -1){
-				solve(idx + 1, score + res);
-				make_state(horse, tmp_horse, cur_arr, tmp_arr);
-			}
-		}
-	}
-}
-
-void set_arr() {
-	for (int i = 0; i <= 20; i++) arr[i] = i * 2;
-	for (int i = 0; i <= 3; i++) {
-		arr[i + 26] = 10 + 3 * i;
-		arr[i + 30] = 25 + 5 * i;
-	}
-	for (int i = 0; i <= 2; i++) arr[i + 40] = 20 + 2 * i;
-	arr[55] = 30;
-	for (int i = 1; i <= 3; i++) arr[i + 55] = 29 - i;
-}
-int main() {
-	for (int i = 0; i < 10; i++) scanf("%d", &order[i]);
-	for (int i = 1; i <= 4; i++) {
-		horse[i].x = 0;
-		horse[i].finish = false;
-	}
-	set_arr();
-	solve(0, 0);
-	printf("%d\n", result);
-	return 0;
+    comb(0, 0);
+    printf("%d\n", result);
+    return 0;
 }
