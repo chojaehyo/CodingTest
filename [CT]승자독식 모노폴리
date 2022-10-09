@@ -1,11 +1,10 @@
 #include <cstdio>
-#include <vector>
-using namespace std;
 const int MAX = 25;
 
-int N, M, K, D, idx, priority[MAX*MAX][4][4], left_player;
+int N, M, K, D, idx, priority[MAX*MAX][5][5], left_player;
 int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
+
 struct INFO{
     int idx, time;
     bool now;
@@ -16,7 +15,7 @@ struct PLAYER{
     int x, y, d;
     bool out;
 };
-vector <PLAYER> player(M+1);
+PLAYER player[MAX*MAX];
 
 bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
 
@@ -110,12 +109,12 @@ int main(){
     int turn = 0;
     left_player = M;
 
-    while(turn < 1000){
+    while(turn <= 1000){
         if(left_player == 1) break;
         move_player();
         turn++;
     }
-    if(turn >= 1000) printf("-1\n");
+    if(turn > 1000) printf("-1\n");
     else printf("%d\n", turn);
     return 0;
 }
