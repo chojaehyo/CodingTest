@@ -1,0 +1,123 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int p, d, score, arr[10][10];
+int dx[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+int dy[] = {0, -1, -1, -1, 0, 1, 1, 1};
+struct INFO{
+    int idx, x, y, dir;
+    bool dead;
+};
+vector <INFO> fish;
+bool compare(INFO a, INFO b){
+    return a.idx < b.idx;
+}
+
+bool check_range(int x, int y){
+    return x >= 0 and x < 4 and y >= 0 and y < 4;
+}
+
+void print_arr(){
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            printf("%d ", arr[i][j]);
+        }printf("\n");
+    }printf("\n");
+}
+void move_fish(){
+    for(int i=1;i<=16;i++){
+        if(fish[i].dead) continue;
+        int x = fish[i].x;
+        int y = fish[i].y;
+        int d = fish[i].dir;
+
+        for(int j=0;j<8;j++){
+            int nx = x + dx[d];
+            int ny = y + dy[d];
+
+            if(check_range(nx, ny) && arr[nx][ny] != -1) {
+                if(arr[nx][ny]) {
+                    fish[arr[nx][ny]].x = x;
+                    fish[arr[nx][ny]].y = y;
+                    fish[arr[x][y]].x = nx;
+                    fish[arr[x][y]].y = ny;
+                    fish[arr[x][y]].dir = d;
+                    int tmp = arr[x][y];
+                    arr[x][y] = arr[nx][ny];
+                    arr[nx][ny] = tmp;
+                }
+                else{
+                    fish[arr[x][y]].x = nx;
+                    fish[arr[x][y]].y = ny;
+                    fish[arr[x][y]].dir = d;
+                    arr[nx][ny] = arr[x][y];
+                    arr[x][y] = 0;
+                }
+                break;
+            }
+            else d = (d+1) % 8;
+        }
+    }
+}
+
+void make_state(int A[][10], int B[][10]){
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            A[i][j] =  B[i][j];
+        }
+    }
+}
+
+void solve(int x, int y, int d, int cur_score){
+    if(score < cur_score) score = cur_score;
+
+    int tmp[10][10] = {0};
+    make_state(tmp, arr);
+    vector <INFO> tmp_fish = fish;
+    move_fish();
+
+    for(int i=1;i<=3;i++){
+        int nx = x + dx[d] * i;
+        int ny = y + dy[d] * i;
+
+        if(check_range(nx, ny) && arr[nx][ny] > 0){
+            int num = arr[nx][ny];
+            fish[num].dead = true;
+            arr[x][y] = 0;
+            arr[nx][ny] = -1;
+
+            solve(nx, ny, fish[num].dir, cur_score + num);
+
+            fish[num].dead = false;
+            arr[x][y] = -1;
+            arr[nx][ny] = num;
+
+        }
+    }
+    make_state(arr, tmp);
+    fish = tmp_fish;
+}
+
+
+int main(){
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            scanf("%d %d", &p, &d);
+            arr[i][j] = p;
+            fish.push_back({p, i, j, d-1, false});
+        }
+    }
+    fish.push_back({-1, -1, -1, -1, true});
+    sort(fish.begin(), fish.end(), compare);
+
+    int num = arr[0][0];
+    arr[0][0] = -1;
+    fish[num].dead = true;
+
+    solve(0, 0, fish[num].dir, num);
+
+    printf("%d\n", score);
+    return 0;
+}
