@@ -1,0 +1,121 @@
+#include <cstdio>
+#include <vector>
+using namespace std;
+const int MAX = 25;
+
+int N, M, K, D, idx, priority[MAX*MAX][4][4], left_player;
+int dx[] = {-1, 1, 0, 0};
+int dy[] = {0, 0, -1, 1};
+struct INFO{
+    int idx, time;
+    bool now;
+};
+INFO arr[MAX][MAX];
+
+struct PLAYER{
+    int x, y, d;
+    bool out;
+};
+vector <PLAYER> player(M+1);
+
+bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
+
+void move_player() {
+    for (int i = 1; i <= M; i++) {
+        if (player[i].out) continue;
+        int x = player[i].x;
+        int y = player[i].y;
+        int d = player[i].d;
+
+        bool move = false, update = false;
+        int my_x, my_y, my_d;
+        for (int j = 0; j < 4; j++) {
+            int nd = priority[i][d][j];
+            int nx = x + dx[nd];
+            int ny = y + dy[nd];
+
+            if (check_range(nx, ny)) {
+                if (arr[nx][ny].idx && arr[nx][ny].now) {
+                    move = true;
+                    if (arr[nx][ny].idx > i) {
+                        player[arr[nx][ny].idx].out = true;
+                        arr[nx][ny].idx = i;
+                        player[i] = {nx, ny, nd, false};
+                    }
+                    else player[i].out = true;
+                    left_player--;
+                }
+                else if (arr[nx][ny].idx == 0) {
+                    move = true;
+                    arr[nx][ny] = {i, K, true};
+                    player[i] = {nx, ny, nd, false};
+                }
+                else if(!update && arr[nx][ny].idx == i){
+                    my_x = nx;
+                    my_y = ny;
+                    my_d = nd;
+                    update = true;
+                }
+                if(move) break;
+
+            }
+        }
+        if(!move){
+            arr[my_x][my_y].idx = i;
+            arr[my_x][my_y].time = K+1;
+            player[i].x = my_x;
+            player[i].y = my_y;
+            player[i].d = my_d;
+        }
+    }
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if(arr[i][j].now) arr[i][j].now = false;
+            else if (!arr[i][j].now && arr[i][j].time) {
+                arr[i][j].time--;
+                if (arr[i][j].time == 0) arr[i][j] = {};
+            }
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d %d", &N, &M, &K);
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &arr[i][j].idx);
+            if(arr[i][j].idx) {
+                arr[i][j].time = K;
+                arr[i][j].now = false;
+                player[arr[i][j].idx].x = i;
+                player[arr[i][j].idx].y = j;
+            }
+        }
+    }
+    for(int i=1;i<=M;i++) {
+        scanf("%d", &D);
+        player[i].d = D-1;
+        player[i].out = false;
+    }
+    for(int i=1;i<=M;i++){
+        for(int j=0;j<4;j++){
+            for(int k=0;k<4;k++){
+                scanf("%d", &priority[i][j][k]);
+                priority[i][j][k]--;
+            }
+        }
+    }
+
+    int turn = 0;
+    left_player = M;
+
+    while(turn < 1000){
+        if(left_player == 1) break;
+        move_player();
+        turn++;
+    }
+    if(turn >= 1000) printf("-1\n");
+    else printf("%d\n", turn);
+    return 0;
+}
