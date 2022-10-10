@@ -1,0 +1,154 @@
+#include <cstdio>
+#include <vector>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 25;
+
+int N, M, C, arr[MAX][MAX], cx, cy, sx, sy, ex, ey;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+struct INFO{
+    int sx, sy, ex, ey;
+};
+vector <INFO> customer;
+bool visited[MAX][MAX];
+struct QUEUE{
+    int x, y, dist;
+};
+
+bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
+
+struct compare{
+    bool operator()(QUEUE a, QUEUE b){
+        if(a.dist > b.dist) return true;
+        else if(a.dist == b.dist){
+            if(a.x > b.x) return true;
+            else if(a.x == b.x){
+                if(a.y > b.y) return true;
+            }
+        }
+        return false;
+    }
+};
+
+int find_customer(){
+    memset(visited, 0, sizeof(visited));
+    priority_queue <QUEUE, vector<QUEUE>, compare> candidate;
+    queue <QUEUE> q;
+    q.push({cx, cy, 0});
+    visited[cx][cy] = true;
+
+    if(arr[cx][cy] >= 2){
+        int num = arr[cx][cy];
+        arr[cx][cy] = 0;
+        return num;
+    }
+    while(!q.empty()){
+        int x = q.front().x;
+        int y = q.front().y;
+        int dist = q.front().dist;
+        q.pop();
+
+        for(int i=0;i<4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(!check_range(nx, ny) || arr[nx][ny] == 1) continue;
+            if(!visited[nx][ny]){
+                visited[nx][ny] = true;
+                if(arr[nx][ny] >= 2) candidate.push({nx, ny, dist+1});
+                q.push({nx, ny, dist+1});
+            }
+        }
+    }
+    if(candidate.size() == 0) return -1;
+    if(C - candidate.top().dist <= 0) return -1;
+    C -= candidate.top().dist;
+    int cNum = arr[candidate.top().x][candidate.top().y];
+    cx = candidate.top().x;
+    cy = candidate.top().y;
+    arr[candidate.top().x][candidate.top().y] = 0;
+    return cNum;
+}
+
+int find_destination(int num){
+    int sx = customer[num-2].sx;
+    int sy = customer[num-2].sy;
+    int ex = customer[num-2].ex;
+    int ey = customer[num-2].ey;
+    memset(visited, 0, sizeof(visited));
+    queue <QUEUE> q;
+    q.push({sx, sy, 0});
+    visited[sx][sy] = true;
+
+    int total_dist = 0;
+    bool stop = false;
+    while(!q.empty() && !stop){
+        int x = q.front().x;
+        int y = q.front().y;
+        int dist = q.front().dist;
+        q.pop();
+
+        for(int i=0;i<4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(!check_range(nx, ny) || arr[nx][ny] == 1) continue;
+            if(!visited[nx][ny]){
+                visited[nx][ny] = true;
+                if(nx == ex && ny == ey){
+                    total_dist = dist + 1;
+                    stop = true;
+                    break;
+                }
+                q.push({nx, ny, dist+1});
+            }
+        }
+    }
+
+    if(stop) {
+        C -= total_dist;
+        cx = ex;
+        cy = ey;
+        if (C < 0) return -1;
+        C += (total_dist * 2);
+        return 1;
+    }
+    return -1;
+}
+
+int main(){
+    scanf("%d %d %d", &N, &M, &C);
+
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+    scanf("%d %d", &cx, &cy);
+    cx--; cy--;
+    for(int i=0;i<M;i++){
+        scanf("%d %d %d %d", &sx, &sy, &ex, &ey);
+        sx--; sy--; ex--; ey--;
+        customer.push_back({sx, sy, ex, ey});
+        arr[sx][sy] = i+2;
+    }
+    int left_customer = M;
+    for(int i=0;i<M;i++){
+        int cNum = find_customer();
+        if(cNum == -1) {
+            C = -1;
+            break;
+        }
+        int res = find_destination(cNum);
+        if(res == -1){
+            C = -1;
+            break;
+        }
+        else left_customer--;
+    }
+    if(left_customer) printf("-1\n");
+    else printf("%d\n", C);
+    return 0;
+}
