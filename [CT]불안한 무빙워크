@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <deque>
+using namespace std;
+
+int N, K, input;
+struct INFO{
+    int safety, person;
+};
+deque <INFO> movingWalk;
+
+int main(){
+    scanf("%d %d", &N, &K);
+
+    for(int i=0;i<N*2;i++) {
+        scanf("%d", &input);
+        movingWalk.push_back({input, 0});
+    }
+    int zero = 0, turn = 0;
+    while(zero < K){
+        INFO info = movingWalk.back();
+        movingWalk.pop_back();
+        movingWalk.push_front(info);
+        if(movingWalk[N-1].person) movingWalk[N-1].person = 0;
+        
+        for(int i=N-2;i>=0;i--){
+            if(movingWalk[i].person) {
+                if(movingWalk[i+1].safety > 0 && movingWalk[i+1].person == 0){
+                    movingWalk[i+1].safety--;
+                    if(movingWalk[i+1].safety == 0) zero++;
+                    movingWalk[i+1].person = 1;
+                    movingWalk[i].person = 0;
+                }
+            }
+        }
+        if(movingWalk[N-1].person) movingWalk[N-1].person = 0;
+        if(movingWalk[0].safety > 0 && movingWalk[0].person == 0){
+            movingWalk[0].safety--;
+            if(movingWalk[0].safety == 0) zero++;
+            movingWalk[0].person = 1;
+        }
+        turn++;
+    }
+    printf("%d\n", turn);
+    return 0;
+}
