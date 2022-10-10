@@ -1,0 +1,25 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int MAX = 10005;
+
+int N, K, sensor[MAX], dist[MAX];
+
+int main() {
+    scanf("%d %d", &N, &K);
+    
+	for(int i = 0; i < N; i++) scanf("%d", &sensor[i]);
+	
+	sort(sensor, sensor + N);
+	
+	for(int i = 0; i < N-1; i++) dist[i] = sensor[i+1] - sensor[i];
+
+	sort(dist, dist + (N-1));
+	
+	int result = 0;
+	
+	for(int i = 0; i< N-K; i++) result += dist[i];
+	
+    printf("%d\n", result);
+	return 0;
+}
