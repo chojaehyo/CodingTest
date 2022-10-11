@@ -1,0 +1,99 @@
+#include <cstdio>
+#include <vector>
+#include <cstring>
+using namespace std;
+const int MAX = 55;
+
+struct INFO{
+    int x, y, m, s, d;
+    bool dead;
+};
+vector <INFO> atom;
+vector <int> arr[MAX][MAX];
+
+int N, M, K, x, y, m, s, d;
+int dx[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+int dy[] = {0, 1, 1, 1, 0, -1, -1, -1};
+
+void move_atom(){
+    memset(arr, 0, sizeof(arr));
+    for(int i=1;i<atom.size();i++){
+        if(atom[i].dead) continue;
+
+        int x = atom[i].x;
+        int y = atom[i].y;
+        int s = atom[i].s % N;
+        int d = atom[i].d;
+
+        int nx = x + dx[d] * s;
+        int ny = y + dy[d] * s;
+
+        if(nx <= 0) nx += N;
+        if(nx > N) nx -= N;
+        if(ny <= 0) ny += N;
+        if(ny > N) ny -= N;
+
+        atom[i].x = nx; atom[i].y = ny;
+        arr[nx][ny].push_back(i);
+    }
+}
+
+void check_arr(){
+    for(int i=1;i<=N;i++){
+        for(int j=1;j<=N;j++){
+            if(arr[i][j].size() >= 2){
+                int cnt = arr[i][j].size(), sum_m = 0, sum_s = 0;
+                int odd_d = 0, even_d = 0;
+
+                for(int k=0;k<arr[i][j].size();k++){
+                    atom[arr[i][j][k]].dead = true;
+                    sum_m += atom[arr[i][j][k]].m;
+                    sum_s += atom[arr[i][j][k]].s;
+                    if(atom[arr[i][j][k]].d % 2) even_d++;
+                    else odd_d++;
+                }
+
+                int final_m = sum_m / 5;
+                int final_s = sum_s / cnt;
+
+                if(final_m) {
+                    if (odd_d == 0 || even_d == 0) {
+                        atom.push_back({i, j, final_m, final_s, 0, false});
+                        atom.push_back({i, j, final_m, final_s, 2, false});
+                        atom.push_back({i, j, final_m, final_s, 4, false});
+                        atom.push_back({i, j, final_m, final_s, 6, false});
+                    }
+                    else {
+                        atom.push_back({i, j, final_m, final_s, 1, false});
+                        atom.push_back({i, j, final_m, final_s, 3, false});
+                        atom.push_back({i, j, final_m, final_s, 5, false});
+                        atom.push_back({i, j, final_m, final_s, 7, false});
+                    }
+                }
+            }
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d %d", &N, &M, &K);
+    atom.push_back({-1, -1, -1, -1, -1, true});
+
+    for(int i=1;i<=M;i++){
+        scanf("%d %d %d %d %d", &x, &y, &m, &s, &d);
+        atom.push_back({x, y, m, s, d, false});
+    }
+
+    for(int i=1;i<=K;i++){
+        move_atom();
+        check_arr();
+    }
+
+    int result = 0;
+    for(int i=1;i<atom.size();i++) {
+        if(atom[i].dead) continue;
+        result += atom[i].m;
+    }
+    printf("%d\n", result);
+    return 0;
+}
