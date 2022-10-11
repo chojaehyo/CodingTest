@@ -1,0 +1,69 @@
+#include <cstdio>
+const int MAX = 505;
+
+int N, arr[MAX][MAX], result;
+int dx[] = {0, 1, 0, -1};
+int dy[] = {-1, 0, 1, 0};
+int percent[] = {1, 1, 2, 2, 7, 7, 10, 10, 5};
+int p_d[4][2][10] = {{{-1, 1, -2, 2, -1, 1, -1, 1, 0, 0},{0, 0, -1, -1, -1, -1, -2, -2, -3, -2}},
+                     {{0, 0, 1, 1, 1, 1, 2, 2, 3, 2}, {-1, 1, -2, 2, -1, 1, -1, 1, 0, 0}},
+                     {{-1, 1, -2, 2, -1, 1, -1, 1, 0, 0},{0, 0, 1, 1, 1, 1, 2, 2, 3, 2}},
+                     {{0, 0, -1, -1, -1, -1, -2, -2, -3, -2},{-1, 1, -2, 2, -1, 1, -1, 1, 0, 0}}};
+
+bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
+
+void move_sand(int x, int y, int d){
+    int nx = x + dx[d];
+    int ny = y + dy[d];
+    if(!check_range(nx, ny)) return;
+
+    int total_sand = arr[nx][ny], sum_sand = 0;
+    arr[nx][ny] = 0;
+
+    for(int i=0;i<9;i++){
+        int nx = x + p_d[d][0][i];
+        int ny = y + p_d[d][1][i];
+        int sand = percent[i] * total_sand / 100;
+
+        if(!check_range(nx, ny)) {
+            result += sand;
+            sum_sand += sand;
+            continue;
+        }
+
+        sum_sand += sand;
+        arr[nx][ny] += sand;
+    }
+    nx = x + p_d[d][0][9];
+    ny = y + p_d[d][1][9];
+    if(!check_range(nx, ny)) result += total_sand - sum_sand;
+    else arr[nx][ny] += total_sand - sum_sand;
+}
+
+int main(){
+    scanf("%d", &N);
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+
+    int x = N/2,  y = N/2, d = 0;
+
+    for(int i=0;i<N;i++){
+        for(int j=0;j<2;j++){
+            for(int k=0;k<=i;k++){
+                move_sand(x, y, d);
+                int nx = x + dx[d];
+                int ny = y + dy[d];
+
+                x = nx; y = ny;
+            }
+            d = (d+1) % 4;
+            if(i == N-1) break;
+        }
+    }
+
+    printf("%d\n", result);
+    return 0;
+}
