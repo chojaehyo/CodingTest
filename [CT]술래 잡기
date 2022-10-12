@@ -1,0 +1,145 @@
+#include <cstdio>
+#include <vector>
+#include <cstring>
+#include <cstdlib>
+using namespace std;
+const int MAX = 105;
+
+int N, M, H, K, x, y, d, tree[MAX][MAX], result;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+int dx2[] = {0, 0, 1, -1};
+int dy2[] = {-1, 1, 0, 0};
+
+vector <int> arr[MAX][MAX];
+struct INFO{
+    int x, y, d;
+    bool catched;
+};
+vector <INFO> target;
+vector <INFO> order;
+
+void make_order(){
+    int tx = (N/2)+1, ty = (N/2) + 1, d = 0;
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < 2; j++) {
+            for (int k = 0; k <= i; k++) {
+                order.push_back({tx, ty, d});
+
+                int ntx = tx + dx[d];
+                int nty = ty + dy[d];
+
+                tx = ntx; ty = nty;
+            }
+            d = (d + 1) % 4;
+            if (i == N - 1) break;
+        }
+    }
+    order.pop_back();
+    d = 2;
+    for (int i = N - 1; i >= 0; i--) {
+        for (int j = 0; j < 2; j++) {
+            for (int k = 0; k <= i; k++) {
+                int ntx = tx + dx[d];
+                int nty = ty + dy[d];
+
+                order.push_back({ntx, nty, d});
+                tx = ntx;
+                ty = nty;
+            }
+            d = (d + 3) % 4;
+            order.back().d = d;
+            if (i == N - 1) break;
+        }
+    }
+    order.pop_back();
+}
+
+bool check_range(int x, int y){return x >= 1 && x <= N && y >= 1 && y <= N;}
+
+void move_target(int tx, int ty){
+    memset(arr, 0, sizeof(arr));
+
+    for(int i=1;i<target.size();i++){
+        if(target[i].catched) continue;
+
+        int x = target[i].x;
+        int y = target[i].y;
+        int d = target[i].d;
+
+        if(abs(x-tx) + abs(y-ty) <= 3){
+            int nx = x + dx2[d];
+            int ny = y + dy2[d];
+
+            if(!check_range(nx, ny)) {
+                if (d % 2) d--;
+                else d++;
+
+                nx = x + dx2[d];
+                ny = y + dy2[d];
+            }
+            if(nx != tx || ny != ty){
+                target[i].x = nx;
+                target[i].y = ny;
+                target[i].d = d;
+                arr[nx][ny].push_back(i);
+            }
+            else {
+                target[i].x = x;
+                target[i].y = y;
+                target[i].d = d;
+                arr[x][y].push_back(i);
+            }
+        }
+        else arr[x][y].push_back(i);
+    }
+}
+
+void catch_target(int turn, int x, int y, int d){
+    int catch_cnt = 0;
+
+    for(int j=0;j<3;j++){
+        int nx = x + dx[d] * j;
+        int ny = y + dy[d] * j;
+
+        if(!check_range(nx, ny) || tree[nx][ny] == 1) continue;
+        if(arr[nx][ny].size() > 0){
+            for(int i=0;i<arr[nx][ny].size();i++) {
+                target[arr[nx][ny][i]].catched = true;
+                catch_cnt++;
+            }
+        }
+    }
+    result += catch_cnt * turn;
+}
+
+int main(){
+    scanf("%d %d %d %d", &N, &M, &H, &K);
+
+    target.push_back({-1, -1, -1, true});
+    for(int i=1;i<=M;i++){
+        scanf("%d %d %d", &x, &y, &d);
+        target.push_back({x, y, d, false});
+        arr[x][y].push_back(i);
+    }
+
+    for(int i=1;i<=H;i++){
+        scanf("%d %d", &x, &y);
+        tree[x][y] = 1;
+    }
+    make_order();
+    
+    int idx1 = 0, idx2 = 1;
+    for(int k=1;k<=K;k++) {
+        int x1 = order[idx1].x, y1 = order[idx1].y, d1 = order[idx1].d;
+        int x2 = order[idx2].x, y2 = order[idx2].y, d2 = order[idx2].d;
+        idx1++; idx2++;
+        idx1 = idx1 % order.size();
+        idx2 = idx2 % order.size();
+
+        move_target(x1, y1);
+        catch_target(k, x2, y2, d2);
+    }
+    printf("%d\n", result);
+    return 0;
+}
