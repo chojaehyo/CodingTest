@@ -1,0 +1,147 @@
+#include <cstdio>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 25;
+
+int N, M, arr[MAX][MAX], tmp[MAX][MAX], result;
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+struct INFO{
+    int x, y, color;
+};
+struct compare{
+    bool operator()(INFO a, INFO b){
+        if(a.color == 0 && b.color > 0) return true;
+        if(a.color == b.color) {
+            if (a.x < b.x) return true;
+            else if (a.x == b.x) {
+                if (a.y > b.y) return true;
+            }
+        }
+        return false;
+    }
+};
+bool visited[MAX][MAX];
+
+priority_queue <INFO, vector<INFO>, compare> max_group;
+int max_group_red_cnt = 1e9;
+
+bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
+
+void get_group(int x, int y){
+    memset(visited, 0, sizeof(visited));
+    priority_queue <INFO, vector<INFO>, compare> group;
+    queue <INFO> q;
+    group.push({x, y, arr[x][y]});
+    q.push({x, y, arr[x][y]});
+    visited[x][y] = true;
+    int red_cnt = 0, color = arr[x][y];
+
+    while(!q.empty()){
+        int x = q.front().x;
+        int y = q.front().y;
+        q.pop();
+
+        for(int i=0;i<4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(!check_range(nx, ny) || arr[nx][ny] <= -1) continue;
+            if(!visited[nx][ny]){
+                if(arr[nx][ny] == 0 || arr[nx][ny] == color) {
+                    visited[nx][ny] = true;
+                    if (arr[nx][ny] == 0) red_cnt++;
+                    q.push({nx, ny, arr[nx][ny]});
+                    group.push({nx, ny, arr[nx][ny]});
+                }
+            }
+        }
+    }
+
+    bool change = false;
+    if(group.size() >= 2){
+        if(group.size() > max_group.size()) change = true;
+        else if(group.size() == max_group.size()) {
+            if (red_cnt < max_group_red_cnt) change = true;
+            else if (red_cnt == max_group_red_cnt) {
+                if (group.top().x > max_group.top().x) change = true;
+                else if (group.top().x == max_group.top().x) {
+                    if (group.top().y < max_group.top().y) change = true;
+                }
+            }
+        }
+    }
+    if(change){
+        max_group = group;
+        max_group_red_cnt = red_cnt;
+    }
+}
+
+void gravity(){
+    for(int j=0;j<N;j++){
+        for(int i=N-1;i>0;i--){
+            if(arr[i][j] == -2){
+                for(int k=i-1;k>=0;k--){
+                    if(arr[k][j] == -1) break;
+                    if(arr[k][j] >= 0){
+                        arr[i][j] = arr[k][j];
+                        arr[k][j] = -2;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void rotate() {
+    memset(tmp, 0, sizeof(tmp));
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            tmp[N - 1 - j][i] = arr[i][j];
+        }
+    }
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            arr[i][j] = tmp[i][j];
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d", &N, &M);
+
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+    while(1){
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N;j++){
+                if(arr[i][j] > 0) {
+                    get_group(i, j);
+                }
+            }
+        }
+        if(max_group.empty()) break;
+        result += max_group.size() * max_group.size();
+
+        while(!max_group.empty()){
+            int x = max_group.top().x;
+            int y = max_group.top().y;
+            max_group.pop();
+            arr[x][y] = -2;
+        }
+        max_group_red_cnt = 1e9;
+        gravity();
+        rotate();
+        gravity();
+    }
+
+    printf("%d\n", result);
+    return 0;
+}
