@@ -1,0 +1,158 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 55;
+
+int N, M, D, S, arr[MAX][MAX], score[4];
+int dx[] = {-1, 1, 0, 0};
+int dy[] = {0, 0, -1, 1};
+int dx2[] = {0, 1, 0, -1};
+int dy2[] = {-1, 0, 1, 0};
+struct INFO{
+    int x, y;
+};
+vector <INFO> pos;
+vector <int> beads, new_beads, tmp;
+
+bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
+void make_pos(){
+    int x = N/2, y = N/2, d = 0;
+
+    for(int i=0;i<N;i++){
+        for(int j=0;j<2;j++){
+            for(int k=0;k<=i;k++){
+                int nx = x + dx2[d];
+                int ny = y + dy2[d];
+                pos.push_back({nx, ny});
+
+                x = nx; y = ny;
+            }
+            d = (d + 1) % 4;
+            if(i == N-1) break;
+        }
+    }
+    pos.pop_back();
+}
+
+void fill_blank(){
+    beads.clear();
+    for(int i=0;i<pos.size();i++){
+        int x = pos[i].x;
+        int y = pos[i].y;
+
+        if(arr[x][y] > 0){
+            beads.push_back(arr[x][y]);
+        }
+    }
+
+    memset(arr, 0, sizeof(arr));
+    for(int i=0;i<beads.size();i++){
+        int x = pos[i].x;
+        int y = pos[i].y;
+
+        arr[x][y] = beads[i];
+    }
+}
+
+bool explode(){
+    bool res = false;
+    new_beads.clear();
+    tmp.clear();
+
+    for(int i=0;i<beads.size();i++){
+        if(tmp.size() == 0) tmp.push_back(beads[i]);
+        else if(tmp.back() == beads[i]) tmp.push_back(beads[i]);
+        else{
+            if(tmp.size() >= 4) {
+                score[tmp.front()] += tmp.size();
+                tmp.clear();
+                res = true;
+            }
+            else {
+                new_beads.insert(new_beads.end(), tmp.begin(), tmp.end());
+                tmp.clear();
+            }
+            tmp.push_back(beads[i]);
+        }
+    }
+    if(tmp.size() >= 4) {
+        score[tmp.front()] += tmp.size();
+        tmp.clear();
+        res = true;
+    }
+    else {
+        new_beads.insert(new_beads.end(), tmp.begin(), tmp.end());
+        tmp.clear();
+    }
+
+    memset(arr, 0, sizeof(arr));
+    for(int i=0;i<min(new_beads.size(), pos.size());i++){
+        int x = pos[i].x;
+        int y = pos[i].y;
+
+        arr[x][y] = new_beads[i];
+    }
+    beads = new_beads;
+    return res;
+}
+
+void make_group(){
+    new_beads.clear();
+    tmp.clear();
+
+    for(int i=0;i<beads.size();i++){
+        if(tmp.size() == 0) tmp.push_back(beads[i]);
+        else if(tmp.back() == beads[i]) tmp.push_back(beads[i]);
+        else{
+            new_beads.push_back(tmp.size());
+            new_beads.push_back(tmp.front());
+            tmp.clear();
+            tmp.push_back(beads[i]);
+        }
+    }
+    if(tmp.size() > 0){
+        new_beads.push_back(tmp.size());
+        new_beads.push_back(tmp.front());
+        tmp.clear();
+    }
+
+    memset(arr, 0, sizeof(arr));
+    for(int i=0;i<min(new_beads.size(), pos.size());i++){
+        int x = pos[i].x;
+        int y = pos[i].y;
+
+        arr[x][y] = new_beads[i];
+    }
+    beads = new_beads;
+}
+
+int main(){
+    scanf("%d %d", &N, &M);
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+    make_pos();
+    int x = N/2, y = N/2;
+    for(int i=0;i<M;i++){
+        scanf("%d %d", &D, &S);
+        D--;
+        for(int j=1;j<=S;j++){
+            int nx = x + dx[D] * j;
+            int ny = y + dy[D] * j;
+
+            if(!check_range(nx, ny)) break;
+            arr[nx][ny] = 0;
+        }
+        fill_blank();
+        while(explode());
+        make_group();
+    }
+    int result = 0;
+    for(int i=1;i<=3;i++) result += i * score[i];
+    printf("%d\n", result);
+    return 0;
+}
