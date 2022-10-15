@@ -1,0 +1,152 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+using namespace std;
+const int MAX = 25;
+
+int N, M, K, C, arr[MAX][MAX], tmp[MAX][MAX], dest[MAX][MAX], result;
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, 1, 0, -1 };
+int dx2[] = { -1, -1, 1, 1 };
+int dy2[] = { -1, 1, -1, 1 };
+vector <pair<int, int>> candidate;
+int max_destroy_x, max_destroy_y, max_score;
+
+bool check_range(int x, int y) { return x >= 0 && x < N && y >= 0 && y < N; }
+
+void grow_tree() {
+	memset(tmp, 0, sizeof(tmp));
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (arr[i][j] > 0) {
+				for (int d = 0; d < 4; d++) {
+					int nx = i + dx[d];
+					int ny = j + dy[d];
+
+					if (!check_range(nx, ny)) continue;
+					
+					if (arr[nx][ny] > 0) tmp[i][j]++;
+				}
+			}
+		}
+	}
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			arr[i][j] += tmp[i][j];
+		}
+	}
+	
+	memset(tmp, 0, sizeof(tmp));
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (arr[i][j] > 0) {
+				candidate.clear();
+				for (int d = 0; d < 4; d++) {
+					int nx = i + dx[d];
+					int ny = j + dy[d];
+
+					if (!check_range(nx, ny) || dest[nx][ny]) continue;
+
+					if (arr[nx][ny] == 0) candidate.push_back({ nx, ny });
+				}
+				if (candidate.size() > 0) {
+					int new_tree = arr[i][j] / candidate.size();
+					for (int k = 0; k < candidate.size(); k++) {
+						int x = candidate[k].first;
+						int y = candidate[k].second;
+						tmp[x][y] += new_tree;
+					}
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			arr[i][j] += tmp[i][j];
+		}
+	}
+}
+
+void find_max_pos(int x, int y) {
+	int tree = 0;
+	tree += arr[x][y];
+
+	for (int i = 0; i < 4; i++) {
+		for (int k = 1; k <= K; k++) {
+			int nx = x + dx2[i] * k;
+			int ny = y + dy2[i] * k;
+
+			if (!check_range(nx, ny) || arr[nx][ny] == -1) break;
+			if (arr[nx][ny] == 0) break;
+			tree += arr[nx][ny];
+		}
+	}
+	if (max_score < tree) {
+		max_destroy_x = x;
+		max_destroy_y = y;
+		max_score = tree;
+	}
+}
+
+void destroy_tree(int t) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if(arr[i][j] > 0) find_max_pos(i, j);
+		}
+	}
+
+	if (max_score != -1) {
+		if (arr[max_destroy_x][max_destroy_y] > 0) {
+			result += arr[max_destroy_x][max_destroy_y];
+			arr[max_destroy_x][max_destroy_y] = 0;
+			dest[max_destroy_x][max_destroy_y] += C + t;
+		}
+		for (int i = 0; i < 4; i++) {
+			for (int k = 1; k <= K; k++) {
+				int nx = max_destroy_x + dx2[i] * k;
+				int ny = max_destroy_y + dy2[i] * k;
+
+				if (!check_range(nx, ny) || arr[nx][ny] == -1) break;
+				if (arr[nx][ny] == 0) {
+					dest[nx][ny] = C + t;
+					break;
+				}
+				result += arr[nx][ny];
+				arr[nx][ny] = 0;
+				dest[nx][ny] = C + t;
+			}
+		}
+	}
+	max_destroy_x = -1, max_destroy_y = -1; max_score = -1;
+}
+
+void remove_dest(int t) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (dest[i][j] > 0 && t - dest[i][j] == 0) {
+				dest[i][j] = 0;
+			}
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d %d %d", &N, &M, &K, &C);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+	for (int i = 1; i <= M; i++) {
+		grow_tree();
+		destroy_tree(i);
+		remove_dest(i);
+	}
+	printf("%d\n", result);
+	return 0;
+}
