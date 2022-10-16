@@ -1,0 +1,168 @@
+#include <cstdio>
+#include <vector>
+#include <cstring>
+#include <queue>
+using namespace std;
+const int MAX = 35;
+
+int N, arr[MAX][MAX], tmp[MAX][MAX], tmp2[MAX][MAX], result;
+int group_num[MAX*MAX][MAX*MAX], group_cnt[MAX*MAX][MAX*MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+vector <pair<int, int>> group[MAX*MAX];
+bool visited[MAX][MAX], visited2[MAX][MAX];
+
+bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
+
+void find_group(int a, int b, int g_idx){
+    memset(visited2, 0, sizeof(visited));
+    queue <pair<int, int>> q;
+    q.push({a, b});
+    visited[a][b] = true;
+    visited2[a][b] = true;
+    group_num[a][b] = g_idx;
+    int num = arr[a][b];
+    group[g_idx].push_back({a, b});
+
+    while(!q.empty()){
+        int x = q.front().first;
+        int y = q.front().second;
+        q.pop();
+
+        for(int i=0;i<4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(!check_range(nx, ny)) continue;
+            if(!visited2[nx][ny]){
+
+                visited2[nx][ny] = true;
+                if(arr[nx][ny] == num){
+                    visited[nx][ny] = true;
+                    group[g_idx].push_back({nx, ny});
+                    q.push({nx, ny});
+                    group_num[nx][ny] = g_idx;
+                }
+            }
+        }
+    }
+}
+
+void check_group(int a, int b){
+    memset(visited2, 0, sizeof(visited2));
+    queue <pair<int ,int>> q;
+    q.push({a, b});
+    visited2[a][b] = true;
+    int g_num = group_num[a][b];
+
+    while(!q.empty()){
+        int x = q.front().first;
+        int y = q.front().second;
+        q.pop();
+
+        for(int i=0;i<4;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(!check_range(nx, ny)) continue;
+            if(!visited2[nx][ny]){
+                if(g_num == group_num[nx][ny]){
+                    visited2[nx][ny] = true;
+                    visited[nx][ny] = true;
+                    q.push({nx, ny});
+                }
+                else group_cnt[g_num][group_num[nx][ny]]++;
+            }
+        }
+    }
+}
+
+void get_score(){
+    memset(visited, 0, sizeof(visited));
+    int idx = 1;
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            if(!visited[i][j]) {
+                find_group(i, j, idx++);
+            }
+        }
+    }
+    memset(visited, 0, sizeof(visited));
+    for(int i=0;i<N;i++) {
+        for (int j = 0; j < N; j++) {
+            if(!visited[i][j]) {
+                check_group(i, j);
+            }
+        }
+    }
+
+    for(int i=1;i<idx-1;i++){
+        for(int j=i+1;j<idx;j++){
+            if(group_cnt[i][j] > 0){
+                int res = 0;
+                res += group[i].size() + group[j].size();
+                res *= arr[group[i][0].first][group[i][0].second];
+                res *= arr[group[j][0].first][group[j][0].second];
+                res *= group_cnt[i][j];
+                result += res;
+            }
+        }
+    }
+}
+
+void rotate_cross(){
+    memset(tmp, 0, sizeof(tmp));
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            tmp[N-1-j][i] = arr[i][j];
+        }
+    }
+}
+
+void rotate_square(int x, int y, int cnt) {
+    memset(tmp2, 0, sizeof(tmp2));
+
+    for (int i = x, ny = y+cnt-1; i < x + cnt; i++, ny--) {
+        for (int j = y, nx = x; j < y + cnt; j++, nx++) {
+            tmp2[nx][ny] = arr[i][j];
+        }
+    }
+
+    for (int i = x; i < x + cnt; i++) {
+        for (int j = y; j < y + cnt; j++) {
+            arr[i][j] = tmp2[i][j];
+        }
+    }
+}
+
+void init(){
+    memset(group, 0, sizeof(group));
+    memset(group_cnt, 0, sizeof(group_cnt));
+    memset(group_num, 0, sizeof(group_num));
+}
+
+int main(){
+    scanf("%d", &N);
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &arr[i][j]);
+        }
+    }
+
+    int n = N/2;
+    for(int i=0;i<=3;i++){
+        init();
+        get_score();
+        rotate_cross();
+        rotate_square(0, 0, n);
+        rotate_square(0, n+1, n);
+        rotate_square(n+1, 0, n);
+        rotate_square(n+1, n+1, n);
+        for(int i=0;i<N;i++) {
+            arr[i][n] = tmp[i][n];
+            arr[n][i] = tmp[n][i];
+        }
+    }
+    printf("%d\n", result);
+    return 0;
+}
