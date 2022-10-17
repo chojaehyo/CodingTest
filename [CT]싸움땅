@@ -1,0 +1,152 @@
+#include <cstdio>
+#include <vector>
+#include <cstdlib>
+using namespace std;
+const int MAX = 25;
+
+int N, M, K, input, score[35], board[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+vector <int> arr[MAX][MAX];
+struct INFO{
+    int x, y, d, s, w;
+};
+vector <INFO> people;
+
+bool check_range(int x, int y){return x >= 0 && x < N && y >= 0 && y < N;}
+
+int find_max_weapon(int x, int y){
+    int max_w = -1;
+    for(int i=0;i<arr[x][y].size();i++){
+        int w = arr[x][y][i];
+        if(max_w < w) max_w = w;
+    }
+    vector <int> tmp;
+    bool find = false;
+    for(int i=0;i<arr[x][y].size();i++){
+        if(!find){
+            if(max_w == arr[x][y][i]) find = true;
+            else tmp.push_back(arr[x][y][i]);
+        }
+        else tmp.push_back(arr[x][y][i]);
+    }
+    if(find) arr[x][y] = tmp;
+    return max_w;
+}
+
+void move_people(){
+    for(int i=1;i<=M;i++){
+        int x = people[i].x;
+        int y = people[i].y;
+        int d = people[i].d;
+        int s = people[i].s;
+        int w = people[i].w;
+        board[x][y] = 0;
+
+        int nx = x + dx[d];
+        int ny = y + dy[d];
+
+        if(!check_range(nx, ny)){
+            d = (d + 2) % 4;
+            nx = x + dx[d];
+            ny = y + dy[d];
+            people[i].d = d;
+        }
+
+        if(board[nx][ny] > 0){
+            int i2 = board[nx][ny];
+            int s2 = people[i2].s;
+            int w2 = people[i2].w;
+
+            int val = (s + w) - (s2 + w2);
+            int winner, loser;
+
+            if(val > 0){
+                winner = i;
+                loser = i2;
+            }
+            else if(val == 0){
+                if(s > s2){
+                    winner = i;
+                    loser = i2;
+                }
+                else if(s < s2){
+                    winner = i2;
+                    loser = i;
+                }
+            }
+            else{
+                winner = i2;
+                loser = i;
+            }
+            if(people[loser].w > 0){
+                arr[nx][ny].push_back(people[loser].w);
+                people[loser].w = 0;
+            }
+
+            int dd = people[loser].d;
+
+            for(int j=0;j<4;j++){
+                int nnx = nx + dx[dd];
+                int nny = ny + dy[dd];
+                if(!check_range(nnx, nny) || board[nnx][nny] > 0) dd = (dd + 1) % 4;
+                else{
+                    int w = find_max_weapon(nnx, nny);
+                    if(w > 0) people[loser].w = w;
+                    people[loser].x = nnx;
+                    people[loser].y = nny;
+                    people[loser].d = dd;
+                    board[nnx][nny] = loser;
+                    break;
+                }
+            }
+            board[nx][ny] = winner;
+            people[winner].x = nx;
+            people[winner].y = ny;
+            score[winner] += abs(val);
+
+            if(people[winner].w > 0){
+                arr[nx][ny].push_back(people[winner].w);
+                people[winner].w = 0;
+            }
+            int w = find_max_weapon(nx, ny);
+            if(w > 0) people[winner].w = w;
+        }
+        else{
+            board[nx][ny] = i;
+            if(people[i].w > 0){
+                arr[nx][ny].push_back(people[i].w);
+                people[i].w = 0;
+            }
+
+            int w = find_max_weapon(nx, ny);
+            if(w > people[i].w) people[i].w = w;
+            people[i].x = nx; people[i].y = ny; people[i].d = d;
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d %d", &N, &M, &K);
+    
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            scanf("%d", &input);
+            arr[i][j].push_back(input);
+        }
+    }
+    people.push_back({-1, -1, -1, -1, -1});
+    int x, y, d, s;
+    for(int i=1;i<=M;i++){
+        scanf("%d %d %d %d", &x, &y, &d, &s);
+        x--; y--;
+        people.push_back({x, y, d, s, 0});
+        board[x][y] = i;
+    }
+
+    for(int i=1;i<=K;i++) move_people();
+
+    for(int i=1;i<=M;i++) printf("%d ", score[i]);
+    return 0;
+}
