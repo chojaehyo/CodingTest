@@ -1,0 +1,48 @@
+#include <cstdio>
+const int MAX = 105;
+
+int L, n, arr[MAX][MAX], tmp[MAX][MAX];
+
+void rotate(int x, int y, int l) {
+	for (int i = x, ny = y + l - 1; i < x + l; i++, ny--) {
+		for (int j = y, nx = x; j < y + l; j++, nx++) {
+			tmp[nx][ny] = arr[i][j];
+		}
+	}
+	for (int i = x; i < x + l; i++) {
+		for (int j = y; j < y + l; j++) {
+			arr[i][j] = tmp[i][j];
+		}
+	}
+}
+
+
+
+void get_sub_arr(int val) {
+	int val2 = 1 << val;
+
+	for (int i = 0; i < n; i += val2) {
+		for (int j = 0; j < n; j += val2) {
+			rotate(i, j, val2);
+		}
+	}
+}
+
+int main() {
+	scanf("%d %d", &n, &L);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			scanf("%d", &arr[i][j]);
+		}
+	}
+
+	get_sub_arr(L);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			printf("%d ", arr[i][j]);
+		}
+		printf("\n");
+	}
+}
