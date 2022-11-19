@@ -1,0 +1,110 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int MAX = 15;
+
+int T, N, result;
+vector <int> connect[MAX];
+vector <int> A, B;
+int arr[MAX], ans[MAX], area[MAX];
+bool visited[MAX];
+
+int get_diff(){
+  int A_total = 0, B_total = 0;
+  for(int i=0;i<A.size();i++) A_total += arr[A[i]];
+  for(int i=0;i<B.size();i++) B_total += arr[B[i]];
+  return abs(A_total-B_total);
+}
+
+void make_vector(int idx){
+  bool ck[MAX] = {0};
+  memset(area, 0, sizeof(area));
+  A.clear();
+  B.clear();
+  
+  for(int i=0;i<idx;i++) ck[ans[i]] = true;
+  for(int i=0;i<N;i++){
+    if(ck[i]){
+      A.push_back(i);
+      area[i] = 1;
+    }
+    else{
+      B.push_back(i);
+      area[i] = 2;
+    }
+  }
+}
+
+bool check_connect(vector <int> v, int flag){
+  memset(visited, 0, sizeof(visited));
+  
+  if(v.size() == 1) return true;
+  
+  queue <int> q;
+  q.push(v[0]);
+  visited[v[0]] = true;
+  
+  while(!q.empty()){
+    int x = q.front();
+    q.pop();
+    
+    for(int i=0;i<connect[x].size();i++){
+      int next = connect[x][i];
+      if(!visited[next] && area[next] == flag){
+        visited[next] = true;
+        q.push(next);
+      }
+    }
+  }
+  for(int i=0;i<v.size();i++){
+    if(!visited[v[i]]) return false;
+  }
+  return true;
+}
+
+void comb(int idx, int val, int total){
+  if(idx >= total){
+    make_vector(idx);
+    if(check_connect(A, 1) && check_connect(B, 2)){
+      int diff = get_diff();
+      result = min(diff, result);
+    }
+  }
+  else{
+    for(int i=val;i<N;i++){
+      ans[idx] = i;
+      comb(idx+1, i+1, total);
+    }
+  }
+}
+int main(){
+  scanf("%d", &T);
+  for(int t=1;t<=T;t++){
+    scanf("%d", &N);
+    result = 987987987;
+    memset(arr, 0, sizeof(arr));
+    memset(ans, 0, sizeof(ans));
+    
+    for(int i=0;i<N;i++){
+      connect[i].clear();
+    }
+    for(int i=0;i<N;i++){
+      int cnt;
+      scanf("%d %d", &arr[i], &cnt);
+      for(int j=0;j<cnt;j++){
+        char a;
+        scanf(" %c", &a);
+        connect[i].push_back(a-'A');
+      }
+    }
+    for(int i=1;i<=N/2;i++){
+      comb(0, 0, i);
+    }
+    if(result == 987987987) printf("#%d -1\n", t);
+    else printf("#%d %d\n", t, result);
+  }
+  return 0;
+}
