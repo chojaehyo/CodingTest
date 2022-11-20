@@ -1,0 +1,89 @@
+#include <cstdio>
+#include <cstdlib>
+#include <queue>
+#include <cstring>
+using namespace std;
+const int MAX = 55;
+
+int T, N, M, X, Y;
+int arr[MAX][MAX];
+bool visited[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+bool check_connect(int a, int b){
+  visited[a][b] = true;
+  queue <pair<int,int>> q;
+  vector <pair<int,int>> uni;
+  q.push({a, b});
+  uni.push_back({a, b});
+  
+  while(!q.empty()){
+    int x = q.front().first;
+    int y = q.front().second;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
+      if(!visited[nx][ny]){
+        int diff = abs(arr[x][y]-arr[nx][ny]); 
+        if(diff >= X && diff <= Y){
+          visited[nx][ny] = true;
+          q.push({nx, ny});
+          uni.push_back({nx, ny});
+        }
+      }
+    }
+    
+  }
+  float total = 0;
+  int cnt = 0;
+  if(uni.size() == 1) return false;
+  else{
+    for(int i=0;i<uni.size();i++){
+      total += arr[uni[i].first][uni[i].second];
+      cnt++;
+    }
+    
+    int avg = total / cnt;
+    for(int i=0;i<uni.size();i++){
+      arr[uni[i].first][uni[i].second] = avg;
+    }
+    return true;
+  }
+}
+int main(){
+  scanf("%d", &T);
+  for(int t=1;t<=T;t++){
+    scanf("%d %d", &N, &M);
+    memset(arr, 0, sizeof(arr));
+    for(int i=0;i<N;i++){
+      for(int j=0;j<M;j++){
+        scanf("%d", &arr[i][j]);
+      }
+    }
+    scanf("%d %d", &X, &Y);
+    
+    int Time = 0;
+    while(1){
+      bool flag = false;
+      memset(visited, 0, sizeof(visited));
+      for(int i=0;i<N;i++){
+        for(int j=0;j<M;j++){
+          if(!visited[i][j]){
+            if(check_connect(i, j)){
+              flag = true;
+            }
+          }
+        }
+      }
+      if(!flag) break;
+      Time++;
+    }
+    printf("#%d %d\n", t, Time);
+  }
+  return 0;
+}
