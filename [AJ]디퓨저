@@ -1,0 +1,99 @@
+#include <cstdio>
+#include <queue>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 105;
+
+int T, N, M, K;
+int d_idx, result;
+int arr[MAX][MAX], ans[15], dist[MAX][MAX];
+struct INFO{
+  int x, y;
+};
+INFO diffuser[15];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+bool visited[MAX][MAX];
+
+bool check_zero(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      if(arr[i][j] == 0){
+        if(dist[i][j] == 0) return false;
+      }
+    }
+  }
+  return true;
+}
+int spread(){
+  queue <INFO> q;
+  for(int i=0;i<K;i++){
+    q.push({diffuser[ans[i]].x, diffuser[ans[i]].y});
+    visited[diffuser[ans[i]].x][diffuser[ans[i]].y] = true;
+  }
+  int max_dist = 0;
+  while(!q.empty()){
+    int x = q.front().x;
+    int y = q.front().y;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 0 || nx >= N || ny < 0 || ny >= M || arr[nx][ny] == 1) continue;
+      if(!visited[nx][ny]){
+        visited[nx][ny] = true;
+        dist[nx][ny] = dist[x][y] + 1;
+        if(max_dist < dist[nx][ny]) max_dist = dist[nx][ny];
+        q.push({nx, ny});
+      }
+    }
+  }
+  if(check_zero()) return max_dist;
+  else return -1;
+}
+void comb(int idx, int val){
+  if(idx >= K){
+    memset(dist, 0, sizeof(dist));
+    memset(visited, 0, sizeof(visited));
+    int res = spread();
+    if(res != -1) result = min(res, result);
+  }
+  else{
+    for(int i=val;i<d_idx;i++){
+      ans[idx] = i;
+      comb(idx+1, i+1);
+    }
+  }
+  
+}
+int main(){
+  scanf("%d", &T);
+  for(int t=1;t<=T;t++){
+    memset(arr, 0, sizeof(arr));
+    memset(diffuser, 0, sizeof(diffuser));
+    d_idx = 0;
+    result = 987987987;
+    int zero = 0;
+    scanf("%d %d %d", &N, &M, &K);
+    for(int i=0;i<N;i++){
+      for(int j=0;j<M;j++){
+        scanf("%d", &arr[i][j]);
+        if(arr[i][j] == 2) {
+          diffuser[d_idx++] = {i, j};
+        }
+        if(arr[i][j] == 0) zero++;
+      }
+    }
+    if(zero == 0) {
+      printf("#%d 0\n", t);
+      continue;
+    }
+    comb(0, 0);
+    if(result == 987987987) printf("#%d -1\n", t);
+    else printf("#%d %d\n", t, result);
+  }
+  return 0;
+}
