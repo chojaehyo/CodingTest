@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <cstring>
+const int MAX = 10005;
+
+int T, r, c, m;
+int data[105][105];
+int x[MAX], y[MAX], d[MAX], f[MAX], w[MAX];
+int dx[5] = {0, -1, 1, 0, 0};
+int dy[5] = {0, 0, 0, -1, 1};
+int next[5] = {0, 2, 1, 4, 3};
+
+int move(int cur, int dist, int max_size, int idx){
+  while(cur+dist < 1 || cur+dist > max_size){
+    d[idx] = next[d[idx]];
+    if(cur+dist < 1){
+      dist += cur-1;
+      cur = 1;
+      dist = -dist;
+    }
+    else if(cur+dist > max_size){
+      dist -= max_size-cur;
+      cur = max_size;
+      dist = -dist;
+    }
+  }
+  return cur+dist;
+}
+
+int search(int col){
+  int sum=0;
+  for(int i=r;i>=1;i--){
+    if(data[i][col] > 0){
+      sum += w[data[i][col]];
+      x[data[i][col]] = -1;
+      y[data[i][col]] = -1;
+      w[data[i][col]] = 0;
+      return sum;
+    }
+  }
+  return sum;
+}
+
+void compare(int pre, int cur){
+  if(w[pre] < w[cur]){
+    data[x[cur]][y[cur]] = cur;
+    x[pre] = -1;
+    y[pre] = -1;
+    w[pre] = 0;
+  }
+  else if(w[pre] > w[cur]){
+    x[cur] = -1;
+    y[cur] = -1;
+    w[cur] = 0;
+  }
+}
+
+int main() {
+  scanf("%d", &T);
+  for(int t=0;t<T;t++){
+    int total = 0;
+    memset(data, 0, sizeof(data));
+    scanf("%d %d %d", &r, &c, &m);
+    for(int i=1;i<=m;i++){
+      scanf("%d %d %d %d %d", &x[i], &y[i], &d[i], &f[i], &w[i]);
+      if(d[i] == 1 || d[i] == 2) f[i] %= 2*r-2;
+      else f[i] %= 2*c-2;
+    }
+    for(int i=1;i<=c;i++){
+      for(int j=1;j<=m;j++){
+        if(x[j] == -1 && y[j] == -1) continue;
+        x[j] = move(x[j], f[j]*dx[d[j]], r, j);
+        y[j] = move(y[j], f[j]*dy[d[j]], c, j);
+        
+        if(data[x[j]][y[j]] == 0) data[x[j]][y[j]] = j;
+        else compare(data[x[j]][y[j]], j);
+      }
+      total += search(i);
+      for(int j=1;j<=m;j++){
+        data[x[j]][y[j]] = 0;
+      }
+    }
+    printf("#%d %d\n", t+1, total);
+  }
+  return 0;
+}
