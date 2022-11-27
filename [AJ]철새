@@ -1,0 +1,162 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAX = 15;
+
+int T, n, k;
+int data[MAX][MAX][MAX], map[MAX][MAX], inx[MAX][MAX];
+int dx[4] = {0, 0, -1, 1};
+int dy[4] = {-1, 1, 0, 0};
+int x[MAX], y[MAX], d[MAX];
+int arrIdx, arr[MAX];
+
+void add1(int num, int Y, int X){
+  int idx = inx[Y][X];
+  for(int i=0;i<arrIdx;i++){
+    data[Y][X][idx+i] = arr[i];
+    inx[Y][X]++;
+  }
+}
+
+void add2(int num, int Y, int X){
+  int idx = inx[Y][X];
+  if(idx >= 1){
+    for(int i=idx-1;i>=0;i--){
+      data[Y][X][i+arrIdx] = data[Y][X][i];
+    }
+    for(int i=0;i<arrIdx;i++){
+      data[Y][X][i] = arr[i];
+      inx[Y][X]++;
+    }
+  }
+  else{
+    for(int i=0;i<arrIdx;i++){
+      data[Y][X][i] = arr[i];
+      inx[Y][X]++;
+    }
+  }
+}
+
+void move(int cur, int val, int dir){
+  if(dir == 0){
+    if(y[val]-1 < 0 || map[y[val]-1][x[val]] == 2){
+      if(y[val]-1 < 0 && map[y[val]+1][x[val]] == 2) return;
+      if(map[y[val]-1][x[val]] == 2 && map[y[val]+1][x[val]] == 2) return;
+      
+      y[val]++;
+      if(cur == val) d[val] = 1;
+    }
+    else y[val]--;
+  }
+     
+  else if(dir == 1){
+    if(y[val]+1 >= n || map[y[val]+1][x[val]] == 2){
+      if(y[val]+1 >= n && map[y[val]-1][x[val]] == 2) return;
+      if(map[y[val]+1][x[val]] == 2 && map[y[val]-1][x[val]] == 2) return;
+      y[val]--;
+      if(cur == val) d[val] = 0;
+    }
+    else y[val]++;
+  }
+  else if(dir == 2){
+    if(x[val]-1 < 0 || map[y[val]][x[val]-1] == 2){
+      if(x[val]-1 < 0 && map[y[val]][x[val]+1] == 2) return;
+      if(map[y[val]][x[val]-1] == 2 && map[y[val]][x[val]+1] == 2) return;
+      x[val]++;
+      if(cur == val) d[val] = 3;
+    }
+    else x[val]--;
+  }
+  else{
+    if(x[val]+1 >= n || map[y[val]][x[val]+1] == 2){
+      if(x[val]+1 >= n && map[y[val]][x[val]-1] == 2) return;
+      if(map[y[val]][x[val]-1] == 2 && map[y[val]][x[val]+1] == 2) return;
+      x[val]--;
+      if(cur == val) d[val] = 2;
+    }
+    else x[val]++;
+  }
+  arr[arrIdx] = val;
+  arrIdx++;
+}
+
+bool check(){
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      if(inx[y[i]][x[i]] >= 4) return true;
+    }
+  }
+  return false;
+}
+
+int main() {
+  scanf("%d", &T);
+  for(int t=0;t<T;t++){
+    int result=0;
+    memset(data, 0, sizeof(data));
+    memset(inx, 0, sizeof(inx));
+    memset(map, 0, sizeof(map));
+    
+    scanf("%d %d", &n, &k);
+    for(int i=0;i<n;i++){
+      for(int j=0;j<n;j++){
+        scanf("%d", &map[i][j]);
+      }
+    }
+    for(int i=0;i<k;i++){
+      scanf("%d %d %d", &y[i], &x[i], &d[i]);
+      int idx = inx[y[i]][x[i]];
+      data[y[i]][x[i]][idx] = i;
+      inx[y[i]][x[i]]++;
+    }
+    bool flag = false;
+    while(!flag){
+      if(result > 1000){
+        printf("#%d -1\n", t+1);
+        break;
+      }
+      for(int i=0;i<k;i++){
+        int xx = x[i];
+        int yy = y[i];
+        int dd = d[i];
+        int idx = inx[yy][xx];
+        if(idx > 1){
+          for(int j=0;j<idx;j++){
+            if(data[yy][xx][j] == i){
+              int tmp;
+              for(int p=j;p<idx;p++){
+                tmp = data[yy][xx][p];
+                move(i, tmp, dd);
+                if(yy != y[tmp] || xx != x[tmp]){
+                  data[yy][xx][p] = 0;
+                  inx[yy][xx]--;
+                }
+              }
+              if(map[y[i]][x[i]] == 1) add1(i, y[i], x[i]);
+              else add2(i, y[i], x[i]);
+              arrIdx=0;
+              memset(arr, 0, sizeof(arr));
+              break;
+            }
+          }
+        }
+        else {
+          data[yy][xx][idx-1] = 0;
+          inx[yy][xx]--;
+          move(i, i, dd);
+          if(map[y[i]][x[i]] == 1) add1(i, y[i], x[i]);
+          else add2(i, y[i], x[i]);
+          arrIdx=0;
+          memset(arr, 0, sizeof(arr));
+        }
+        flag = check();
+        if(flag == true) {
+          printf("#%d %d\n", t+1, result+1);
+          break;
+        }
+      }
+      result++;
+    }
+  }
+  return 0;
+}
