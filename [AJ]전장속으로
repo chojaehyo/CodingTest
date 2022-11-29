@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <queue>
+#include <vector>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAX = 25;
+
+int T, N, sx, sy, level, catch_num, Time;
+int arr[MAX][MAX];
+struct info{
+  int x, y, d;
+};
+bool visited[MAX][MAX];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+
+bool compare(info a, info b){
+  if(a.d < b.d) return true;
+  else if(a.d == b.d){
+    if(a.x < b.x) return true;
+    else if(a.x == b.x && a.y < b.y) return true;
+    return false;
+  }
+  return false;
+}
+
+bool move(int a, int b){
+  queue <info> q;
+  vector <info> v;
+  q.push({a, b, 0});
+  visited[a][b] = true;
+  
+  while(!q.empty()){
+    int x = q.front().x;
+    int y = q.front().y;
+    int d = q.front().d;
+    q.pop();
+    
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 0 || nx >= N || ny < 0 || ny >= N || arr[nx][ny] > level) continue;
+    
+      if(!visited[nx][ny]){
+        visited[nx][ny] = true;
+        if(arr[nx][ny] == 0) q.push({nx, ny, d+1});
+        else if(arr[nx][ny] > 0 && arr[nx][ny] < level){
+          v.push_back({nx, ny, d+1});
+        }
+        else if(arr[nx][ny] == level) q.push({nx, ny, d+1});
+      }
+    }
+  }
+  
+  sort(v.begin(), v.end(), compare);
+  
+  if(v.size() != 0){
+    int x = v[0].x;
+    int y = v[0].y;
+    int d = v[0].d;
+    arr[x][y] = 0;
+    catch_num++;
+    if(catch_num == level){
+      level++;
+      catch_num = 0;
+    }
+    sx = x, sy = y;
+    Time += d;
+    return true;
+  }
+  return false;
+}
+
+int main() {
+  scanf("%d", &T);
+  for(int t=1;t<=T;t++){
+    scanf("%d", &N);
+    level = 2, catch_num = 0, Time = 0;
+    memset(arr, 0, sizeof(arr));
+    memset(visited, 0, sizeof(visited));
+    
+    for(int i=0;i<N;i++){
+      for(int j=0;j<N;j++){
+        scanf("%d", &arr[i][j]);
+        if (arr[i][j] == 9) {
+          sx = i, sy = j;
+          arr[i][j] = 0;
+        }
+      }
+    }
+    while(1){
+      memset(visited, 0, sizeof(visited));
+      if(!move(sx, sy)) break;
+    }
+    printf("#%d %d\n", t, Time);
+  }
+  
+  return 0;
+}
