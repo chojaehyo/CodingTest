@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <cstring>
+#include <vector>
+using namespace std;
+const int MAX = 15;
+
+int T, N, M, result;
+int input[MAX][MAX], arr[MAX][MAX], ans[10];
+int dx[] = {-1, 0, 1, 0};
+int dy[] = {0, 1, 0, -1};
+struct info{
+  int x, y, num;
+};
+vector <info> v;
+
+void water(int x, int y, int d){
+  while(1){
+    int nx = x+dx[d];
+    int ny = y+dy[d];
+    
+    if(nx < 0 || nx >= N || ny < 0 || ny >= M || arr[nx][ny] == 6) break;
+    
+    arr[nx][ny] = 9;
+    x = nx, y = ny;
+  }
+}
+void clearn(){
+  for(int i=0;i<v.size();i++){
+    if(v[i].num == 1){
+      water(v[i].x, v[i].y, ans[i]);
+    }
+    else if(v[i].num == 2){
+      water(v[i].x, v[i].y, ans[i]);
+      water(v[i].x, v[i].y, (ans[i]+2)%4);
+    }
+    else if(v[i].num == 3){
+      water(v[i].x, v[i].y, ans[i]);
+      water(v[i].x, v[i].y, (ans[i]+1)%4);
+    }
+    else if(v[i].num == 4){
+      water(v[i].x, v[i].y, ans[i]);
+      water(v[i].x, v[i].y, (ans[i]+1)%4);
+      water(v[i].x, v[i].y, (ans[i]+3)%4);
+    }
+    else{
+      water(v[i].x, v[i].y, ans[i]);
+      water(v[i].x, v[i].y, (ans[i]+1)%4);
+      water(v[i].x, v[i].y, (ans[i]+2)%4);
+      water(v[i].x, v[i].y, (ans[i]+3)%4);
+    }
+  }
+}
+
+void count_zero(){
+  int res = 0;
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      if(arr[i][j] == 0) res++;
+    }
+  }
+  if(res < result) result = res;
+}
+
+void reset_arr(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      arr[i][j] = input[i][j];
+    }
+  }
+}
+void print_arr(){
+  for(int i=0;i<N;i++){
+    for(int j=0;j<M;j++){
+      printf("%d ", arr[i][j]);
+    }printf("\n");
+  }printf("\n");
+}
+
+void comb(int idx, int total){
+  if(idx >= total){
+    reset_arr();
+    clearn();
+    count_zero();
+    return;
+  }
+  else{
+    for(int i=0;i<4;i++){
+      ans[idx] = i;
+      comb(idx+1, total);
+    }
+  }
+}
+int main() {
+  scanf("%d", &T);
+  for(int t=1;t<=T;t++){
+    scanf("%d %d", &N, &M);
+    result = 987987987;
+    memset(arr, 0, sizeof(arr));
+    memset(ans, 0, sizeof(ans));
+    memset(input, 0, sizeof(input));
+    v.clear();
+    int cnt = 0;
+    
+    for(int i=0;i<N;i++){
+      for(int j=0;j<M;j++){
+        scanf("%d", &input[i][j]);
+        if(input[i][j] >= 1 && input[i][j] <= 5) {
+          v.push_back({i, j, input[i][j]});
+          cnt++;
+        }
+      }
+    }
+    comb(0, cnt);
+    printf("#%d %d\n", t, result);
+  }
+  return 0;
+}
