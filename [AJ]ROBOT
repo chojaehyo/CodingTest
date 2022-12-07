@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <queue>
+using namespace std;
+const int MAX = 105;
+
+int M, N, Dx, Dy, Dd, result;
+int arr[MAX][MAX];
+int dx[4] = {0, 0, 1, -1};
+int dy[4] = {1, -1, 0, 0};
+int nd1[4] = {2, 3, 0, 1};
+int nd2[4] = {3, 2, 1, 0};
+
+bool visited[MAX][MAX][5];
+struct info{
+  int x, y, d, count;
+};
+
+void get_result(int a, int b, int dir, int cnt){
+  queue <info> q;
+  q.push({a, b, dir, cnt});
+  visited[a][b][dir] = true;
+  
+  while(!q.empty()){
+    int x = q.front().x;
+    int y = q.front().y;
+    int d = q.front().d;
+    int count = q.front().count;
+    q.pop();
+    
+    if(x == Dx && y == Dy && d == Dd) {
+      result = count;
+      return;
+    }
+    for(int i=1;i<=3;i++){
+      int nx = x+dx[d]*i;
+      int ny = y+dy[d]*i;
+      
+      if(nx < 1 || nx > M || ny < 1 || ny > N || arr[nx][ny] == 1) break;
+      
+      if(!visited[nx][ny][d]) {
+        visited[nx][ny][d] = true;
+        q.push({nx, ny, d, count+1});
+      }
+    }
+
+    if(!visited[x][y][nd1[d]]) {
+      visited[x][y][nd1[d]] = true;
+      q.push({x, y, nd1[d], count+1});
+    }
+    if(!visited[x][y][nd2[d]]) {
+      visited[x][y][nd2[d]] = true;
+      q.push({x, y, nd2[d], count+1});
+    }
+  }
+}
+
+int main() {
+  scanf("%d %d", &M, &N);
+  for(int i=1;i<=M;i++){
+    for(int j=1;j<=N;j++){
+      scanf("%d", &arr[i][j]);
+    }
+  }
+  int sx, sy, sd;
+  scanf("%d %d %d", &sx, &sy, &sd);
+  sd--;
+  scanf("%d %d %d", &Dx, &Dy, &Dd);
+  Dd--;
+  
+  get_result(sx, sy, sd, 0);
+  printf("%d\n", result);
+  return 0;
+}
