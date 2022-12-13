@@ -1,0 +1,69 @@
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <queue>
+using namespace std;
+const int MAX = 1005;
+
+int n, m, q_cnt;
+int data[MAX][MAX];
+int visited[MAX][MAX];
+int store[10];
+struct pos{
+  int x, y;
+};
+int dx[4] = {-1, 0, 1, 0};
+int dy[4] = {0, 1, 0, -1};
+
+void get_result(int a, int b, int val){
+  int s_num=0;
+  visited[a][b] = val;
+  queue <pos> q;
+  q.push({a, b});
+  if(store[data[a][b]] == -1) {
+    store[data[a][b]] = 0;
+    s_num++;
+  }
+  while(!q.empty()){
+    int x = q.front().x;
+    int y = q.front().y;
+    q.pop();
+    for(int i=0;i<4;i++){
+      int nx = x+dx[i];
+      int ny = y+dy[i];
+      
+      if(nx < 1 || nx > n || ny < 1 || ny > m) continue;
+      
+      if(visited[nx][ny]<val){
+        if(store[data[nx][ny]] == -1) {
+          store[data[nx][ny]] = abs(nx-a)+abs(ny-b);
+          s_num++;
+          if(s_num == 10) return;
+        }
+        visited[nx][ny] = val;
+        q.push({nx, ny});
+      }
+    }
+  }
+}
+int main() {
+  scanf("%d %d", &n, &m);
+  for(int i=1;i<=n;i++){
+    for(int j=1;j<=m;j++){
+      scanf("%1d", &data[i][j]);
+    }
+  }
+  scanf("%d", &q_cnt);
+  for(int i=0;i<q_cnt;i++){
+    int x, y, k, q[15];
+    scanf("%d %d %d", &x, &y, &k);
+    for(int j=0;j<k;j++){
+      scanf("%1d", &q[j]);
+    }
+    memset(store, -1, sizeof(store));
+    get_result(x, y, i+1);
+    for(int j=0;j<k;j++) printf("%d ", store[q[j]]);
+    printf("\n");
+  }
+  return 0;
+}
